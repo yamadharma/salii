@@ -231,7 +231,6 @@ include $(TOPDIR)/make.d/lvm.rul
 include $(TOPDIR)/make.d/mdadm.rul
 include $(TOPDIR)/make.d/openssh.rul
 include $(TOPDIR)/make.d/openssl.rul
-include $(TOPDIR)/make.d/parted.rul
 include $(TOPDIR)/make.d/pdisk.rul
 include $(TOPDIR)/make.d/popt.rul
 include $(TOPDIR)/make.d/reiserfsprogs.rul
