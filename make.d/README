@@ -1,0 +1,8 @@
+#
+# $Id: README 3424 2006-02-27 21:05:00Z finley $
+#  vi:set filetype=text et tw=72:
+#
+
+After dropping a new .rul file in here, be sure that you also 
+explicitly include it in the top level Makefile.
+

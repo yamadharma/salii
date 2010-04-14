@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# $Id: 99all.harmless_example_script 2783 2004-06-01 22:08:19Z brianfinley $
+#
+
+echo 
+echo "I live in /var/lib/systemimager/scripts/post-install."
+echo "See: /var/lib/systemimager/scripts/post-install/README for details."
+echo 
+

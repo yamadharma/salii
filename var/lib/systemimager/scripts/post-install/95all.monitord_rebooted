@@ -1,0 +1,105 @@
+#!/bin/bash
+#
+# Description: report the rebooted status to the monitor server.
+#
+
+# netcat timeout in seconds
+TIMEOUT=30
+
+write_monitor_msg() {
+    if [ -z $MONITOR_SERVER ]; then
+        return
+    fi
+    if [ -z $MONITOR_PORT ]; then
+        MONITOR_PORT=8181
+    fi
+
+    msg=`echo "$@"`
+
+    # Get the client mac address.
+    if [ -z "$mac" ]; then
+        mac=`ifconfig $DEVICE 2>/dev/null | sed -ne "s/.*HWaddr //p" | sed "s/ //g" | sed s/:/./g`
+    fi
+
+    # Report the message to the monitor server.
+    send_msg=`echo "mac=$mac:ip=$IPADDR:host=$HOSTNAME:$msg"`
+
+    # Find netcat binary
+    netcat=`(type -p netcat || type -p nc) 2>/dev/null`
+    [ -z $netcat ] && return
+
+    # Create /etc/systemimager if it doesn't exist.
+    if [ ! -d /etc/systemimager ]; then
+        mkdir -p /etc/systemimager
+    fi
+
+    rebooted_state_file=/etc/systemimager/si_monitor.client.rebooted
+    cat << EOF > $rebooted_state_file
+#!/bin/bash
+(echo "$send_msg" | $netcat -w $TIMEOUT $MONITOR_SERVER $MONITOR_PORT) && >$rebooted_state_file
+EOF
+    chmod 700 $rebooted_state_file
+
+    if [ -f /etc/SuSE-release ]; then
+        # SuSE
+        rc_local=/etc/init.d/after.local
+        grep -q $rebooted_state_file $rc_local 2>/dev/null || echo $rebooted_state_file >> $rc_local
+    elif [ -f /etc/redhat-release ]; then
+        # RedHat / Fedora
+        if [ -e /etc/rc.d/rc.local ]; then
+            rc_local=/etc/rc.d/rc.local
+        else
+            rc_local=/etc/rc.local
+        fi
+        grep -q $rebooted_state_file $rc_local 2>/dev/null || echo $rebooted_state_file >> $rc_local
+    elif [ -f /etc/debian_version ]; then
+        # Debian
+        init_d_file=/etc/init.d/systemimager-monitor-firstboot
+	cat << EOF > $init_d_file
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides: systemimager-monitor-firstboot
+# Required-Start: $network $local_fs $syslog
+# Required-Stop:
+# Default-Start:  3 5
+# Default-Stop:
+# Short-Description: Report the REBOOTED state to the image server
+# Description: Send the informations to the si_monitor daemon on the image
+#              to set the REBOOTED state for this correctly installed client.
+### END INIT INFO
+
+set -e
+
+case "\$1" in
+  start)
+        $rebooted_state_file
+        ;;
+  stop|reload|restart|force-reload)
+        ;;
+  *)
+        exit 1
+        ;;
+esac
+exit 0
+EOF
+        chmod a+x $init_d_file
+        if [ ! -e /etc/rcS.d/S99systemimager-monitor-firstboot ]; then
+            ln -s $init_d_file /etc/rcS.d/S99systemimager-monitor-firstboot
+        fi
+    else
+        # Unknown distribution... try with standard rc.local.
+        if [ -e /etc/rc.d/rc.local ]; then
+            rc_local=/etc/rc.d/rc.local
+        else
+            rc_local=/etc/rc.local
+        fi
+        grep -q $rebooted_state_file $rc_local 2>/dev/null || echo $rebooted_state_file >> $rc_local
+    fi
+}
+
+# Load installation variables.
+[ -e /tmp/post-install/variables.txt ] && . /tmp/post-install/variables.txt
+
+# Write commands to send status and final message to the monitord.
+write_monitor_msg "status=102:speed=0"
+
