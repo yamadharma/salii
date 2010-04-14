@@ -69,7 +69,6 @@ include $(INITRD_DIR)/make.d/lsb.rul
 include $(INITRD_DIR)/make.d/rsync.rul
 include $(INITRD_DIR)/make.d/sysvinit.rul
 include $(INITRD_DIR)/make.d/udev.rul
-include $(INITRD_DIR)/make.d/udpcast.rul
 
 PHONY += build_dir 
 build_dir:	$(INITRD_BUILD_DIR).build
@@ -126,12 +125,8 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(HOTPLUG_DIR).install	\
 								$(RSYNC_DIR).install		\
 								$(BITTORRENT_DIR).install 	\
-								$(CX_FREEZE_BINARY) 		\
-								$(UDPCAST_BINARY)
+								$(CX_FREEZE_BINARY) 		
 								
-
-	# Copy over other binaries.
-	cp -a $(UDPCAST_BINARY)    	        $(INITRD_BUILD_DIR)/bin
 
 	# Copy over the standard libs. -BEF-
 	cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
@@ -239,8 +234,7 @@ initrd_get_source:	$(INITRD_SRC_DIR)/$(BUSYBOX_TARBALL) \
 			$(INITRD_SRC_DIR)/$(DHCLIENT_TARBALL) \
 			$(INITRD_SRC_DIR)/$(MODUTILS_TARBALL) \
 			$(INITRD_SRC_DIR)/$(MODULE_INIT_TOOLS_TARBALL) \
-			$(INITRD_SRC_DIR)/$(RSYNC_TARBALL) \
-			$(INITRD_SRC_DIR)/$(UDPCAST_TARBALL)
+			$(INITRD_SRC_DIR)/$(RSYNC_TARBALL) 
 
 PHONY += build_dir_clean
 build_dir_clean:
