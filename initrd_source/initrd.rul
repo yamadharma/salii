@@ -69,13 +69,14 @@ include $(INITRD_DIR)/make.d/lsb.rul
 include $(INITRD_DIR)/make.d/rsync.rul
 include $(INITRD_DIR)/make.d/sysvinit.rul
 include $(INITRD_DIR)/make.d/udev.rul
-include $(INITRD_DIR)/make.d/mdadm.rul
 
 ## BOEL BINARIES
 #
 include $(INITRD_DIR)/make.d/bc.rul
 include $(INITRD_DIR)/make.d/e2fsprogs.rul
 include $(INITRD_DIR)/make.d/parted.rul
+include $(INITRD_DIR)/make.d/mdadm.rul
+include $(INITRD_DIR)/make.d/reiserfsprogs.rul
 
 PHONY += build_dir 
 build_dir:	$(INITRD_BUILD_DIR).build
@@ -138,7 +139,9 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(MKE2FS_BINARY) 		\
 								$(TUNE2FS_BINARY) 		\
 								$(PARTED_BINARY) 		\
-								$(MDADM_BINARIES)
+								$(MDADM_BINARIES) 		\
+								$(MKREISERFS_BINARY) 		\
+								$(REISERFSTUNE_BINARY)
 								
 
 	# Copy over the standard libs. -BEF-
@@ -175,11 +178,13 @@ endif
 	install -m 644 $(LSB_DIR)/init-functions $(INITRD_BUILD_DIR)/lib/lsb
 
 	# Install manually the binaries
-	install -m 755 --strip $(BC_BINARY)         $(INITRD_BUILD_DIR)/bin/
-	install -m 755 --strip $(MKE2FS_BINARY)     $(INITRD_BUILD_DIR)/sbin/
-	install -m 755 --strip $(TUNE2FS_BINARY)    $(INITRD_BUILD_DIR)/sbin/
-	install -m 755 --strip $(PARTED_BINARY)     $(INITRD_BUILD_DIR)/sbin/
-	install -m 755 --strip $(MDADM_BINARIES)    $(INITRD_BUILD_DIR)/sbin/
+	install -m 755 --strip $(BC_BINARY)         	$(INITRD_BUILD_DIR)/bin/
+	install -m 755 --strip $(MKE2FS_BINARY)     	$(INITRD_BUILD_DIR)/sbin/
+	install -m 755 --strip $(TUNE2FS_BINARY)    	$(INITRD_BUILD_DIR)/sbin/
+	install -m 755 --strip $(PARTED_BINARY)     	$(INITRD_BUILD_DIR)/sbin/
+	install -m 755 --strip $(MDADM_BINARIES)    	$(INITRD_BUILD_DIR)/sbin/
+	install -m 755 --strip $(MKREISERFS_BINARY)     $(INITRD_BUILD_DIR)/sbin/mkreiserfs
+	install -m 755 --strip $(REISERFSTUNE_BINARY)   $(INITRD_BUILD_DIR)/sbin/reiserfstune
 
 	# Copy over text files from the skel directory.
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)

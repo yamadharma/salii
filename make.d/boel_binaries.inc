@@ -20,26 +20,26 @@ PHONY += boel_binaries_tarball
 boel_binaries_tarball:	$(BOEL_BINARIES_TARBALL)
 
 
-$(BOEL_BINARIES_TARBALL):	$(BC_DIR).build \
-				$(TAR_DIR).build \
-				$(GZIP_BINARY) \
-				$(DISCOVER_DIR).build \
-				$(DISCOVER_DATA_DIR).build \
-				$(KEXEC_BINARY) \
-				$(HFSUTILS_BINARY) \
-				$(DOSFSTOOLS_DIR).build \
-				$(MKE2FS_BINARY) \
-				$(TUNE2FS_BINARY) \
-				$(PARTED_BINARY) \
-				$(UTIL_LINUX_DIR).build \
-				$(MDADM_BINARIES) \
-				$(MKREISERFS_BINARY) \
-				$(REISERFSTUNE_BINARY) \
+$(BOEL_BINARIES_TARBALL):	# $(BC_DIR).build \
+				# $(TAR_DIR).build \
+				# $(GZIP_BINARY) \
+				# $(DISCOVER_DIR).build \
+				# $(DISCOVER_DATA_DIR).build \
+				# $(KEXEC_BINARY) \
+				# $(HFSUTILS_BINARY) \
+				# $(DOSFSTOOLS_DIR).build \
+				# $(MKE2FS_BINARY) \
+				# $(TUNE2FS_BINARY) \
+				# $(PARTED_BINARY) \
+				# $(UTIL_LINUX_DIR).build \
+				# $(MDADM_BINARIES) \
+				# $(MKREISERFS_BINARY) \
+				# $(REISERFSTUNE_BINARY) \
 				$(MKJFS_BINARY) \
 				$(JFS_TUNE_BINARY) \
 				$(MKXFS_BINARY) \
 				$(XFS_DB_BINARY) \
-				$(CTCS_BINARY) \
+				# $(CTCS_BINARY) \
 				$(OPENSSH_SBINARIES) \
 				$(OPENSSH_BINARIES) \
 				$(OPENSSH_CONF_FILES) \

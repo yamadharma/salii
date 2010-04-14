@@ -228,12 +228,10 @@ include $(TOPDIR)/make.d/jfsutils.rul
 include $(TOPDIR)/make.d/kernel.rul
 include $(TOPDIR)/make.d/kexec.rul
 include $(TOPDIR)/make.d/lvm.rul
-include $(TOPDIR)/make.d/mdadm.rul
 include $(TOPDIR)/make.d/openssh.rul
 include $(TOPDIR)/make.d/openssl.rul
 include $(TOPDIR)/make.d/pdisk.rul
 include $(TOPDIR)/make.d/popt.rul
-include $(TOPDIR)/make.d/reiserfsprogs.rul
 include $(TOPDIR)/make.d/tar.rul
 include $(TOPDIR)/make.d/util-linux.rul
 include $(TOPDIR)/make.d/xfsprogs.rul
