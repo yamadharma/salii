@@ -70,6 +70,10 @@ include $(INITRD_DIR)/make.d/rsync.rul
 include $(INITRD_DIR)/make.d/sysvinit.rul
 include $(INITRD_DIR)/make.d/udev.rul
 
+## BOEL BINARIES
+#
+include $(INITRD_DIR)/make.d/bc.rul
+
 PHONY += build_dir 
 build_dir:	$(INITRD_BUILD_DIR).build
 
@@ -125,7 +129,8 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(HOTPLUG_DIR).install	\
 								$(RSYNC_DIR).install		\
 								$(BITTORRENT_DIR).install 	\
-								$(CX_FREEZE_BINARY) 		
+								$(CX_FREEZE_BINARY) 		\
+								$(BC_DIR).build
 								
 
 	# Copy over the standard libs. -BEF-
