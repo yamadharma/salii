@@ -222,7 +222,6 @@ include $(TOPDIR)/make.d/ctcs.rul
 include $(TOPDIR)/make.d/discover-data.rul
 include $(TOPDIR)/make.d/discover.rul
 include $(TOPDIR)/make.d/dosfstools.rul
-include $(TOPDIR)/make.d/e2fsprogs.rul
 include $(TOPDIR)/make.d/gzip.rul
 include $(TOPDIR)/make.d/hfsutils.rul
 include $(TOPDIR)/make.d/jfsutils.rul

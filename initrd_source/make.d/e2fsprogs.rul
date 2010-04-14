@@ -1,0 +1,40 @@
+#
+# $Id: e2fsprogs.rul 4344 2007-11-24 16:40:35Z arighi $
+#
+E2FSPROGS_VERSION := 1.41.11
+E2FSPROGS_DIR := e2fsprogs-$(E2FSPROGS_VERSION)
+E2FSPROGS_TARBALL := e2fsprogs-$(E2FSPROGS_VERSION).tar.gz
+#E2FSPROGS_URL :=  http://download.systemimager.org/pub/e2fsprogs/$(E2FSPROGS_TARBALL)
+E2FSPROGS_URL :=  http://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/$(E2FSPROGS_VERSION)/$(E2FSPROGS_TARBALL)?use_mirror=garr
+
+## Disabled
+#E2FSPROGS_PATCH := $(PATCH_DIR)/e2fsprogs.patch
+
+MKE2FS_BINARY := $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/misc/mke2fs 
+TUNE2FS_BINARY := $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/misc/tune2fs 
+
+ALL_SOURCE += $(INITRD_SRC_DIR)/$(E2FSPROGS_TARBALL)
+
+ifdef IS_PPC64
+	E2FSPROGS_CONFIGURE = --host=ppc-unknown-linux
+endif
+E2FSPROGS_CONFIGURE := $(E2FSPROGS_CONFIGURE) --enable-elf-shlibs
+
+# build  e2fsprogs binaries
+PHONY += e2fsprogs
+e2fsprogs:	$(TUNE2FS_BINARY) $(MKE2FS_BINARY)
+
+$(TUNE2FS_BINARY) $(MKE2FS_BINARY):	$(INITRD_SRC_DIR)/$(E2FSPROGS_TARBALL)
+	[ -d $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR) ] || ( cd $(INITRD_SRC_DIR) && tar -xvzf $(E2FSPROGS_TARBALL) )
+	chmod -R u+rw $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)
+	( cd $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR) && chmod +x ./configure && ./configure  $(E2FSPROGS_CONFIGURE) )
+	$(MAKE) -j $(NCPUS) -C $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)
+
+# download the e2fsprogs tarball
+$(INITRD_SRC_DIR)/$(E2FSPROGS_TARBALL):
+	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
+	$(GETSOURCE) $(E2FSPROGS_URL) $(INITRD_SRC_DIR)
+
+PHONY += e2fsprogs_clean
+e2fsprogs_clean:
+	rm -rf $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)
