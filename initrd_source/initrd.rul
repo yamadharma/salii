@@ -69,6 +69,7 @@ include $(INITRD_DIR)/make.d/lsb.rul
 include $(INITRD_DIR)/make.d/rsync.rul
 include $(INITRD_DIR)/make.d/sysvinit.rul
 include $(INITRD_DIR)/make.d/udev.rul
+include $(INITRD_DIR)/make.d/mdadm.rul
 
 ## BOEL BINARIES
 #
@@ -136,7 +137,8 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(BC_DIR).build 		\
 								$(MKE2FS_BINARY) 		\
 								$(TUNE2FS_BINARY) 		\
-								$(PARTED_BINARY)
+								$(PARTED_BINARY) 		\
+								$(MDADM_BINARIES)
 								
 
 	# Copy over the standard libs. -BEF-
@@ -177,6 +179,7 @@ endif
 	install -m 755 --strip $(MKE2FS_BINARY)     $(INITRD_BUILD_DIR)/sbin/
 	install -m 755 --strip $(TUNE2FS_BINARY)    $(INITRD_BUILD_DIR)/sbin/
 	install -m 755 --strip $(PARTED_BINARY)     $(INITRD_BUILD_DIR)/sbin/
+	install -m 755 --strip $(MDADM_BINARIES)    $(INITRD_BUILD_DIR)/sbin/
 
 	# Copy over text files from the skel directory.
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
