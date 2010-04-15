@@ -16,6 +16,17 @@ ALL_SOURCE += $(INITRD_SRC_DIR)/$(LSB_TARBALL)
 PHONY += lsb
 lsb:	$(LSB_DIR).build
 
+$(LSB_DIR).build:  $(LSB_DIR).unpack
+	# nothing to do here
+	touch $@
+
+PHONY += lsb_install
+lsb_install: 	$(LSB_DIR).install
+
+$(LSB_DIR).install: $(LSB_DIR).build $(INITRD_BUILD_DIR).prep
+	install -m 755 -d $(INITRD_BUILD_DIR)/lib/lsb
+	install -m 644 $(LSB_DIR)/init-functions $(INITRD_BUILD_DIR)/lib/lsb
+
 $(LSB_DIR).unpack: 	$(INITRD_DIR)/make.d/lsb.rul \
 					$(INITRD_SRC_DIR)/$(LSB_TARBALL) \
 					$(LSB_PATCHES)
@@ -24,9 +35,6 @@ $(LSB_DIR).unpack: 	$(INITRD_DIR)/make.d/lsb.rul \
 	cd $(LSB_DIR) && cat $(LSB_PATCHES) < /dev/null | patch -p1
 	touch $@
 
-$(LSB_DIR).build:  $(LSB_DIR).unpack
-	# nothing to do here
-	touch $@
 
 $(INITRD_SRC_DIR)/$(LSB_TARBALL):
 	mkdir -p $(INITRD_SRC_DIR)

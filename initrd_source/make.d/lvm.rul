@@ -1,0 +1,46 @@
+#
+#	$Id: lvm.rul 4473 2009-10-20 18:34:07Z bli $
+#    vi: set filetype=make:
+#
+#	2007-02-10 Bernard Li
+#	- LVM 2.2.02.18 provides --with-dmdir in ./configure script
+#	2005-01-12 Andrea Righi
+#   	- provided patch for lvm support
+#	2005.07.12 Brian Elliott Finley; patch from Erich Focht
+#	- updates devmapper to 1.01.02
+#	- creates the symbolic link libdevmapper.so.1.01 which is required when
+#	  running mklibs (for tmp/boel_binaries/lib*). Without this patch the build
+#	  fails except one builds on a system where libdevmapper of the same version
+#	  is installed. But this is not why we build devmapper, after all...
+#
+
+
+LVM_VERSION	:= 2.2.02.63
+LVM_DIR		:= LVM$(LVM_VERSION)
+LVM_TARBALL	:= LVM$(LVM_VERSION).tgz
+LVM_URL	:= ftp://sources.redhat.com/pub/lvm2/$(LVM_TARBALL)
+#LVM_URL		:= http://download.systemimager.org/pub/lvm/$(LVM_TARBALL)
+LVM_BINARY	:= $(INITRD_SRC_DIR)/$(LVM_DIR)/tools/lvm
+
+## Disabled
+#LVM_PATCHES	:= $(shell ls $(PATCH_DIR)/lvm.*.patch 2>/dev/null | sort)
+
+PHONY += lvm
+lvm:	$(LVM_BINARY)
+$(LVM_BINARY):	$(INITRD_SRC_DIR)/$(LVM_TARBALL)
+	rm -rf $(INITRD_SRC_DIR)/$(LVM_DIR)
+	cd $(INITRD_SRC_DIR) && tar -xvzf $(LVM_TARBALL)
+	cd $(INITRD_SRC_DIR)/$(LVM_DIR) && \
+		./configure --prefix=/usr --disable-nls --with-optimisation=-Os
+	cd $(INITRD_SRC_DIR)/$(LVM_DIR) 
+	$(MAKE) -j $(NCPUS) -C $(INITRD_SRC_DIR)/$(LVM_DIR)
+
+$(INITRD_SRC_DIR)/$(LVM_TARBALL):
+	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
+	$(GETSOURCE) $(LVM_URL) $(INITRD_SRC_DIR)
+
+ALL_SOURCE += $(INITRD_SRC_DIR)/$(LVM_TARBALL)
+
+PHONY += lvm_clean
+lvm_clean:
+	rm -rf $(INITRD_SRC_DIR)/$(LVM_DIR)
