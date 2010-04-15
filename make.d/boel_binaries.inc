@@ -35,14 +35,17 @@ $(BOEL_BINARIES_TARBALL):	# $(BC_DIR).build \
 				# $(MDADM_BINARIES) \
 				# $(MKREISERFS_BINARY) \
 				# $(REISERFSTUNE_BINARY) \
-				$(MKJFS_BINARY) \
-				$(JFS_TUNE_BINARY) \
-				$(MKXFS_BINARY) \
-				$(XFS_DB_BINARY) \
+
+				# $(MKJFS_BINARY) \
+				# $(JFS_TUNE_BINARY) \
+
+				# $(MKXFS_BINARY) \
+				# $(XFS_DB_BINARY) \
+
 				# $(CTCS_BINARY) \
-				$(OPENSSH_SBINARIES) \
-				$(OPENSSH_BINARIES) \
-				$(OPENSSH_CONF_FILES) \
+				# $(OPENSSH_SBINARIES) \
+				# $(OPENSSH_BINARIES) \
+				# $(OPENSSH_CONF_FILES) \
 				$(LVM_BINARY) \
 				$(SRC_DIR)/modules_build-stamp
 	#

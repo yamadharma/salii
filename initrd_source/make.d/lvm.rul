@@ -16,7 +16,7 @@
 
 
 LVM_VERSION	:= 2.2.02.63
-LVM_DIR		:= LVM$(LVM_VERSION)
+LVM_DIR		:= $(INITRD_SRC_DIR)/LVM$(LVM_VERSION)
 LVM_TARBALL	:= LVM$(LVM_VERSION).tgz
 LVM_URL	:= ftp://sources.redhat.com/pub/lvm2/$(LVM_TARBALL)
 #LVM_URL		:= http://download.systemimager.org/pub/lvm/$(LVM_TARBALL)
@@ -26,14 +26,21 @@ LVM_BINARY	:= $(INITRD_SRC_DIR)/$(LVM_DIR)/tools/lvm
 #LVM_PATCHES	:= $(shell ls $(PATCH_DIR)/lvm.*.patch 2>/dev/null | sort)
 
 PHONY += lvm
-lvm:	$(LVM_BINARY)
-$(LVM_BINARY):	$(INITRD_SRC_DIR)/$(LVM_TARBALL)
-	rm -rf $(INITRD_SRC_DIR)/$(LVM_DIR)
+lvm:	$(LVM_DIR).build
+
+$(LVM_DIR).build:	$(INITRD_SRC_DIR)/$(LVM_TARBALL)
+	rm -rf $(LVM_DIR)
 	cd $(INITRD_SRC_DIR) && tar -xvzf $(LVM_TARBALL)
-	cd $(INITRD_SRC_DIR)/$(LVM_DIR) && \
-		./configure --prefix=/usr --disable-nls --with-optimisation=-Os
-	cd $(INITRD_SRC_DIR)/$(LVM_DIR) 
-	$(MAKE) -j $(NCPUS) -C $(INITRD_SRC_DIR)/$(LVM_DIR)
+	cd $(LVM_DIR) && \
+		./configure --prefix=$(INITRD_BUILD_DIR)/usr --disable-nls --with-optimisation=-Os
+	cd $(LVM_DIR) 
+	$(MAKE) -j $(NCPUS) -C $(LVM_DIR)
+
+PHONY += lvm_install
+lvm_install: $(LVM_DIR).install
+
+$(LVM_DIR).install: $(LVM_DIR).build
+	$(MAKE) -j $(NCPUS) -C $(LVM_DIR) install
 
 $(INITRD_SRC_DIR)/$(LVM_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)

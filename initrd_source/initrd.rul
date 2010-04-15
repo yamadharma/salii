@@ -79,10 +79,10 @@ include $(INITRD_MAKE_DIR)/parted.rul
 include $(INITRD_MAKE_DIR)/mdadm.rul
 include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
 include $(INITRD_MAKE_DIR)/xfsprogs.rul
-#include $(INITRD_DIR)/make.d/jfsutils.rul
+include $(INITRD_MAKE_DIR)/jfsutils.rul
 #include $(INITRD_DIR)/make.d/openssh.rul
 #include $(INITRD_DIR)/make.d/openssl.rul
-#include $(INITRD_DIR)/make.d/lvm.rul
+include $(INITRD_MAKE_DIR)/lvm.rul
 
 PHONY += build_dir 
 build_dir:	$(INITRD_BUILD_DIR).build
@@ -134,6 +134,8 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(MDADM_DIR).install 		\
 								$(REISERFSPROGS_DIR).install	\
 								$(XFSPROGS_DIR).install		\
+								$(JFSUTILS_DIR).install		\
+								$(LVM_DIR).install		\
 								$(BITTORRENT_DIR).install 	\
 								$(CX_FREEZE_BINARY) 		#Bittorrent needs this to install!
 
