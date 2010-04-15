@@ -77,7 +77,7 @@ include $(INITRD_MAKE_DIR)/bc.rul
 include $(INITRD_MAKE_DIR)/e2fsprogs.rul
 include $(INITRD_MAKE_DIR)/parted.rul
 include $(INITRD_MAKE_DIR)/mdadm.rul
-#include $(INITRD_DIR)/make.d/reiserfsprogs.rul
+include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
 #include $(INITRD_DIR)/make.d/xfsprogs.rul
 #include $(INITRD_DIR)/make.d/jfsutils.rul
 #include $(INITRD_DIR)/make.d/openssh.rul
@@ -132,6 +132,7 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(E2FSPROGS_DIR).install 	\
 								$(PARTED_DIR).install 		\
 								$(MDADM_DIR).install 		\
+								$(REISERFSPROGS_DIR).install	\
 								$(BITTORRENT_DIR).install 	\
 								$(CX_FREEZE_BINARY) 		#Bittorrent needs this to install!
 
