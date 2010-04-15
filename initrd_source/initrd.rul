@@ -59,20 +59,19 @@ SKEL_FILES = $(shell find $(INITRD_DIR)/skel \
 #
 # Order is relevant for certain components, so re-order as is appropriate. -BEF-
 #
+include $(INITRD_MAKE_DIR)/cx_freeze.rul
 include $(INITRD_MAKE_DIR)/busybox.rul
-#include $(INITRD_MAKE_DIR)/lsb.rul
-include $(INITRD_DIR)/make.d/cx_freeze.rul
-#include $(INITRD_DIR)/make.d/bittorrent.rul
-#include $(INITRD_DIR)/make.d/dhclient.rul
-#include $(INITRD_DIR)/make.d/hotplug.rul
-#include $(INITRD_DIR)/make.d/rsync.rul
-#include $(INITRD_DIR)/make.d/sysvinit.rul
-#include $(INITRD_DIR)/make.d/udev.rul
+include $(INITRD_MAKE_DIR)/lsb.rul
+include $(INITRD_DIR)/make.d/bittorrent.rul
+include $(INITRD_MAKE_DIR)/hotplug.rul
+include $(INITRD_MAKE_DIR)/rsync.rul
+include $(INITRD_MAKE_DIR)/sysvinit.rul
+include $(INITRD_MAKE_DIR)/udev.rul
 
 ## BOEL BINARIES
 #
-#include $(INITRD_DIR)/make.d/bc.rul
-#include $(INITRD_DIR)/make.d/e2fsprogs.rul
+include $(INITRD_MAKE_DIR)/bc.rul
+include $(INITRD_MAKE_DIR)/e2fsprogs.rul
 #include $(INITRD_DIR)/make.d/parted.rul
 #include $(INITRD_DIR)/make.d/mdadm.rul
 #include $(INITRD_DIR)/make.d/reiserfsprogs.rul
@@ -121,7 +120,15 @@ $(INITRD_BUILD_DIR).prep:	$(INITRD_DIR)/initrd.rul
 $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(SKEL_FILES) 			\
 								$(BUSYBOX_DIR).install 		\
-								$(LSB_DIR).install
+								$(SYSVINIT_DIR).install		\
+								$(UDEV_DIR).install 		\
+								$(LSB_DIR).install 		\
+								$(HOTPLUG_DIR).install 		\
+								$(RSYNC_DIR).install 		\
+								$(BC_DIR).install 		\
+								$(E2FSPROGS_DIR).install 	\
+								$(BITTORRENT_DIR).install 	\
+								$(CX_FREEZE_BINARY) 		#Bittorrent needs this to install!
 
 	# Copy over the standard libs. -BEF-
 	cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
