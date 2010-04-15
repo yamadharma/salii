@@ -10,7 +10,6 @@ BC_URL 		:= http://download.systemimager.org/pub/bc/$(BC_TARBALL)
 
 ALL_SOURCE += $(INITRD_SRC_DIR)/$(BC_TARBALL)
 
-
 PHONY += bc
 bc:	$(BC_DIR).build
 $(BC_DIR).build:    $(BC_DIR).unpack
@@ -29,11 +28,9 @@ $(BC_DIR).unpack:	$(INITRD_DIR)/make.d/bc.rul \
 	cd $(INITRD_SRC_DIR) && tar -xvzf $(BC_TARBALL)
 	touch $@
 
-
 $(INITRD_SRC_DIR)/$(BC_TARBALL):
 	mkdir -p $(INITRD_SRC_DIR)
 	$(GETSOURCE) $(BC_URL) $(INITRD_SRC_DIR)
-
 
 PHONY += bc_clean
 bc_clean:

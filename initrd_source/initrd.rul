@@ -44,7 +44,6 @@ INITRD_BINARIES = $(shell file \
 							| perl -pi -e 's/:.*//')
 							#initrd_source/build_dir/libexec/* \
 
-
 ## Should initrd.img be gzipped?
 INITRD_COMPRESS = yes
 ifdef IS_PPC64

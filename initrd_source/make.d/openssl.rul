@@ -9,13 +9,13 @@
 #   - don't always rebuild
 #
 
-OPENSSL_VERSION         := 0.9.7e
+OPENSSL_VERSION         := 1.0.0
 OPENSSL_DIR             := openssl-$(OPENSSL_VERSION)
 OPENSSL_TARBALL         := openssl-$(OPENSSL_VERSION).tar.gz
-OPENSSL_MD5SUM          := a8777164bca38d84e5eb2b1535223474
+OPENSSL_MD5SUM          := 89eaa86e25b2845f920ec00ae4c864ed
 OPENSSL_TARBALL_TARGET  := $(SRC_DIR)/$(OPENSSL_TARBALL)
-#OPENSSL_URL             := http://www.openssl.org/source/$(OPENSSL_TARBALL)
-OPENSSL_URL             := http://download.systemimager.org/pub/openssl/$(OPENSSL_TARBALL)
+OPENSSL_URL             := http://www.openssl.org/source/$(OPENSSL_TARBALL)
+#OPENSSL_URL             := http://download.systemimager.org/pub/openssl/$(OPENSSL_TARBALL)
 OPENSSL_BINARIES        := $(SRC_DIR)/$(OPENSSL_DIR)/apps/openssl
 OPENSSL_PATCHES 		:= $(shell ls $(PATCH_DIR)/openssl.*.patch 2>/dev/null | sort)
 
