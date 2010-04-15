@@ -7,7 +7,7 @@
 #
 
 PARTED_VERSION := 2.2
-PARTED_DIR := parted-$(PARTED_VERSION)
+PARTED_DIR := $(INITRD_SRC_DIR)/parted-$(PARTED_VERSION)
 PARTED_TARBALL := parted-$(PARTED_VERSION).tar.gz
 PARTED_URL := http://ftp.gnu.org/gnu/parted/$(PARTED_TARBALL)
 #PARTED_URL := http://download.systemimager.org/pub/parted/$(PARTED_TARBALL)
@@ -23,17 +23,23 @@ ifdef IS_PPC64
 endif
 
 PHONY += parted
-parted:	$(PARTED_BINARY)
+parted:	$(PARTED_DIR).build
 
-$(PARTED_BINARY):	$(INITRD_SRC_DIR)/$(PARTED_TARBALL) $(PARTED_PATCHES)
+$(PARTED_DIR).build:	$(INITRD_SRC_DIR)/$(PARTED_TARBALL) $(PARTED_PATCHES) $(E2FSPROGS_DIR).build
 	rm -rf $(INITRD_SRC_DIR)/$(PARTED_DIR)
 	cd $(INITRD_SRC_DIR) && tar -xvzf $(PARTED_TARBALL)
-	cd $(INITRD_SRC_DIR)/$(PARTED_DIR) && \
+	cd $(PARTED_DIR) && \
 	  cat $(PARTED_PATCHES) < /dev/null | patch -p1
-	( cd $(INITRD_SRC_DIR)/$(PARTED_DIR) && \
-	  CPPFLAGS=-I$(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib CFLAGS=-I$(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib LDFLAGS=-L$(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib \
-	  ./configure --disable-Werror --prefix= $(PARTED_CONFIGURE))
-	$(MAKE) -j $(NCPUS) -C $(INITRD_SRC_DIR)/$(PARTED_DIR)
+	( cd $(PARTED_DIR) && \
+	  CPPFLAGS=-I$(E2FSPROGS_DIR)/lib CFLAGS=-I$(E2FSPROGS_DIR)/lib LDFLAGS=-L$(E2FSPROGS_DIR)/lib \
+	  ./configure --disable-Werror --prefix=$(INITRD_BUILD_DIR) $(PARTED_CONFIGURE))
+	$(MAKE) -j $(NCPUS) -C $(PARTED_DIR)
+
+PHONY += parted_install
+parted_install: $(PARTED_DIR).install
+
+$(PARTED_DIR).install: $(PARTED_DIR).build
+	$(MAKE) -j $(NCPUS) -C $(PARTED_DIR) install
 
 $(INITRD_SRC_DIR)/$(PARTED_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
