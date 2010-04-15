@@ -10,8 +10,7 @@ REISERFSPROGS_TARBALL := $(REISERFSPROGS_DIR).tar.gz
 #REISERFSPROGS_URL := http://download.systemimager.org/pub/reiserfsprogs/$(REISERFSPROGS_TARBALL)
 REISERFSPROGS_URL := http://ftp.kernel.org/pub/linux/utils/fs/reiserfs/$(REISERFSPROGS_TARBALL)
 
-## Disabled
-#REISERFSPROGS_PATCHES := $(shell ls $(PATCH_DIR)/reiserfsprogs.*.patch 2>/dev/null | sort)
+REISERFSPROGS_PATCHES := $(shell ls $(INITRD_PATCH_DIR)/reiserfsprogs.*.patch 2>/dev/null | sort)
 
 MKREISERFS_BINARY := $(INITRD_SRC_DIR)/$(REISERFSPROGS_DIR)/mkreiserfs/mkreiserfs
 REISERFSTUNE_BINARY := $(INITRD_SRC_DIR)/$(REISERFSPROGS_DIR)/tune/reiserfstune
@@ -35,7 +34,8 @@ reiserfsprogs:	$(MKREISERFS_BINARY)
 $(MKREISERFS_BINARY) $(REISERFSTUNE_BINARY):	$(INITRD_SRC_DIR)/$(REISERFSPROGS_TARBALL)
 	[ -d $(INITRD_SRC_DIR)/$(REISERFSPROGS_DIR) ] || \
 	  ( cd $(INITRD_SRC_DIR) && tar xvfz $(REISERFSPROGS_TARBALL) && \
-	    (cd $(REISERFSPROGS_DIR) ) ) 
+	    (cd $(REISERFSPROGS_DIR) && \
+		(cat $(REISERFSPROGS_PATCHES) < /dev/null | patch -p1))) 
 	( cd $(INITRD_SRC_DIR)/$(REISERFSPROGS_DIR) && chmod +x ./configure && \
 	  CFLAGS="-O2 -Wall" ./configure )
 	$(MAKE) -j $(NCPUS) -C $(INITRD_SRC_DIR)/$(REISERFSPROGS_DIR)
