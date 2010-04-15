@@ -6,7 +6,7 @@
 #
 
 MDADM_VERSION := 3.1.2
-MDADM_DIR := mdadm-$(MDADM_VERSION)
+MDADM_DIR := $(INITRD_SRC_DIR)/mdadm-$(MDADM_VERSION)
 MDADM_TARBALL := mdadm-$(MDADM_VERSION).tar.gz
 MDADM_URL := http://www.kernel.org/pub/linux/utils/raid/mdadm/$(MDADM_TARBALL)
 # MDADM_URL := http://download.systemimager.org/pub/mdadm/$(MDADM_TARBALL)
@@ -17,38 +17,28 @@ MDADM_BINARIES := $(INITRD_SRC_DIR)/$(MDADM_DIR)/mdadm
 
 ALL_SOURCE += $(INITRD_SRC_DIR)/$(MDADM_TARBALL)
 
-#
-# build  mdadm binaries
-#
 PHONY += mdadm
-mdadm:	$(MDADM_BINARIES)
+mdadm:	$(MDADM_DIR).build
 
-# install the raid tools (new style) (used by some autoinstall clients)
-PHONY += install_mdadm
-install_mdadm:	$(MDADM_BINARIES)
-	$(SI_INSTALL) -d $(TFTP_BIN_DEST)
-	$(SI_INSTALL) -m 755 $(INITRD_SRC_DIR)/$(MDADM_DIR)/mdadm \
-	    $(TFTP_BIN_DEST)/mdadm
-
-# install the mdadm binary (pulled by some autoinstall clients)
-# this rule is for building the boot tarball
-PHONY += install_standard_mdadm
-install_standard_mdadm:	$(MDADM_BINARIES)
-	$(SI_INSTALL) -m 755 $(INITRD_SRC_DIR)/$(MDADM_DIR)/mdadm $(DESTDIR)
-
-$(MDADM_BINARIES): 
-	rm -rf $(INITRD_SRC_DIR)/$(MDADM_DIR)
+$(MDADM_DIR).build: $(INITRD_SRC_DIR)/$(MDADM_TARBALL)
+	rm -rf $(MDADM_DIR)
 	$(MAKE) $(INITRD_SRC_DIR)/$(MDADM_TARBALL)
-	[ -d $(INITRD_SRC_DIR)/$(MDADM_DIR) ] || \
-	    ( cd $(INITRD_SRC_DIR) && tar -xvzf $(MDADM_TARBALL) )
-	cd $(INITRD_SRC_DIR)/$(MDADM_DIR) 
-	$(MAKE) -j $(NCPUS) -C $(INITRD_SRC_DIR)/$(MDADM_DIR)
+	[ -d $(MDADM_DIR) ] || \
+		( cd $(INITRD_SRC_DIR) && tar zxvf $(MDADM_TARBALL) )
+	cd $(MDADM_DIR)
+	$(MAKE) -j $(NCPUS) -C $(MDADM_DIR)
 
-# download the mdadm tarball
+PHONY += mdadm_install
+mdam_install: $(MDADM_DIR).install
+
+$(MDADM_DIR).install: $(MDADM_DIR).build
+	install -m 755 --strip $(MDADM_DIR)/mdadm $(INITRD_SBIN_DIR)
+	install -m 755 --strip $(MDADM_DIR)/mdmon $(INITRD_SBIN_DIR) 
+
 $(INITRD_SRC_DIR)/$(MDADM_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
 	$(GETSOURCE) $(MDADM_URL) $(INITRD_SRC_DIR)
 
 PHONY += mdadm_clean
 mdadm_clean:
-	rm -rf $(INITRD_SRC_DIR)/$(MDADM_DIR)
+	rm -rf $(MDADM_DIR)

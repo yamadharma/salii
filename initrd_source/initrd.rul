@@ -31,6 +31,9 @@ INITRD_PATCH_DIR = $(INITRD_DIR)/patches
 INITRD_SRC_DIR = $(INITRD_DIR)/src
 INITRD_BUILD_DIR = $(INITRD_DIR)/build_dir
 INITRD_MAKE_DIR = $(INITRD_DIR)/make.d
+INITRD_MAN_DIR = $(INITRD_BUILD_DIR)/usr/share/man
+INITRD_SBIN_DIR = $(INITRD_BUILD_DIR)/sbin
+INITRD_BIN_DIR = $(INITRD_BUILD_DIR)/bin
 
 INITRD_BINARIES = $(shell file \
 							initrd_source/build_dir/bin/* \
@@ -73,7 +76,7 @@ include $(INITRD_MAKE_DIR)/udev.rul
 include $(INITRD_MAKE_DIR)/bc.rul
 include $(INITRD_MAKE_DIR)/e2fsprogs.rul
 include $(INITRD_MAKE_DIR)/parted.rul
-#include $(INITRD_DIR)/make.d/mdadm.rul
+include $(INITRD_MAKE_DIR)/mdadm.rul
 #include $(INITRD_DIR)/make.d/reiserfsprogs.rul
 #include $(INITRD_DIR)/make.d/xfsprogs.rul
 #include $(INITRD_DIR)/make.d/jfsutils.rul
@@ -128,6 +131,7 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(BC_DIR).install 		\
 								$(E2FSPROGS_DIR).install 	\
 								$(PARTED_DIR).install 		\
+								$(MDADM_DIR).install 		\
 								$(BITTORRENT_DIR).install 	\
 								$(CX_FREEZE_BINARY) 		#Bittorrent needs this to install!
 
