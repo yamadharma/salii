@@ -3,7 +3,7 @@
 ifndef IS_PPC64
 
 XFSPROGS_VERSION := 3.1.1
-XFSPROGS_DIR := xfsprogs-$(XFSPROGS_VERSION)
+XFSPROGS_DIR := $(INITRD_SRC_DIR)/xfsprogs-$(XFSPROGS_VERSION)
 XFSPROGS_TARBALL := xfsprogs-$(XFSPROGS_VERSION).tar.gz
 #XFSPROGS_URL := ftp://oss.sgi.com/projects/xfs/download/cmd_tars/$(XFSPROGS_TARBALL)
 XFSPROGS_URL := ftp://oss.sgi.com/projects/xfs/cmd_tars/$(XFSPROGS_TARBALL)
@@ -12,31 +12,24 @@ XFSPROGS_URL := ftp://oss.sgi.com/projects/xfs/cmd_tars/$(XFSPROGS_TARBALL)
 ## Disabled
 #XFSPROGS_PATCHES := $(shell ls $(PATCH_DIR)/xfsprogs.*.patch 2>/dev/null | sort)
 
-MKXFS_BINARY := $(INITRD_SRC_DIR)/$(XFSPROGS_DIR)/mkfs/mkfs.xfs
-XFS_DB_BINARY := $(INITRD_SRC_DIR)/$(XFSPROGS_DIR)/db/xfs_db
-
 ALL_SOURCE += $(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL)
 
-PHONY += install_xfsprogs
-install_xfsprogs:	xfsprogs
-	mkdir -p $(TFTP_BIN_DEST)
-	$(SI_INSTALL) -m 755 \
-	  $(MKXFS_BINARY) $(TFTP_BIN_DEST)
-
-PHONY += install_standard_xfsprogs
-install_standard_xfsprogs:	xfsprogs
-	$(SI_INSTALL) -m 755 \
-	  $(MKXFS_BINARY) $(DESTDIR)
-
 PHONY += xfsprogs
-xfsprogs:	$(MKXFS_BINARY)
+xfsprogs:	$(XFSPROGS_DIR).build
 
-$(MKXFS_BINARY):	$(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL)
-	rm -rf $(INITRD_SRC_DIR)/$(XFSPROGS_DIR)
+PHONY += xfsprogs_install
+xfsprogs_install: $(XFSPROGS_DIR).install)
+
+$(XFSPROGS_DIR).install: $(XFSPROGS_DIR).build
+	$(SI_INSTALL) -m 755 $(XFSPROGS_DIR)/mkfs/mkfs.xfs $(INITRD_SBIN_DIR)
+	$(SI_INSTALL) -m 755 $(XFSPROGS_DIR)/db/xfs_db $(INITRD_SBIN_DIR)
+
+$(XFSPROGS_DIR).build:	$(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL)
+	rm -rf $(XFSPROGS_DIR)
 	cd $(INITRD_SRC_DIR) && tar xfvz $(XFSPROGS_TARBALL)
-	chmod +x $(INITRD_SRC_DIR)/$(XFSPROGS_DIR)/configure
-	cd $(INITRD_SRC_DIR)/$(XFSPROGS_DIR) && ./configure
-	$(MAKE) -C $(INITRD_SRC_DIR)/$(XFSPROGS_DIR) DEBUG=-DNDEBUG
+	chmod +x $(XFSPROGS_DIR)/configure
+	cd $(XFSPROGS_DIR) && ./configure
+	$(MAKE) -j $(NCPUS) -C $(XFSPROGS_DIR)
 
 $(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
@@ -44,7 +37,7 @@ $(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL):
 
 PHONY += xfsprogs_clean
 xfsprogs_clean:
-	rm -rf $(INITRD_SRC_DIR)/$(XFSPROGS_DIR)
+	rm -rf $(XFSPROGS_DIR)
 
 else
 
