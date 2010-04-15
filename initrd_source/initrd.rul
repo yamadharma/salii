@@ -149,12 +149,9 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(REISERFSTUNE_BINARY) 		\
 								$(MKXFS_BINARY) 		\
 								$(XFS_DB_BINARY) 		\
-								$(MKJFS_BINARY) 		\
-								$(OPENSSH_BINARIES) 		\
 								$(OPENSSH_SBINARIES) 		\
-								$(OPENSSH_CONF_FILES) 		 
-								#$(JFS_TUNE_BINARY) 		 
-								
+								$(OPENSSH_BINARIES) 		\
+								$(OPENSSH_CONF_FILES)
 
 	# Copy over the standard libs. -BEF-
 	cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
@@ -206,11 +203,11 @@ endif
 	install -m 755 --strip $(XFS_DB_BINARY) 	$(INITRD_BUILD_DIR)/sbin/
 
 	#install -m 755 --strip $(MKJFS_BINARY)          $(INITRD_BUILD_DIR)/sbin/
+	#install -m 755 --strip $(JFS_TUNE_BINARY)       $(INITRD_BUILD_DIR)/sbin/
 
+	install -m 755 --strip $(OPENSSH_BINARIES)       $(INITRD_BUILD_DIR)/usr/bin
 	install -m 755 --strip $(OPENSSH_SBINARIES)     $(INITRD_BUILD_DIR)/usr/sbin
 	install -m 644 $(OPENSSH_CONF_FILES)            $(INITRD_BUILD_DIR)/etc/ssh
-
-	install -m 755 --strip $(JFS_TUNE_BINARY)       $(INITRD_BUILD_DIR)/sbin/
 
 	# Copy over text files from the skel directory.
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
