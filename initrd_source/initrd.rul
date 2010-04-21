@@ -69,6 +69,7 @@ include $(INITRD_MAKE_DIR)/hotplug.rul
 include $(INITRD_MAKE_DIR)/rsync.rul
 include $(INITRD_MAKE_DIR)/sysvinit.rul
 include $(INITRD_MAKE_DIR)/udev.rul
+include $(INITRD_MAKE_DIR)/kexec.rul
 
 ## BOEL BINARIES
 #
@@ -135,6 +136,7 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(XFSPROGS_DIR).install		\
 								$(JFSUTILS_DIR).install		\
 								$(LVM_DIR).install		\
+								$(KEXEC_DIR).install		\
 								$(OPENSSH_DIR).install 		\
 								$(BITTORRENT_DIR).install 	\
 								$(CX_FREEZE_BINARY) 		

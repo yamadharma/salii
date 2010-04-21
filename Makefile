@@ -47,7 +47,6 @@
 #
 #   o kernels:                  /usr/share/systemimager/boot/`arch`/flavor/
 #   o initrd.img:               /usr/share/systemimager/boot/`arch`/flavor/
-#   o boel_binaries.tar.gz:     /usr/share/systemimager/boot/`arch`/flavor/
 #
 #   o perl libraries:           /usr/lib/systemimager/perl/
 #
@@ -201,7 +200,7 @@ include config.inc
 
 # build everything, install nothing
 .PHONY:	all
-all:	kernel $(INITRD_DIR)/initrd.img boel_binaries_tarball manpages dev_tarball
+all:	kernel $(INITRD_DIR)/initrd.img manpages dev_tarball
 
 binaries: $(BOEL_BINARIES_TARBALL) kernel $(INITRD_DIR)/initrd.img
 
@@ -218,18 +217,8 @@ binaries: $(BOEL_BINARIES_TARBALL) kernel $(INITRD_DIR)/initrd.img
 # by setting a variable in one and using it in another, then that should be
 # abstracted out. Its much more robust to include *.rul... -dannf
 #
-include $(TOPDIR)/make.d/ctcs.rul
-include $(TOPDIR)/make.d/discover-data.rul
-include $(TOPDIR)/make.d/discover.rul
-include $(TOPDIR)/make.d/dosfstools.rul
-include $(TOPDIR)/make.d/gzip.rul
-include $(TOPDIR)/make.d/hfsutils.rul
 include $(TOPDIR)/make.d/kernel.rul
-include $(TOPDIR)/make.d/kexec.rul
-include $(TOPDIR)/make.d/pdisk.rul
 include $(TOPDIR)/make.d/popt.rul
-include $(TOPDIR)/make.d/tar.rul
-include $(TOPDIR)/make.d/util-linux.rul
 include $(TOPDIR)/make.d/zlib.rul
 
 include $(TOPDIR)/initrd_source/initrd.rul
@@ -363,25 +352,6 @@ install_common_libs:
 	$(SI_INSTALL) -m 644 $(LIB_SRC)/SystemImager/UseYourOwnKernel.pm $(LIB_DEST)/SystemImager
 	$(SI_INSTALL) -m 755 $(LIB_SRC)/confedit $(LIB_DEST)
 
-# checks the sized of the i386 kernel and initrd to make sure they'll fit 
-# on an autoinstall diskette
-.PHONY:	check_floppy_size
-check_floppy_size:	$(LINUX_IMAGE) $(INITRD_DIR)/initrd.img
-ifeq ($(ARCH), i386)
-	@### see if the kernel and ramdisk are larger than the size of a 1.44MB
-	@### floppy image, minus about 10k for syslinux stuff
-	@echo -n "Ramdisk + Kernel == "
-	@echo "`$(CHECK_FLOPPY_SIZE)`"
-	@echo "                    1454080 is the max that will fit."
-	@[ `$(CHECK_FLOPPY_SIZE)` -lt 1454081 ] || \
-	     (echo "" && \
-	      echo "************************************************" && \
-	      echo "Dammit.  The kernel and ramdisk are too large.  " && \
-	      echo "************************************************" && \
-	      exit 1)
-	@echo " - ok, that should fit on a floppy"
-endif
-
 # install the initscript & config files for the server
 .PHONY:	install_configs
 install_configs:
@@ -476,11 +446,8 @@ install:
 .PHONY:	install_binaries
 install_binaries:	install_kernel \
 			install_initrd \
-			install_boel_binaries_tarball \
 			install_initrd_template \
 			install_dev_tarball
-
-include make.d/boel_binaries.inc
 
 .PHONY:	complete_source_tarball
 complete_source_tarball:	$(TOPDIR)/tmp/systemimager-$(VERSION)-complete_source.tar.bz2.sign
@@ -627,8 +594,6 @@ show_targets:
 	@echo "install_server_all"
 	@echo "    Install all files needed by a server."
 	@echo "	"
-	@echo "install_boel_binaries_tarball"
-	@echo ""
 	@echo "install_initrd"
 	@echo ""
 	@echo "source_tarball"
