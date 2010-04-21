@@ -64,7 +64,7 @@ SKEL_FILES = $(shell find $(INITRD_DIR)/skel \
 include $(INITRD_MAKE_DIR)/cx_freeze.rul
 include $(INITRD_MAKE_DIR)/busybox.rul
 include $(INITRD_MAKE_DIR)/lsb.rul
-include $(INITRD_DIR)/make.d/bittorrent.rul
+include $(INITRD_MAKE_DIR)/bittorrent.rul
 include $(INITRD_MAKE_DIR)/hotplug.rul
 include $(INITRD_MAKE_DIR)/rsync.rul
 include $(INITRD_MAKE_DIR)/sysvinit.rul
@@ -79,8 +79,8 @@ include $(INITRD_MAKE_DIR)/mdadm.rul
 include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
 include $(INITRD_MAKE_DIR)/xfsprogs.rul
 include $(INITRD_MAKE_DIR)/jfsutils.rul
-#include $(INITRD_DIR)/make.d/openssh.rul
-#include $(INITRD_DIR)/make.d/openssl.rul
+include $(INITRD_MAKE_DIR)/openssh.rul
+include $(INITRD_MAKE_DIR)/openssl.rul
 include $(INITRD_MAKE_DIR)/lvm.rul
 
 PHONY += build_dir 
@@ -135,8 +135,9 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(XFSPROGS_DIR).install		\
 								$(JFSUTILS_DIR).install		\
 								$(LVM_DIR).install		\
+								$(OPENSSH_DIR).install 		\
 								$(BITTORRENT_DIR).install 	\
-								$(CX_FREEZE_BINARY) 		#Bittorrent needs this to install!
+								$(CX_FREEZE_BINARY) 		
 
 	# Copy over the standard libs. -BEF-
 	cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
@@ -217,7 +218,7 @@ initrd:	$(INITRD_DIR)/initrd
 #		part of the distribution. -BEF-
 #
 $(INITRD_DIR)/initrd:	$(INITRD_BUILD_DIR).build
-	cd "${INITRD_BUILD_DIR}" && find . | cpio --quiet -o -H newc | gzip >"$(INITRD_DIR)/initrd" || exit 1
+	cd "${INITRD_BUILD_DIR}" && find . | cpio --quiet -o -H newc | gzip >"$(INITRD_DIR)/initrd.img" || exit 1
 
 PHONY += install_initrd_template
 install_initrd_template:	$(INITRD_BUILD_DIR).build
@@ -249,7 +250,6 @@ build_dir_clean:
 PHONY += initrd_clean
 initrd_clean:	build_dir_clean $(subst .rul,_clean,$(shell cd $(INITRD_DIR)/make.d && ls *.rul))
 	-find . -name "*~" -exec rm -f {} \;
-	rm -f $(INITRD_DIR)/initrd
 	rm -f $(INITRD_DIR)/initrd.img
 
 PHONY += initrd_distclean
