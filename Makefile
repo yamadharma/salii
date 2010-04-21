@@ -83,7 +83,7 @@
 # To include the ctcs test suite, and associated files, do a 'make WITH_CTCS=1 all'
 #
 
-DESTDIR :=
+DESTDIR := "/var/tmp/dennis"
 VERSION := $(shell cat VERSION)
 
 ## is this an unstable release?
@@ -184,10 +184,9 @@ FLAMETHROWER_STATE_DIR = $(DESTDIR)/var/state/systemimager/flamethrower
 
 RSYNC_STUB_DIR = $(ETC)/systemimager/rsync_stubs
 
-CHECK_FLOPPY_SIZE = expr \`du -b $(INITRD_DIR)/initrd.img | cut -f 1\` + \`du -b $(LINUX_IMAGE) | cut -f 1\`
-
 SI_INSTALL = $(TOPDIR)/tools/si_install --si-prefix=$(PREFIX)
 GETSOURCE = $(TOPDIR)/tools/getsource
+MYMODULES = $(TOPDIR)/tools/my_modules
 
 # Some root tools are probably needed to build SystemImager packages, so
 # explicitly add the right paths here. -AR-
@@ -202,11 +201,11 @@ include config.inc
 .PHONY:	all
 all:	kernel $(INITRD_DIR)/initrd.img manpages dev_tarball
 
-binaries: $(BOEL_BINARIES_TARBALL) kernel $(INITRD_DIR)/initrd.img
+binaries: kernel $(INITRD_DIR)/initrd.img
 
 # All has been modified as docs don't build on non debian platforms
 #
-#all:	$(BOEL_BINARIES_TARBALL) kernel $(INITRD_DIR)/initrd.img docs manpages
+#all:	kernel $(INITRD_DIR)/initrd.img docs manpages
 
 #
 # Now include the other targets.  Some of these may have order dependencies.

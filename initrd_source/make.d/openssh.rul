@@ -58,6 +58,7 @@ openssh_install: $(OPENSSH_DIR).install
 	install -m 644 $(TOPDIR)/etc/ssh/sshd_config $(INITRD_BUILD_DIR)/etc/ssh/sshd_config
 
 $(OPENSSH_DIR).install: $(OPENSSH_DIR).build
+	$(MAKE) DESTDIR=$(INITRD_BUILD_DIR) -j $(NCPUS) -C $(OPENSSH_DIR) install
 
 $(INITRD_SRC_DIR)/openssh_verify.stamp:	$(OPENSSH_TARBALL_TARGET)
 	[ "$(shell md5sum $(OPENSSH_TARBALL_TARGET) | cut -d' ' -f1)" = "$(OPENSSH_MD5SUM)" ]

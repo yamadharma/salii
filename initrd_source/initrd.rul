@@ -44,15 +44,6 @@ INITRD_BINARIES = $(shell file \
 							| perl -pi -e 's/:.*//')
 							#initrd_source/build_dir/libexec/* \
 
-## Should initrd.img be gzipped?
-INITRD_COMPRESS = yes
-ifdef IS_PPC64
-INITRD_COMPRESS = no
-endif
-ifeq ($(ARCH),alpha)
-INITRD_COMPRESS = no
-endif
-
 # Indexing the skel files
 SKEL_FILES = $(shell find $(INITRD_DIR)/skel \
 						-not -regex '.*/.svn.*' -and \
@@ -112,6 +103,16 @@ $(INITRD_BUILD_DIR).prep:	$(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/var
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/var/run
 
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 660 tty1 c 4 1
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 660 tty2 c 4 2
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 660 tty3 c 4 3
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 660 tty4 c 4 4
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 660 tty5 c 4 5
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 660 tty6 c 4 6
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 600 console c 5 1
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 660 null c 1 3
+	cd $(INITRD_BUILD_DIR)/dev && mknod -m 660 zero c 1 5
+
 	touch $@
 
 #
@@ -122,6 +123,7 @@ $(INITRD_BUILD_DIR).prep:	$(INITRD_DIR)/initrd.rul
 #
 $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(SKEL_FILES) 			\
+								$(SRC_DIR)/modules_build-stamp 	\
 								$(BUSYBOX_DIR).install 		\
 								$(SYSVINIT_DIR).install		\
 								$(UDEV_DIR).install 		\
@@ -200,14 +202,8 @@ endif
 PHONY += initrd.img
 initrd.img:	$(INITRD_DIR)/initrd.img
 
-ifeq ($(INITRD_COMPRESS),yes)
-$(INITRD_DIR)/initrd.img:	$(INITRD_DIR)/initrd
-	gzip -9 < $(INITRD_DIR)/initrd > $(INITRD_DIR)/initrd.img
-else
 $(INITRD_DIR)/initrd.img:       $(INITRD_DIR)/initrd
-	cp -a $(INITRD_DIR)/initrd $(INITRD_DIR)/initrd.img
-endif
-
+	gzip -f -S ".img" $(INITRD_DIR)/initrd
 
 PHONY += initrd
 initrd:	$(INITRD_DIR)/initrd
@@ -220,7 +216,13 @@ initrd:	$(INITRD_DIR)/initrd
 #		part of the distribution. -BEF-
 #
 $(INITRD_DIR)/initrd:	$(INITRD_BUILD_DIR).build
-	cd "${INITRD_BUILD_DIR}" && find . | cpio --quiet -o -H newc | gzip >"$(INITRD_DIR)/initrd.img" || exit 1
+	# Installing kernel modules
+	$(MAKE) INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_SRC) -j $(NCPUS) modules_install
+
+	# Adding current modules
+	$(MYMODULES) $(INITRD_BUILD_DIR) $(INITRD_BUILD_DIR)/my_modules/INSMOD_COMMANDS
+
+	cd "${INITRD_BUILD_DIR}" && find . | cpio --quiet -o -H newc > "$(INITRD_DIR)/initrd" || exit 1
 
 PHONY += install_initrd_template
 install_initrd_template:	$(INITRD_BUILD_DIR).build
