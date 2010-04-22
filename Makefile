@@ -199,7 +199,7 @@ include config.inc
 
 # build everything, install nothing
 .PHONY:	all
-all:	kernel $(INITRD_DIR)/initrd.img manpages dev_tarball
+all:	kernel $(INITRD_DIR)/initrd.img manpages #dev_tarball
 
 binaries: kernel $(INITRD_DIR)/initrd.img
 
@@ -445,8 +445,8 @@ install:
 .PHONY:	install_binaries
 install_binaries:	install_kernel \
 			install_initrd \
-			install_initrd_template \
-			install_dev_tarball
+			install_initrd_template #\
+			#install_dev_tarball
 
 .PHONY:	complete_source_tarball
 complete_source_tarball:	$(TOPDIR)/tmp/systemimager-$(VERSION)-complete_source.tar.bz2.sign

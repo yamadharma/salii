@@ -28,7 +28,7 @@ load() {
 # DEBUG=yes export DEBUG
 
 # directories with the firmware files
-FIRMWARE_DIRS="/lib/hotplug/firmware /usr/local/lib/hotplug/firmware /usr/lib/hotplug/firmware"
+FIRMWARE_DIRS="/lib/firmware /lib/hotplug/firmware /usr/local/lib/hotplug/firmware /usr/lib/hotplug/firmware"
 
 # mountpoint of sysfs
 SYSFS=$(sed -n 's/^.* \([^ ]*\) sysfs .*$/\1/p' /proc/mounts | sed -e '2,$d')

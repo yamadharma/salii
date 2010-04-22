@@ -55,8 +55,8 @@ case "$1" in
 	# Fix permissions and missing symlinks/programs for devices made in
 	# initramfs, and catch up on everything we missed
 	echo "Loading hardware drivers..."
-	/sbin/udevtrigger
-	if /sbin/udevsettle; then
+	/usr/sbin/udevtrigger
+	if /usr/sbin/udevsettle; then
 	    echo OK
 	else
 	    echo ERROR: $?
@@ -80,8 +80,8 @@ case "$1" in
 	;;
     restart)
 	echo "Loading additional hardware drivers..."
-	/sbin/udevtrigger
-	if /sbin/udevsettle; then
+	/usr/sbin/udevtrigger
+	if /usr/sbin/udevsettle; then
 	    echo OK
 	else
 	    echo ERROR: $?

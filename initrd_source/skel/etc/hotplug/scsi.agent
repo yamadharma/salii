@@ -50,7 +50,7 @@ add)
     for MODULE in $MODULES; do
 	if is_blacklisted $MODULE; then
 	    mesg "     $MODULE: blacklisted (for $TYPE)"
-	elif modprobe --quiet $MODULE; then
+	elif modprobe $MODULE; then
 	    mesg "     $MODULE: loaded sucessfully (for $TYPE)"
 	else
 	    mesg "     $MODULE: can't be loaded (for $TYPE)"

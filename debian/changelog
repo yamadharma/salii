@@ -1,3 +1,12 @@
+systemimager (1.0.0) squeeze; urgency=low
+
+  * Initial release of sali
+  * The creation of boel_binaries has been removed and some of the packages has been moved to the initrd.rul
+  * Removed a couple of packages that could be replaced by Busybox, ie. dhcp
+  * Authors: Bas van der Vlies, Dennis Stam
+
+ -- Dennis Stam <dennis.stam@sara.nl>  Thu, 22 Apr 2010 08:47:47 +0100
+
 systemimager (4.1.7) gutsy; urgency=low
 
   * NMU: new development release 4.1.7
