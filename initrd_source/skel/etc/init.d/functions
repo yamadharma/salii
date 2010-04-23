@@ -814,18 +814,6 @@ sali_start_udevd() {
 #
 ################################################################################
 #
-start_hotplug() {
-    #
-    # Start udevd first, then hotplug
-    logmsg
-    logmsg start_hotplug
-    touch /etc/fstab
-    /etc/init.d/hotplug start
-
-}
-#
-################################################################################
-#
 # Configure loopback interface (may as well)
 ifconfig_loopback() {
     logmsg
@@ -1148,55 +1136,6 @@ start_syslogd() {
         USELOGGER=1
         logmsg "Successfully started syslogd!"
     fi
-}
-#
-################################################################################
-#
-# Detect what we can.
-# Note: Modules that are needed during the initial boot stages of BOEL should
-#       be copied to the "skel/my_modules" directory prior to creating your
-#       custom initrd.gz. -BEF-
-#
-autodetect_hardware_and_load_modules() {
-    logmsg
-    logmsg autodetect_hardware_and_load_modules
-    if [ -e /proc/sys/kernel/hotplug ] && uname -r | grep -q boel; then
-        logmsg "Detecting hardware using hotplug (this may take a long time): "
-        /etc/init.d/hotplug stop
-        /etc/init.d/hotplug start
-    elif [ -d /sys/bus -a -e /lib/modules/`uname -r`/modules.pcimap ]; then
-        logmsg "Hardware already detected by hotplug"
-    else
-	logmsg "Not able to detect hardware"
-    fi
-
-    # Prepend with other modules that we will probably need.
-    MODULES=`echo sd_mod ide-disk $MODULES | sort -u`
-
-    logmsg $MODULES
-
-    for MODULE in $MODULES
-    do
-        logmsg
-        logmsg "Loading $MODULE... "
-	if echo $MODULE | grep '[-_]' >/dev/null 2>&1; then
-            if modprobe `echo $MODULE | sed 's/-/_/g'` 2>/dev/null; then
-                logmsg "done!"
-            elif modprobe `echo $MODULE | sed 's/_/-/g'` 2>/dev/null; then
-                logmsg "done!"
-            else
-                logmsg "not needed or already loaded."
-            fi
-        else
-            modprobe $MODULE 2>/dev/null && logmsg "done!" || logmsg "not needed or already loaded."
-        fi
-    done
-
-    # Show loaded modules
-    logmsg ">> Loaded kernel modules:"
-    for m in `cut -d' ' -f1 /proc/modules`; do
-        logmsg "$m"
-    done
 }
 #
 ################################################################################
