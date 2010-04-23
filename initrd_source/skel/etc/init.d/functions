@@ -787,29 +787,6 @@ start_udevd() {
     logmsg start_udevd
     /etc/init.d/udev start
 
-    # If udev failed fall back to a static /dev
-    if [ $? -ne 0 ]; then
-        logmsg "failed!"
-        logmsg "Creating a static /dev..."
-        cd / && tar -xzf dev.tar.gz || shellout
-        logmsg done
-    fi
-}
-
-sali_start_udevd() {
-
-	logmsg
-	logmsg SALI start udevd
-	#mknod /dev/null c 1 3
-	logmsg starting udevd as daemon
-	/sbin/udevd --daemon
-        #udevadm >/dev/null 2>&1 || shellout
-	logmsg udev trigger
-	udevadm trigger
-
-	logmsg settle
-        udevadm settle ${1:+--timeout=$1} || shellout
-
 }
 #
 ################################################################################

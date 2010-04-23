@@ -28,13 +28,13 @@
 #
 {
 
-switch_root_to_tmpfs
+#switch_root_to_tmpfs
 
-mount_proc
+#mount_proc
 
 monitor_save_dmesg
 
-mount_sys
+#mount_sys
 
 get_arch
 
@@ -44,17 +44,12 @@ ifconfig_loopback
 
 load_my_modules
 
-sali_start_udevd 10
+start_udevd
 #start_udevd
-
-logmsg
-logmsg SALI, we need keyboard
-modprobe usbhid
-modprobe hid
 
 #start_hotplug
 
-mount_pts
+#mount_pts
 
 # Need to do this prior to read_local_cfg to get last_root parameter, 
 # if specified. -BEF-
