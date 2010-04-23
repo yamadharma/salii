@@ -44,9 +44,15 @@ ifconfig_loopback
 
 load_my_modules
 
-start_udevd
+sali_start_udevd 10
+#start_udevd
 
-start_hotplug
+logmsg
+logmsg SALI, we need keyboard
+modprobe usbhid
+modprobe hid
+
+#start_hotplug
 
 mount_pts
 
@@ -56,11 +62,11 @@ variableize_kernel_append_parameters
 
 read_kernel_append_parameters
 
-read_local_cfg
+#read_local_cfg
 
 # Re-read kernel append parameters -- we want them to override what's in 
 # the local.cfg files. -BEF-
-read_kernel_append_parameters
+#read_kernel_append_parameters
 
 start_network
 beep
@@ -101,7 +107,9 @@ fi
 
 get_scripts_directory
 
-autodetect_hardware_and_load_modules
+logmsg
+logmsg Hotplug removed
+#autodetect_hardware_and_load_modules
 
 # HOSTNAME may already be set via local.cfg -BEF-
 if [ -z $HOSTNAME ]; then
