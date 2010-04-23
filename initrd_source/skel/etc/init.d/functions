@@ -939,6 +939,10 @@ read_local_cfg() {
 #   use DHCP. -BEF-
 #
 start_network() {
+
+    logmsg "SALI remark: Temporarily disabled due some changes in the initrd envirenmont"
+    return
+
     logmsg
     logmsg start_network
     if [ ! -z $IPADDR ]; then
@@ -1051,6 +1055,10 @@ start_network() {
 #
 #   Ping test
 ping_test() {
+
+    logmsg "SALI remark: Temporarily disabled due some changes in the initrd envirenmont"
+    return
+
     logmsg
     logmsg ping_test
 

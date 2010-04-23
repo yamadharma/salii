@@ -220,7 +220,7 @@ $(INITRD_DIR)/initrd:	$(INITRD_BUILD_DIR).build
 	$(MAKE) INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_SRC) -j $(NCPUS) modules_install
 
 	# Adding current modules
-	$(MYMODULES) $(INITRD_BUILD_DIR) $(INITRD_BUILD_DIR)/my_modules/INSMOD_COMMANDS
+	#$(MYMODULES) $(INITRD_BUILD_DIR) $(INITRD_BUILD_DIR)/my_modules/INSMOD_COMMANDS
 
 	cd "${INITRD_BUILD_DIR}" && find . | cpio --quiet -o -H newc > "$(INITRD_DIR)/initrd" || exit 1
 
