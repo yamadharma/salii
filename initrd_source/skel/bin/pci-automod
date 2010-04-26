@@ -11,6 +11,9 @@
 # [inspired by an article in the German Linux Magazin]
 #
 
+echo "Disabled by Bas van der Vlies"
+exit 0
+
 usage () {
     echo
     echo "Usage: $0 --class storage|net|serial --list|--load|--hwlist"
