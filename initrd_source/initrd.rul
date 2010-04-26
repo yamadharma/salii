@@ -56,8 +56,8 @@ include $(INITRD_MAKE_DIR)/cx_freeze.rul
 include $(INITRD_MAKE_DIR)/busybox.rul
 include $(INITRD_MAKE_DIR)/lsb.rul
 include $(INITRD_MAKE_DIR)/bittorrent.rul
-include $(INITRD_MAKE_DIR)/hotplug.rul
 include $(INITRD_MAKE_DIR)/rsync.rul
+#include $(INITRD_MAKE_DIR)/hotplug.rul
 include $(INITRD_MAKE_DIR)/sysvinit.rul
 include $(INITRD_MAKE_DIR)/udev.rul
 include $(INITRD_MAKE_DIR)/kexec.rul
@@ -128,7 +128,7 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(SYSVINIT_DIR).install		\
 								$(UDEV_DIR).install 		\
 								$(LSB_DIR).install 		\
-								$(HOTPLUG_DIR).install 		\
+								#$(HOTPLUG_DIR).install 		\
 								$(RSYNC_DIR).install 		\
 								$(BC_DIR).install 		\
 								$(E2FSPROGS_DIR).install 	\
@@ -169,8 +169,8 @@ endif
 	strip $(INITRD_BINARIES)
 
 	# BitTorrent binaries must not be stripped. -AR-
-	cd $(INITRD_BUILD_DIR)/bin && ln -s ../lib/bittorrent/torrentinfo-console
-	cd $(INITRD_BUILD_DIR)/bin && ln -s ../lib/bittorrent/bittorrent-console
+	cd $(INITRD_BUILD_DIR)/bin && ln -fs ../lib/bittorrent/torrentinfo-console
+	cd $(INITRD_BUILD_DIR)/bin && ln -fs ../lib/bittorrent/bittorrent-console
 
 	# Copy over text files from the skel directory.
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
@@ -218,7 +218,7 @@ initrd:	$(INITRD_DIR)/initrd
 $(INITRD_DIR)/initrd:	$(INITRD_BUILD_DIR).build
 	# Installing kernel modules
 	$(MAKE) INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_SRC) -j $(NCPUS) modules_install
-
+	
 	# Adding current modules
 	#$(MYMODULES) $(INITRD_BUILD_DIR) $(INITRD_BUILD_DIR)/my_modules/INSMOD_COMMANDS
 
