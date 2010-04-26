@@ -54,7 +54,6 @@ SKEL_FILES = $(shell find $(INITRD_DIR)/skel \
 #
 include $(INITRD_MAKE_DIR)/cx_freeze.rul
 include $(INITRD_MAKE_DIR)/busybox.rul
-include $(INITRD_MAKE_DIR)/lsb.rul
 include $(INITRD_MAKE_DIR)/bittorrent.rul
 include $(INITRD_MAKE_DIR)/rsync.rul
 #include $(INITRD_MAKE_DIR)/hotplug.rul
@@ -127,7 +126,6 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(BUSYBOX_DIR).install 		\
 								$(SYSVINIT_DIR).install		\
 								$(UDEV_DIR).install 		\
-								$(LSB_DIR).install 		\
 								#$(HOTPLUG_DIR).install 		\
 								$(RSYNC_DIR).install 		\
 								$(BC_DIR).install 		\
