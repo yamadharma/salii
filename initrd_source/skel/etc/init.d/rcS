@@ -49,6 +49,10 @@ logmsg start_udevd
 
 start_udevd
 #start_udevd
+lsmod
+modprobe uhci_hcd
+modprobe usbhid
+modprobe hid
 shellout
 
 #start_hotplug
