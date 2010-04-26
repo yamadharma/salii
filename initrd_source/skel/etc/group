@@ -21,6 +21,8 @@ cdrom::19:cdrom
 dialout::20:root
 ftp::21:
 tape::22:root
+video:x:44:
+plugdev:x:46:
 users::100:games
 nogroup::-2:
 nobody::65534:

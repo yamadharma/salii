@@ -30,11 +30,11 @@
 
 #switch_root_to_tmpfs
 
-#mount_proc
+mount_proc
 
 monitor_save_dmesg
 
-#mount_sys
+mount_sys
 
 get_arch
 
@@ -44,8 +44,12 @@ ifconfig_loopback
 
 load_my_modules
 
+logmsg
+logmsg start_udevd
+
 start_udevd
 #start_udevd
+shellout
 
 #start_hotplug
 
