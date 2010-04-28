@@ -44,16 +44,16 @@ ifconfig_loopback
 
 load_my_modules
 
-logmsg
-logmsg start_udevd
-
 start_udevd
 #start_udevd
 lsmod
 modprobe uhci_hcd
 modprobe usbhid
 modprobe hid
-shellout
+
+logmsg
+logmsg Opening shell
+shellopen
 
 #start_hotplug
 

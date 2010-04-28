@@ -226,6 +226,18 @@ shellout() {
     fi
     exec sh > /dev/console 2>&1
 }
+
+shellopen() {
+	logmsg
+	logmsg "Starting console..."
+
+	if [ ! -z $MONITOR_SERVER ]; then
+		logmsg "Strating console, stopping monitoring"
+		stop_report_task -1
+	fi
+
+	exec sh > /dev/console 2>&1
+}
 #
 ################################################################################
 #
