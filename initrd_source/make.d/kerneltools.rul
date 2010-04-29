@@ -1,0 +1,39 @@
+#
+#	$Id: kerneltools.rul 3472 2006-03-23 19:59:02Z finley $
+#   vi: set filetype=make:
+#
+
+KERNELTOOLS_VERSION	:= 3.8
+KERNELTOOLS_DIR 	:= $(INITRD_SRC_DIR)/module-init-tools-$(KERNELTOOLS_VERSION)
+KERNELTOOLS_TARBALL 	:= module-init-tools-$(KERNELTOOLS_VERSION).tar.gz
+KERNELTOOLS_URL		:= http://www.kernel.org/pub/linux/utils/kernel/module-init-tools/$(KERNELTOOLS_TARBALL)
+
+ALL_SOURCE += $(INITRD_SRC_DIR)/$(KERNELTOOLS_TARBALL)
+
+PHONY += kerneltools
+kerneltools:	$(KERNELTOOLS_DIR).build
+$(KERNELTOOLS_DIR).build:    $(BC_DIR).unpack
+	cd $(KERNELTOOLS_DIR) && ./configure
+	$(MAKE) -j $(NCPUS) -C $(KERNELTOOLS_DIR)
+	touch $@
+
+PHONY += kerneltools_install
+kerneltools_install: 	$(KERNELTOOLS_DIR).install
+
+$(KERNELTOOLS_DIR).install: $(BC_DIR).build $(INITRD_BUILD_DIR).prep
+	$(MAKE) -j $(NCPUS) -C $(KERNELTOOLS_DIR) install DESTDIR=$(INITRD_BUILD_DIR)
+
+$(KERNELTOOLS_DIR).unpack:	$(INITRD_DIR)/make.d/kerneltools.rul \
+                    $(INITRD_SRC_DIR)/$(KERNELTOOLS_TARBALL)
+	cd $(INITRD_SRC_DIR) && tar -xvzf $(KERNELTOOLS_TARBALL)
+	touch $@
+
+$(INITRD_SRC_DIR)/$(KERNELTOOLS_TARBALL):
+	mkdir -p $(INITRD_SRC_DIR)
+	$(GETSOURCE) $(KERNELTOOLS_URL) $(INITRD_SRC_DIR)
+
+PHONY += kerneltools_clean
+kerneltools_clean:
+	rm -rf $(KERNELTOOLS_DIR)
+	rm -f  $(KERNELTOOLS_DIR).unpack
+	rm -f  $(KERNELTOOLS_DIR).build
