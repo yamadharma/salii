@@ -50,10 +50,10 @@ ls -ltra /
 
 start_udevd
 #start_udevd
-lsmod
-modprobe uhci_hcd
-modprobe usbhid
-modprobe hid
+#lsmod
+#modprobe uhci_hcd
+#modprobe usbhid
+#modprobe hid
 
 sleep 5
 
