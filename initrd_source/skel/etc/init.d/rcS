@@ -42,7 +42,11 @@ adjust_arch
 
 ifconfig_loopback
 
-load_my_modules
+# Obsolete, going to find a better solution
+#load_my_modules
+
+pwd
+ls -ltra /
 
 start_udevd
 #start_udevd
@@ -50,6 +54,8 @@ lsmod
 modprobe uhci_hcd
 modprobe usbhid
 modprobe hid
+
+sleep 5
 
 logmsg
 logmsg Opening shell
