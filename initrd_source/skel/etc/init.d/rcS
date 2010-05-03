@@ -42,21 +42,7 @@ adjust_arch
 
 ifconfig_loopback
 
-# Obsolete, going to find a better solution
-#load_my_modules
-
-pwd
-ls -ltra /
-
 start_udevd
-
-logmsg
-logmsg Opening shell
-shellopen
-
-#start_hotplug
-
-#mount_pts
 
 # Need to do this prior to read_local_cfg to get last_root parameter, 
 # if specified. -BEF-
@@ -64,11 +50,11 @@ variableize_kernel_append_parameters
 
 read_kernel_append_parameters
 
-#read_local_cfg
+read_local_cfg
 
 # Re-read kernel append parameters -- we want them to override what's in 
 # the local.cfg files. -BEF-
-#read_kernel_append_parameters
+read_kernel_append_parameters
 
 start_network
 beep
@@ -86,8 +72,6 @@ if [ ! -z $FLAMETHROWER_DIRECTORY_PORTBASE ]; then
 fi
 
 get_torrents_directory
-
-get_boel_binaries_tarball
 beep
 
 tmpfs_watcher
@@ -108,10 +92,6 @@ if [ "x$SSH" = "xy" ]; then
 fi
 
 get_scripts_directory
-
-logmsg
-logmsg Hotplug removed
-#autodetect_hardware_and_load_modules
 
 # HOSTNAME may already be set via local.cfg -BEF-
 if [ -z $HOSTNAME ]; then

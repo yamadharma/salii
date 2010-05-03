@@ -947,9 +947,6 @@ read_local_cfg() {
 #
 start_network() {
 
-    logmsg "SALI remark: Temporarily disabled due some changes in the initrd envirenmont"
-    return
-
     logmsg
     logmsg start_network
     if [ ! -z $IPADDR ]; then
@@ -1004,57 +1001,17 @@ start_network() {
         logmsg
         ### END ether sleep ###
         
-        # create directory to catch dhcp information
-        DHCLIENT_DIR="/var/state/dhcp"
-        mkdir -p $DHCLIENT_DIR
-        
-        # combine systemimager code to the stock debian dhclient-script
-        # and make executable
-        cat /etc/dhclient-script.si-prefix \
-            /etc/dhclient-script.debian-dist \
-            > /etc/dhclient-script
-        chmod +x /etc/dhclient-script
-
-        # be sure AF_PACKET is supported in the kernel
-        [ -f /lib/modules/`uname -r`/modules.dep ] && modprobe af_packet &> /dev/null
-        
-        # get info via dhcp
         logmsg
-        logmsg "dhclient"
-        dhclient $DEVICE
-        if [ ! -s ${DHCLIENT_DIR}/dhclient.leases ]; then
+        logmsg "Using default eth0: udhcpc"
+	udhcpc       
+        
+	if [ ! -s /tmp/udhcpc.ip ]; then
             logmsg
             logmsg "I couldn't configure the network interface using DHCP."
             logmsg
             shellout
         fi
         
-        if [ -z ${DEVICE} ]; then
-            # Figure out which interface actually got configured.
-            # Suggested by James Oakley.
-            #
-            DEVICE=`grep interface ${DHCLIENT_DIR}/dhclient.leases | \
-                sed -e 's/^.*interface "//' -e 's/";//'`
-        fi
-        
-        # read dhcp info in as variables -- this file will be created by 
-        # the /etc/dhclient-start script that is run automatically by
-        # dhclient.
-        . /tmp/dhcp_info.${DEVICE} || shellout
-        ### END dhcp ###
-        
-        # Re-read configuration information from local.cfg to over-ride
-        # DHCP settings, if necessary. -BEF-
-        if [ -f /tmp/local.cfg ]; then
-            logmsg
-            logmsg "Overriding any DHCP settings with pre-boot local.cfg settings."
-            . /tmp/local.cfg || shellout
-        fi
-
-        logmsg
-        logmsg "Overriding any DHCP settings with pre-boot settings from kernel append"
-        logmsg "parameters."
-        read_kernel_append_parameters
     fi
 }
 #
@@ -1062,9 +1019,6 @@ start_network() {
 #
 #   Ping test
 ping_test() {
-
-    logmsg "SALI remark: Temporarily disabled due some changes in the initrd envirenmont"
-    return
 
     logmsg
     logmsg ping_test
