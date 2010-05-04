@@ -59,8 +59,6 @@ read_kernel_append_parameters
 start_network
 beep
 
-shellopen
-
 if [ ! -z $MONITOR_SERVER ]; then
     init_monitor_server
 fi
