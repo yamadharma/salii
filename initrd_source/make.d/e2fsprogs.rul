@@ -21,17 +21,23 @@ E2FSPROGS_CONFIGURE := $(E2FSPROGS_CONFIGURE) --enable-elf-shlibs
 PHONY += e2fsprogs
 e2fsprogs:	$(E2FSPROGS_DIR).build
 
+#$(E2FSPROGS_DIR).build:	$(INITRD_SRC_DIR)/$(E2FSPROGS_TARBALL)
+#[ -d $(E2FSPROGS_DIR) ] || ( cd $(INITRD_SRC_DIR) && tar -xvzf $(E2FSPROGS_TARBALL) )
+#chmod -R u+rw $(E2FSPROGS_DIR)
+#( cd $(E2FSPROGS_DIR) && chmod +x ./configure && ./configure --prefix=$(INITRD_BUILD_DIR) $(E2FSPROGS_CONFIGURE) )
+#$(MAKE) -j $(NCPUS) -C $(E2FSPROGS_DIR)
+
 $(E2FSPROGS_DIR).build:	$(INITRD_SRC_DIR)/$(E2FSPROGS_TARBALL)
 	[ -d $(E2FSPROGS_DIR) ] || ( cd $(INITRD_SRC_DIR) && tar -xvzf $(E2FSPROGS_TARBALL) )
 	chmod -R u+rw $(E2FSPROGS_DIR)
-	( cd $(E2FSPROGS_DIR) && chmod +x ./configure && ./configure --prefix=$(INITRD_BUILD_DIR) $(E2FSPROGS_CONFIGURE) )
+	( cd $(E2FSPROGS_DIR) && chmod +x ./configure && ./configure $(E2FSPROGS_CONFIGURE) )
 	$(MAKE) -j $(NCPUS) -C $(E2FSPROGS_DIR)
 
 PHONY += e2fsprogs_install
 e2fsprogs_install: $(E2FSPROGS_DIR).install 
 
 $(E2FSPROGS_DIR).install: $(E2FSPROGS_DIR).build
-	$(MAKE) -j $(NCPUS) -C $(E2FSPROGS_DIR) install
+	cd $(E2FSPROGS_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
 
 # download the e2fsprogs tarball
 $(INITRD_SRC_DIR)/$(E2FSPROGS_TARBALL):
