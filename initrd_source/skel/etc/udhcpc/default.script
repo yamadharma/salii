@@ -4,4 +4,5 @@
 # common initialization first, especially if more dhcp event notifications
 # are added.
 
+echo "SISRV: $sisrv"
 exec /etc/udhcpc/default.$1
