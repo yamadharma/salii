@@ -1,0 +1,30 @@
+diff -ru busybox-1.16.1/networking/udhcp/options.c busybox-1.16.1-sali/networking/udhcp/options.c
+--- busybox-1.16.1/networking/udhcp/options.c	2010-03-28 19:43:36.000000000 +0200
++++ busybox-1.16.1-sali/networking/udhcp/options.c	2010-05-03 16:09:36.839349040 +0200
+@@ -14,6 +14,7 @@
+ /* Supported options are easily added here */
+ const struct dhcp_option dhcp_options[] = {
+ 	/* flags                                    code */
++	{ OPTION_IP                   | OPTION_REQ, 0xe0 }, /* SALI_IMAGESERVER   */
+ 	{ OPTION_IP                   | OPTION_REQ, 0x01 }, /* DHCP_SUBNET        */
+ 	{ OPTION_S32                              , 0x02 }, /* DHCP_TIME_OFFSET   */
+ 	{ OPTION_IP | OPTION_LIST     | OPTION_REQ, 0x03 }, /* DHCP_ROUTER        */
+@@ -64,6 +65,7 @@
+  * for udhcpc stript */
+ /* Must match dhcp_options[] order */
+ const char dhcp_option_strings[] ALIGN1 =
++	"sisrv" "\0"       /* SALI_IMAGESERVER    */
+ 	"subnet" "\0"      /* DHCP_SUBNET         */
+ 	"timezone" "\0"    /* DHCP_TIME_OFFSET    */
+ 	"router" "\0"      /* DHCP_ROUTER         */
+diff -ru busybox-1.16.1/networking/udhcp/options.h busybox-1.16.1-sali/networking/udhcp/options.h
+--- busybox-1.16.1/networking/udhcp/options.h	2010-03-28 19:43:36.000000000 +0200
++++ busybox-1.16.1-sali/networking/udhcp/options.h	2010-05-03 16:09:09.615358400 +0200
+@@ -36,6 +36,7 @@
+ #define DHCP_MAGIC		0x63825363
+ 
+ /* DHCP option codes (partial list) */
++#define SALI_IMAGESERVER 	0xe0
+ #define DHCP_PADDING            0x00
+ #define DHCP_SUBNET             0x01
+ #define DHCP_TIME_OFFSET        0x02

@@ -945,6 +945,83 @@ read_local_cfg() {
 #   Configure network interface using local.cfg settings if possible, else
 #   use DHCP. -BEF-
 #
+#
+ping_test() {
+
+    logmsg
+    logmsg ping_test
+
+    PING_DESTINATION=$1
+    
+    logmsg
+    logmsg "Pinging your IMAGESERVER"
+
+
+    # Ping test code submitted by Grant Noruschat <grant@eigen.ee.ualberta.ca>
+    # modified slightly by Brian Finley.
+    PING_COUNT=1
+    PING_EXIT_STATUS=1
+    while [ "$PING_EXIT_STATUS" != "0" ]
+    do
+        logmsg "PING ATTEMPT $PING_COUNT: "
+        ping -c 1 $PING_DESTINATION || shellout
+        PING_EXIT_STATUS=$?
+
+        if [ "$PING_EXIT_STATUS" = "0" ]; then
+            logmsg
+            logmsg "  We have connectivity to your IMAGESERVER!"
+        fi
+
+        PING_COUNT=$(( $PING_COUNT + 1 ))
+        if [ "$PING_COUNT" = "4" ]; then
+		return 
+        fi
+    done
+
+    unset PING_DESTINATION
+    unset HOST_TYPE
+
+}
+
+start_udhcpc_for(){
+	udhcpc -i $1
+
+	if [ -s /tmp/udhcpc ]; then
+		. /tmp/udhcpc || shellout
+		ping_test $IMAGESERVER
+
+		if [ "$PING_EXIT_STATUS" != "0" ]; then
+			UDHCPRSLT=1
+		else
+			UDHCPRSLT=0
+		fi
+	else
+		UDHCPRSLT=1
+	fi
+}
+
+start_udhcpc_guess(){
+
+	UDHCPGRSLT=1
+
+	for NIC in $(ls -1 /sys/class/net/)
+	do
+		if [ "$NIC" != "lo" ]; then
+			start_udhcpc_for $NIC
+		
+			if [ "$UDHCPRSLT" != "0" ]; then
+		   		logmsg
+		   		logmsg "Ip could not be set for $NIC"
+				UDHCPGRSLT=1
+			else
+				UDHCPGRSLT=0
+				break
+                	fi
+		fi
+	done
+
+}
+
 start_network() {
 
     logmsg
@@ -1001,80 +1078,32 @@ start_network() {
         logmsg
         ### END ether sleep ###
         
-        logmsg
-        logmsg "Using default eth0: udhcpc"
-	udhcpc       
-        
-	if [ ! -s /tmp/udhcpc.ip ]; then
-            logmsg
-            logmsg "I couldn't configure the network interface using DHCP."
-            logmsg
-            shellout
-        fi
+	if [ ! -z $DEVICE ]; then
+		logmsg
+		logmsg "Param DEVICE specified, using $DEVICE"
+		start_udhcpc_for $DEVICE
+
+		if [ "$UDHCPRSLT" != "0" ]; then
+		   logmsg
+		   logmsg "Ip could not be set, guessing interface!"
+                   start_udhcpc_guess
+                fi
+	else
+		logmsg
+        	logmsg "Param DEVICE not set, guesing interface"
+		start_udhcpc_guess
+	fi
+
+	if [ "$UDHCPGRSLT" != "0" ]; then
+		logmsg
+		logmsg "DHCP configuration failed"
+		logmsg
+		shellout
+	fi
         
     fi
 }
-#
-################################################################################
-#
-#   Ping test
-ping_test() {
 
-    logmsg
-    logmsg ping_test
-
-    # The reason we don't ping the IMAGESERVER if FLAMETHROWER_DIRECTORY_PORTBASE
-    # is set, is that the client may never be given, know, or need to know, the 
-    # IP address of the imageserver because the client is receiving _all_ of it's
-    # data via multicast, which is more like listening to a channel, as compared 
-    # with connecting directly to a server.  -BEF-
-    #
-    if [ ! -z "$FLAMETHROWER_DIRECTORY_PORTBASE" ]; then
-        PING_DESTINATION=$GATEWAY
-        HOST_TYPE="default gateway"
-    else
-        PING_DESTINATION=$IMAGESERVER
-        HOST_TYPE="SystemImager server"
-    fi 
-    logmsg
-    logmsg "Pinging your $HOST_TYPE to ensure we have network connectivity."
-    logmsg
-
-
-    # Ping test code submitted by Grant Noruschat <grant@eigen.ee.ualberta.ca>
-    # modified slightly by Brian Finley.
-    PING_COUNT=1
-    PING_EXIT_STATUS=1
-    while [ "$PING_EXIT_STATUS" != "0" ]
-    do
-        logmsg "PING ATTEMPT $PING_COUNT: "
-        ping -c 1 $PING_DESTINATION
-        PING_EXIT_STATUS=$?
-
-        if [ "$PING_EXIT_STATUS" = "0" ]; then
-            logmsg
-            logmsg "  We have connectivity to your $HOST_TYPE!"
-        fi
-
-        PING_COUNT=$(( $PING_COUNT + 1 ))
-        if [ "$PING_COUNT" = "4" ]; then
-            logmsg
-            logmsg "  WARNING:  Failed ping test."
-            logmsg "            Despite this seemingly depressing result, I will attempt"
-            logmsg "            to proceed with the install.  Your $HOST_TYPE may be"
-            logmsg "            configured to not respond to pings, but it wouldn't hurt"
-            logmsg "            to double check that your networking equipment is"
-            logmsg "            working properly!"
-            logmsg
-            sleep 5
-            PING_EXIT_STATUS=0
-        fi
-    done
-
-    unset PING_DESTINATION
-    unset HOST_TYPE
-
-}
 #
 ################################################################################
 #

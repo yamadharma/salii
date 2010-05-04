@@ -4,5 +4,10 @@
 # common initialization first, especially if more dhcp event notifications
 # are added.
 
-echo "SISRV: $sisrv"
+DHCPVARFILE=/tmp/udhcpc
+
+echo "IMAGESERVER=$sisrv" > $DHCPVARFILE
+echo "IPADRR=$ip" >> $DHCPVARFILE
+echo "HOSTNAME=$hostname" >> $DHCPVARFILE
+
 exec /etc/udhcpc/default.$1

@@ -15,7 +15,7 @@
 #
 
 
-LVM_VERSION	:= 2.2.02.63
+LVM_VERSION	:= 2.2.02.64
 LVM_DIR		:= $(INITRD_SRC_DIR)/LVM$(LVM_VERSION)
 LVM_TARBALL	:= LVM$(LVM_VERSION).tgz
 LVM_URL	:= ftp://sources.redhat.com/pub/lvm2/$(LVM_TARBALL)
