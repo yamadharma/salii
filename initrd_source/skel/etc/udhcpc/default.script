@@ -9,6 +9,6 @@ DHCPVARFILE=/tmp/udhcpc
 echo "IMAGESERVER=$sisrv" > $DHCPVARFILE
 echo "IPADRR=$ip" >> $DHCPVARFILE
 echo "HOSTNAME=$hostname" >> $DHCPVARFILE
-echo "NETMASK=$netmask" >> $DHCPVARFILE
+echo "NETMASK=$subnet" >> $DHCPVARFILE
 
 exec /etc/udhcpc/default.$1
