@@ -39,7 +39,7 @@ $(OPENSSH_DIR).build:	$(INITRD_SRC_DIR)/openssh_verify.stamp
 	rm -rf $(OPENSSH_DIR)
 	( cd $(INITRD_SRC_DIR) && tar -xvzf $(OPENSSH_TARBALL) )
 	cd $(OPENSSH_DIR) && \
-	  LD_LIBRARY_PATH=$(OPENSSL_DIR) ./configure --prefix=$(INITRD_BUILD_DIR) \
+	  LD_LIBRARY_PATH=$(OPENSSL_DIR) ./configure --prefix=/usr \
 	  --with-zlib=$(INITRD_SRC_DIR)/$(ZLIB_DIR) \
 	  --with-ssl-dir=$(INITRD_SRC_DIR)/$(OPENSSL_DIR) --without-rpath \
 	  --disable-last-log --disable-libutil --disable-pututxline \
@@ -52,7 +52,7 @@ $(OPENSSH_DIR).build:	$(INITRD_SRC_DIR)/openssh_verify.stamp
 
 PHONY += openssh_install
 openssh_install: $(OPENSSH_DIR).install
-	$(MAKE) -j $(NCPUS) -C $(OPENSSH_DIR) install
+	cd $(OPENSSH_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
 	
 	install -m 644 $(TOPDIR)/etc/ssh/ssh_config $(INITRD_BUILD_DIR)/etc/ssh/ssh_config
 	install -m 644 $(TOPDIR)/etc/ssh/sshd_config $(INITRD_BUILD_DIR)/etc/ssh/sshd_config
