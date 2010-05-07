@@ -21,14 +21,14 @@ PHONY += jfsutils_install
 jfsutils_install: $(JFSUTILS_DIR).install
 
 $(JFSUTILS_DIR).install: $(JFSUTILS_DIR).build
-	$(MAKE) -j $(NCPUS) -C $(JFSUTILS_DIR) install
+	cd $(JFSUTILS_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
 
 $(JFSUTILS_DIR).build:	$(INITRD_SRC_DIR)/$(JFSUTILS_TARBALL)
 	[ -d $(JFSUTILS_DIR) ] || \
 	  ( cd $(INITRD_SRC_DIR) && zcat $(JFSUTILS_TARBALL) | tar xv && \
 	    	( cd $(JFSUTILS_DIR) && chmod +x ./configure && \
 	 	 CPPFLAGS=-I$(E2FSPROGS_DIR)/lib CFLAGS="-O2 -Wall -I$(E2FSPROGS_DIR)/lib" LDFLAGS=-L$(E2FSPROGS_DIR)/lib \
-	  	./configure --prefix=$(INITRD_BUILD_DIR) ) )
+	  	./configure --prefix=/usr ) )
 	$(MAKE) -j $(NCPUS) -C $(JFSUTILS_DIR)
 
 $(INITRD_SRC_DIR)/$(JFSUTILS_TARBALL):
