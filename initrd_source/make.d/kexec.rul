@@ -16,14 +16,14 @@ kexec:	$(KEXEC_DIR).build
 $(KEXEC_DIR).build:  $(INITRD_SRC_DIR)/$(KEXEC_TARBALL)
 	rm -rf $(KEXEC_DIR)
 	cd $(INITRD_SRC_DIR) && tar -xvjf $(KEXEC_TARBALL)
-	cd $(KEXEC_DIR) && ./configure --prefix=$(INITRD_BUILD_DIR)
+	cd $(KEXEC_DIR) && ./configure --prefix=/usr
 	$(MAKE) -j $(NCPUS) -C $(KEXEC_DIR)
 
 PHONY += kexec_install
 kexec_install: $(KEXEC_DIR).install
 
 $(KEXEC_DIR).install: 	$(KEXEC_DIR).build
-	$(MAKE) -j $(NCPUS) -C $(KEXEC_DIR) install
+	cd $(KEXEC_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
 
 $(INITRD_SRC_DIR)/$(KEXEC_TARBALL):
 	mkdir -p $(SRC_DIR)
