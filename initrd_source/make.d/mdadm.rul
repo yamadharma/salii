@@ -25,13 +25,13 @@ $(MDADM_DIR).build: $(INITRD_SRC_DIR)/$(MDADM_TARBALL)
 	$(MAKE) $(INITRD_SRC_DIR)/$(MDADM_TARBALL)
 	[ -d $(MDADM_DIR) ] || \
 		( cd $(INITRD_SRC_DIR) && tar zxvf $(MDADM_TARBALL) )
-	cd $(MDADM_DIR) && $(MAKE) -j $(NCPUS) -C $(MDADM_DIR)
+	cd $(MDADM_DIR) && $(MAKE) -j $(NCPUS)
 
 PHONY += mdadm_install
 mdam_install: $(MDADM_DIR).install
 
 $(MDADM_DIR).install: $(MDADM_DIR).build
-	cd $(MDADM_DIR) && make DESTDIR=$(INITRD_SBIN_DIR) install
+	cd $(MDADM_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
 
 $(INITRD_SRC_DIR)/$(MDADM_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)

@@ -20,7 +20,7 @@ PHONY += aria2_install
 aria2_install:	$(ARIA2_DIR).install
 
 $(ARIA2_DIR).install:	$(ARIA2_DIR).build
-	cd $(ARIA2_DIR) && make install DESTDIR=$(INITRD_BUILD_DIR)
+	cd $(ARIA2_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
 
 $(ARIA2_DIR).unpack:   	$(INITRD_DIR)/make.d/aria2.rul	\
 			$(INITRD_SRC_DIR)/$(ARIA2_TARBALL)

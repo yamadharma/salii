@@ -21,7 +21,7 @@ PHONY += kerneltools_install
 kerneltools_install: 	$(KERNELTOOLS_DIR).install
 
 $(KERNELTOOLS_DIR).install: $(KERNELTOOLS_DIR).build $(INITRD_BUILD_DIR).prep
-	$(MAKE) -j $(NCPUS) -C $(KERNELTOOLS_DIR) install DESTDIR=$(INITRD_BUILD_DIR)
+	$(MAKE) -j $(NCPUS) -C $(KERNELTOOLS_DIR) DESTDIR=$(INITRD_BUILD_DIR) install
 
 $(KERNELTOOLS_DIR).unpack:	$(INITRD_DIR)/make.d/kerneltools.rul \
                     $(INITRD_SRC_DIR)/$(KERNELTOOLS_TARBALL)
