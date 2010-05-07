@@ -72,7 +72,10 @@ include $(INITRD_MAKE_DIR)/busybox.rul
 #include $(INITRD_MAKE_DIR)/bittorrent.rul
 include $(INITRD_MAKE_DIR)/rsync.rul
 #include $(INITRD_MAKE_DIR)/hotplug.rul
-include $(INITRD_MAKE_DIR)/sysvinit.rul
+
+# Not needed HvB 7 mei 2010
+#include $(INITRD_MAKE_DIR)/sysvinit.rul
+
 include $(INITRD_MAKE_DIR)/udev.rul
 include $(INITRD_MAKE_DIR)/kexec.rul
 include $(INITRD_MAKE_DIR)/aria2.rul
@@ -130,7 +133,6 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(SKEL_FILES) 			\
 								$(SRC_DIR)/modules_build-stamp 	\
 								$(BUSYBOX_DIR).install 		\
-								$(SYSVINIT_DIR).install		\
 								$(UDEV_DIR).install 		\
 								$(RSYNC_DIR).install 		\
 								$(BC_DIR).install 		\
@@ -176,10 +178,6 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 
 	# We need dns resolving, so copy the libresolv libs
 	cp -a /lib/libresolv* $(INITRD_BUILD_DIR)/lib
-
-	# BitTorrent binaries must not be stripped. -AR-
-	cd $(INITRD_BUILD_DIR)/bin && ln -fs ../lib/bittorrent/torrentinfo-console
-	cd $(INITRD_BUILD_DIR)/bin && ln -fs ../lib/bittorrent/bittorrent-console
 
 	# Copy over text files from the skel directory.
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
