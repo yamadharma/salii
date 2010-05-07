@@ -32,15 +32,14 @@ $(LVM_DIR).build:	$(INITRD_SRC_DIR)/$(LVM_TARBALL)
 	rm -rf $(LVM_DIR)
 	cd $(INITRD_SRC_DIR) && tar -xvzf $(LVM_TARBALL)
 	cd $(LVM_DIR) && \
-		./configure --prefix=$(INITRD_BUILD_DIR)/usr --disable-nls --with-optimisation=-Os
-	cd $(LVM_DIR) 
-	$(MAKE) -j $(NCPUS) -C $(LVM_DIR)
+		./configure --prefix=/usr --disable-nls --with-optimisation=-Os
+	cd $(LVM_DIR) && $(MAKE) -j $(NCPUS)
 
 PHONY += lvm_install
 lvm_install: $(LVM_DIR).install
 
 $(LVM_DIR).install: $(LVM_DIR).build
-	$(MAKE) -j $(NCPUS) -C $(LVM_DIR) install
+	cd $(LVM_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
 
 $(INITRD_SRC_DIR)/$(LVM_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
