@@ -32,14 +32,14 @@ $(PARTED_DIR).build:	$(INITRD_SRC_DIR)/$(PARTED_TARBALL) $(PARTED_PATCHES) $(E2F
 	  cat $(PARTED_PATCHES) < /dev/null | patch -p1
 	( cd $(PARTED_DIR) && \
 	  CPPFLAGS=-I$(E2FSPROGS_DIR)/lib CFLAGS=-I$(E2FSPROGS_DIR)/lib LDFLAGS=-L$(E2FSPROGS_DIR)/lib \
-	  ./configure --disable-Werror --prefix=$(INITRD_BUILD_DIR) $(PARTED_CONFIGURE))
+	  ./configure --disable-Werror --prefix=/usr $(PARTED_CONFIGURE))
 	$(MAKE) -j $(NCPUS) -C $(PARTED_DIR)
 
 PHONY += parted_install
 parted_install: $(PARTED_DIR).install
 
 $(PARTED_DIR).install: $(PARTED_DIR).build
-	$(MAKE) -j $(NCPUS) -C $(PARTED_DIR) install
+	cd $(PARTED_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
 
 $(INITRD_SRC_DIR)/$(PARTED_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
