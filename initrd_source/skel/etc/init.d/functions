@@ -530,63 +530,49 @@ bittorrent_autodetect_staging_dir() {
 #
 #   Usage: bittorrent_get_file torrent destination
 #
+bittorrent_check_log(){
+	PATTERN=$1
+	FILE=$1
+	COLUMN=$3
+
+	CURRENTLINE=$(tail -n 1 $FILE)
+	RSLT=$(echo $CURRENTLINE | egrep $PATTERN | cut -d " " -f $COLUMN)
+
+	if [ $RSLT ]; then
+		echo "$RSLT"
+	fi
+}
+
 bittorrent_get_file() {
         torrent=$1
         destination=$2
 
         # Bittorrent log file
-        bittorrent_log=/tmp/bittorrent-`basename ${torrent}`.log
-        # Time to poll bittorrent events
-        bittorrent_polling_time=${BITTORRENT_POLLING_TIME:-5}
-        # Wait after the download is finished to seed the other peers
-        bittorrent_seed_wait=${BITTORRENT_SEED_WAIT:-n}
-        # Minimum upload rate threshold (in KB/s), if lesser stop seeding
-        bittorrent_upload_min=${BITTORRENT_UPLOAD_MIN:-50}
+        bittorrent_log=/tmp/bittorrent.log
 
-        # Start downloading.
-        /bin/bittorrent-console --no_upnp --no_start_trackerless_client --max_upload_rate 0 --display_interval 1 --rerequest_interval 1 --bind ${IPADDR} --save_in ${destination} ${torrent} > $bittorrent_log &
-        pid=$!
-        if [ ! -d /proc/$pid ]; then
-            logmsg "error: couldn't run bittorrent-console!"
-            shellout
-        fi
-        unset pid
+	##Starting aria2c and sending the stdout to a file
+	/usr/bin/aria2c --human-readable=false --dir $destination > $bittorrent_log &
 
-        # Wait for BitTorrent log to appear.
-        while [ ! -e $bittorrent_log ]; do
-            sleep 1
-        done
+	downloadpattern="(SIZE:[0-9]+B/[0-9]+B\([0-9]{1,2}1{0,1}\%\))"
+	donepattern="(SEEDING\(ratio:[0-9.]+\))"
 
-        # Checking download...
-        while :; do
-            while :; do
-                status=`grep 'percent done:' $bittorrent_log | sed -ne '$p' | sed 's/percent done: *//' | sed -ne '/^[0-9]*\.[0-9]*$/p'`
-                [ ! -z "$status" ] && break
-            done
-            logmsg "percent done: $status %"
-            if [ "$status" = "100.0" ]; then
-                # Sleep until upload rate reaches the minimum threshold
-                while [ "$bittorrent_seed_wait" = "y" ]; do
-                    sleep $bittorrent_polling_time
-                    while :; do
-                        upload_rate=`grep 'upload rate:' $bittorrent_log | sed -ne '$p' | sed 's/upload rate: *\([0-9]*\)\.[0-9]* .*$/\1/' | sed -ne '/^\([0-9]*\)$/p'`
-                        [ ! -z $upload_rate ] && break
-                    done
-                    logmsg "upload rate: $upload_rate KB/s"
-                    [ $upload_rate -lt $bittorrent_upload_min ] && break
-                done
-                logmsg "Download completed"
-                unset bittorrent_log upload_rate counter
-                break
-            fi
-            sleep $bittorrent_polling_time
-        done
 
-        unset bittorrent_polling_time
-        unset bittorrent_seed_wait
-        unset bittorrent_upload_min
-        unset torrent
-        unset destination
+	if [ -e $bittorrent_log ]; then
+		while : ; do
+			SEED=$(bittorrent_check_log $donepattern $bittorent_log 2)
+			DOWNLOAD=$(bittorrent_check_log $downloadpattern $bittorrent_log 2)
+
+			if [ $SEED ]; then
+				echo "\nDownload complete"
+				break
+			elif [ $DOWNLOAD ]; then
+				echo "\rDownloading: $DOWNLOAD\c"
+			fi
+		done
+	else
+		logmsg "Could not find the bittorrent log file"
+		shellout
+	fi
 }
 #
 ################################################################################
@@ -596,81 +582,8 @@ bittorrent_get_file() {
 #   Usage: bittorrent_stop
 #
 bittorrent_stop() {
-    # Try to kill all the BitTorrent processes
-    btclient="bittorrent-console"
-
-    logmsg "killing BitTorrent client..."
-    killall -15 $btclient >/dev/null 2>&1
-
-    # Forced kill after 5 secs.
-    sleep 5
-    killall -9 $btclient >/dev/null 2>&1
-
-    # Remove bittorrent logs.
-    rm -rf /tmp/bittorrent*.log
-    unset btclient
-}
-#
-################################################################################
-#
-#   Get other binaries, kernel module tree, and miscellaneous other stuff that
-#   got put in the binaries tarball. -BEF-
-#
-get_boel_binaries_tarball() {
-
-    logmsg
-    logmsg get_boel_binaries_tarball
-
-    logmsg New SARA install method, diabled get_boel_binaries_tarball
-    return
-
-    mkdir -p ${BOEL_BINARIES_DIR}
-
-    if [ ! -z $SSH_DOWNLOAD_URL ]; then
-        # If we're using SSH, get the boel_binaries from a web server.
-        logmsg "SSH_DOWNLOAD_URL variable is set, so we will install over SSH!"
-
-        if [ ! -z $FLAMETHROWER_DIRECTORY_PORTBASE ]; then
-            logmsg "FLAMETHROWER_DIRECTORY_PORTBASE is also set, but I will be conservative and proceed with SSH."
-        fi
-
-        # Remove possible trailing / from URL
-        SSH_DOWNLOAD_URL=`echo $SSH_DOWNLOAD_URL | sed 's/\/$//'`
-
-        cd ${BOEL_BINARIES_DIR}
-        CMD="wget ${SSH_DOWNLOAD_URL}/${ARCH}/${FLAVOR}/boel_binaries.tar.gz"
-        logmsg "$CMD"
-        $CMD || shellout
-
-    elif [ "x$BITTORRENT" = "xy" ]; then
-
-        # Download BOEL binaries from peers
-        bittorrent_tarball="boel_binaries.tar.gz"
-        logmsg "Start downloading ${bittorrent_tarball} (${ARCH}) using bittorrent"
-        logmsg ""
-        logmsg "--> INFO: remember to start /etc/init.d/systemimager-server-bittorrent on the image server!"
-        logmsg ""
-        bittorrent_get_file ${TORRENTS_DIR}/${ARCH}-${bittorrent_tarball}.torrent ${BOEL_BINARIES_DIR}
-        cd ${BOEL_BINARIES_DIR} && mv ${ARCH}-${bittorrent_tarball} ${bittorrent_tarball}
-        unset bittorrent_tarball
-
-    elif [ ! -z $FLAMETHROWER_DIRECTORY_PORTBASE ]; then
-
-        MODULE_NAME="boot-${ARCH}-${FLAVOR}"
-        DIR="${BOEL_BINARIES_DIR}"
-        RETRY=7
-        flamethrower_client
-
-    else
-        # Use rsync
-        CMD="rsync -av ${IMAGESERVER}::boot/${ARCH}/${FLAVOR}/boel_binaries.tar.gz ${BOEL_BINARIES_DIR}"
-        logmsg "$CMD"
-        $CMD || shellout
-    fi
-
-    # Untar the tarball
-    tar -C / -xzf ${BOEL_BINARIES_DIR}/boel_binaries.tar.gz || shellout
-    chown -R 0.0 /lib/modules || shellout
+	logmsg
+	logmsg "This function is decapricated, the bittorrent client keeps running until a reboot!"
 }
 #
 ################################################################################

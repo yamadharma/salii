@@ -61,20 +61,21 @@ include $(INITRD_MAKE_DIR)/mdadm.rul
 include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
 include $(INITRD_MAKE_DIR)/xfsprogs.rul
 include $(INITRD_MAKE_DIR)/jfsutils.rul
-include $(INITRD_MAKE_DIR)/openssh.rul
 include $(INITRD_MAKE_DIR)/openssl.rul
+include $(INITRD_MAKE_DIR)/openssh.rul
 include $(INITRD_MAKE_DIR)/lvm.rul
 include $(INITRD_MAKE_DIR)/kerneltools.rul
 
 ## Original
-include $(INITRD_MAKE_DIR)/cx_freeze.rul
+#include $(INITRD_MAKE_DIR)/cx_freeze.rul
 include $(INITRD_MAKE_DIR)/busybox.rul
-include $(INITRD_MAKE_DIR)/bittorrent.rul
+#include $(INITRD_MAKE_DIR)/bittorrent.rul
 include $(INITRD_MAKE_DIR)/rsync.rul
 #include $(INITRD_MAKE_DIR)/hotplug.rul
 include $(INITRD_MAKE_DIR)/sysvinit.rul
 include $(INITRD_MAKE_DIR)/udev.rul
 include $(INITRD_MAKE_DIR)/kexec.rul
+include $(INITRD_MAKE_DIR)/aria2.rul
 
 
 PHONY += build_dir 
@@ -143,33 +144,35 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(LVM_DIR).install		\
 								$(KEXEC_DIR).install		\
 								$(OPENSSH_DIR).install 		\
-								$(BITTORRENT_DIR).install 	\
-								$(CX_FREEZE_BINARY) 		
+								$(ARIA2_DIR).install
 
 	# Copy over the standard libs. -BEF-
 	cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
 	test ! -d /lib64 || cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib64
 	# Explicitly include more w/mklibs -L.  -dawild-
-ifeq ($(ARCH),x86_64)
-	( \
-		cd $(INITRD_BUILD_DIR) && \
-		$(PYTHON) $(INITRD_DIR)/mklibs -L /lib64:/usr/lib64:/lib:/usr/lib -v -d lib64 ./*bin/* \
-	)
-	# copy libnss files as they are not automatically included
-	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib64
-else
-	( \
-		cd $(INITRD_BUILD_DIR) && \
-		$(PYTHON) $(INITRD_DIR)/mklibs -L /lib:/usr/lib:/lib64:/usr/lib64 -v -d lib ./*bin/* \
-	)
-	# copy libnss files as they are not automatically included
-	cp -a /lib/libnss* $(INITRD_BUILD_DIR)/lib
-endif
+
+# Mischien gaat het een en ander hier ook fout HvB
+#
+#ifeq ($(ARCH),x86_64)
+#	( \
+#		cd $(INITRD_BUILD_DIR) && \
+#		$(PYTHON) $(INITRD_DIR)/mklibs -L /lib64:/usr/lib64:/lib:/usr/lib -v -d lib64 ./*bin/* \
+#	)
+#	# copy libnss files as they are not automatically included
+#	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib64
+#else
+#	( \
+#		cd $(INITRD_BUILD_DIR) && \
+#		$(PYTHON) $(INITRD_DIR)/mklibs -L /lib:/usr/lib:/lib64:/usr/lib64 -v -d lib ./*bin/* \
+#	)
+#	# copy libnss files as they are not automatically included
+#	cp -a /lib/libnss* $(INITRD_BUILD_DIR)/lib
+#endif
 	# Undo prelinking. -AR-
 	#[ -x `which prelink` ] && (find $(INITRD_BUILD_DIR) -type f -exec prelink -u {} \; 2>&1 | grep -v "does not have .gnu.prelink_undo section\|is not an ELF file") || true
 
-	# Strip 'em. -BEF-
-	strip $(INITRD_BINARIES)
+	# Strip 'em. -BEF- HvB
+	#strip $(INITRD_BINARIES)
 
 	# We need dns resolving, so copy the libresolv libs
 	cp -a /lib/libresolv* $(INITRD_BUILD_DIR)/lib

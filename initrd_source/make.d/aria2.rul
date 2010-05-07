@@ -1,0 +1,38 @@
+#
+#  vi: set filetype=make:
+#
+
+ARIA2_VERSION	= 1.9.2
+ARIA2_TARBALL	= aria2-$(ARIA2_VERSION).tar.bz2
+ARIA2_URL	= http://downloads.sourceforge.net/project/aria2/stable/latest/$(ARIA2_TARBALL)?use_mirror=garr
+ARIA2_DIR	= $(INITRD_SRC_DIR)/aria2-$(ARIA2_VERSION)
+
+ALL_SOURCE += $(INITRD_SRC_DIR)/$(ARIA2_TARBALL)
+
+PHONY += aria2
+aria2:	$(ARIA2_DIR).build
+
+$(ARIA2_DIR).build:  $(ARIA2_DIR).unpack
+	cd $(ARIA2_DIR) && ./configure --prefix=/usr  && make
+	touch $@
+
+PHONY += aria2_install
+aria2_install:	$(ARIA2_DIR).install
+
+$(ARIA2_DIR).install:	$(ARIA2_DIR).build
+	cd $(ARIA2_DIR) && make install DESTDIR=$(INITRD_BUILD_DIR)
+
+$(ARIA2_DIR).unpack:   	$(INITRD_DIR)/make.d/aria2.rul	\
+			$(INITRD_SRC_DIR)/$(ARIA2_TARBALL)
+	rm -rf $(ARIA2_DIR)
+	cd $(INITRD_SRC_DIR) && tar -xvjf $(INITRD_SRC_DIR)/$(ARIA2_TARBALL)
+	touch $@
+
+$(INITRD_SRC_DIR)/$(ARIA2_TARBALL):
+	mkdir -p $(INITRD_SRC_DIR)
+	$(GETSOURCE) $(ARIA2_URL)/$(ARIA2_TARBALL) $(INITRD_SRC_DIR)
+
+PHONY += aria2_clean
+aria2_clean:
+	rm -rf $(ARIA2_DIR)
+	rm -f  $(ARIA2_DIR).build $(ARIA2_DIR).unpack $(ARIA2_DIR).install
