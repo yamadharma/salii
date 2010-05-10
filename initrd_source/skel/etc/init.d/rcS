@@ -132,6 +132,7 @@ if [ -z $SCRIPTNAME ] && [ -z $IMAGENAME ] && [ -z $HOSTNAME ]; then
     logmsg
     shellout
 fi
+write_variables
     
 choose_autoinstall_script
 

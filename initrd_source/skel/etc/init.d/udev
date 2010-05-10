@@ -53,7 +53,7 @@ supported_kernel() {
 
 # shell version of /usr/bin/tty
 my_tty() {
-  [ -x /bin/readlink ] || return 0
+  [ -x /usr/bin/readlink ] || return 0
   [ -e /proc/self/fd/0 ] || return 0
   readlink --silent /proc/self/fd/0 || true
 }
