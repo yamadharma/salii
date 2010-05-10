@@ -590,10 +590,11 @@ bittorrent_get_file() {
 		DOWNLOAD=$(bittorrent_check_log $downloadpattern $bittorrent_log)
 
 		if [ $SEED ]; then
-			echo -e "\nDownload complete"
+			echo "Download complete"
 			break
 		elif [ $DOWNLOAD ]; then
-			echo -e "\rDownloading: $DOWNLOAD\c"
+			echo "Downloading: $DOWNLOAD"
+			sleep 2
 		fi
 	done
 }
@@ -953,6 +954,7 @@ start_udhcpc_guess(){
 				UDHCPGRSLT=1
 			else
 				UDHCPGRSLT=0
+				DEVICE=$NIC
 				break
                 	fi
 		fi

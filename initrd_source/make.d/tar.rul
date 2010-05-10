@@ -1,0 +1,44 @@
+#
+# $Id: tar.rul 4473 2009-10-20 18:34:07Z bli $
+# vi: set filetype=make:
+#
+
+TAR_VERSION = 1.23
+TAR_DIR     = $(INITRD_SRC_DIR)/tar-$(TAR_VERSION)
+TAR_TARBALL = tar-$(TAR_VERSION).tar.bz2
+TAR_URL     = http://ftp.gnu.org/gnu/tar/$(TAR_TARBALL)
+
+ALL_SOURCE += $(INITRD_SRC_DIR)/$(TAR_TARBALL)
+
+PHONY += tar
+tar: $(TAR_DIR).build
+
+$(TAR_DIR).build: $(TAR_DIR).unpack
+	cd $(TAR_DIR) && ./configure --prefix=/usr && make
+	touch $@
+
+PHONY += tar_install
+tar_install: $(TAR_DIR).install
+
+$(TAR_DIR).install: $(TAR_DIR).build
+	cd $(TAR_DIR) && make install DESTDIR=$(INITRD_BUILD_DIR)
+
+
+$(TAR_DIR).unpack: 		$(INITRD_DIR)/make.d/tar.rul \
+				$(INITRD_SRC_DIR)/$(TAR_TARBALL)
+	rm -fr $(TAR_DIR)
+	cd $(INITRD_SRC_DIR) && tar -xvjf $(TAR_TARBALL)
+	cd $(TAR_DIR) && cat $(TAR_PATCHES) < /dev/null | patch -p1
+	touch $@
+
+
+$(INITRD_SRC_DIR)/$(TAR_TARBALL):
+	mkdir -p $(SRC_DIR)
+	$(GETSOURCE) $(TAR_URL) $(INITRD_SRC_DIR)
+
+
+PHONY += tar_clean
+tar_clean:
+	rm -rf $(TAR_DIR)
+	rm -f  $(TAR_DIR).unpack
+	rm -f  $(TAR_DIR).build
