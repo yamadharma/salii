@@ -13,7 +13,7 @@ PHONY += aria2
 aria2:	$(ARIA2_DIR).build
 
 $(ARIA2_DIR).build:  $(ARIA2_DIR).unpack
-	cd $(ARIA2_DIR) && ./configure --prefix=/usr  && make
+	cd $(ARIA2_DIR) && ./configure --without-sqlite3 --prefix=/usr  && make
 	touch $@
 
 PHONY += aria2_install
