@@ -500,20 +500,24 @@ flamethrower_client() {
 #   Usage: bittorrent_autodetect_staging_dir torrent
 #
 bittorrent_autodetect_staging_dir() {
-    torrent=$1
-    if [ ! -f $torrent ]; then
-        logmsg "warning: torrent file $torrent does not exist!"
+    torrent_file=$1
+    if [ ! -f $torrent_file ]; then
+        logmsg "warning: torrent file $torrent_file does not exist!"
         return
     fi
 
     # List of preferred staging directory (/tmp = ramdisk staging)
+    logmsg "Getting disks for storing"
     preferred_dirs="/tmp /a/tmp `df 2>/dev/null | sed '1d' | sed 's/[[:space:]]\+/ /g' | cut -d' ' -f6`"
+    logmsg "Disks: $preferred_dirs"
 
     # Use a breathing room of 100MB (this should be enough for a lot of cases)
     breathing_room=102400
 
     # Evaluate torrent size
-    torrent_size=$((`/bin/torrentinfo-console $torrent | sed -ne 's/^file size\.*: \([0-9]\+\).*$/\1/p'` / 1024 + $breathing_room))
+    logmsg "Getting torrent size"
+    torrent_size=$(( $( (aria2c -S $torrent_file | awk '/Total Length:/ { print $4}' | sed 's/[(),]*//g' ) ) / 1024 + $breathing_room ))
+    logmsg "Torrent size: $torrent_size"
 
     # Find a directory to host the image tarball
     for dir in $preferred_dirs; do
@@ -532,8 +536,8 @@ bittorrent_autodetect_staging_dir() {
 #
 bittorrent_check_log(){
 	PATTERN=$1
-	FILE=$1
-	COLUMN=$3
+	FILE=$2
+	COLUMN=2
 
 	CURRENTLINE=$(tail -n 1 $FILE)
 	RSLT=$(echo $CURRENTLINE | egrep $PATTERN | cut -d " " -f $COLUMN)
@@ -551,28 +555,47 @@ bittorrent_get_file() {
         bittorrent_log=/tmp/bittorrent.log
 
 	##Starting aria2c and sending the stdout to a file
-	/usr/bin/aria2c --human-readable=false --dir $destination > $bittorrent_log &
+	logmsg "/usr/bin/aria2c --human-readable=false --dir $destination $torrent_file > $bittorrent_log &"
+	/usr/bin/aria2c --human-readable=false --dir $destination $torrent_file > $bittorrent_log &
+	
+	pid=$!
+	if [ ! -d /proc/$pid ]; then
+		logmsg "Bittorrent client not running"
+		shellout
+	fi
+
+	echo $pid > /var/run/aria2c.pid
 
 	downloadpattern="(SIZE:[0-9]+B/[0-9]+B\([0-9]{1,2}1{0,1}\%\))"
 	donepattern="(SEEDING\(ratio:[0-9.]+\))"
 
 
-	if [ -e $bittorrent_log ]; then
-		while : ; do
-			SEED=$(bittorrent_check_log $donepattern $bittorent_log 2)
-			DOWNLOAD=$(bittorrent_check_log $downloadpattern $bittorrent_log 2)
+	cntr=0
+	while : ; do
+		if [ -e $bittorrent_log ]; then
+			break
+		else
+			cntr=$(($cntr+1))
+			sleep 5
+		fi
 
-			if [ $SEED ]; then
-				echo "\nDownload complete"
-				break
-			elif [ $DOWNLOAD ]; then
-				echo "\rDownloading: $DOWNLOAD\c"
-			fi
-		done
-	else
-		logmsg "Could not find the bittorrent log file"
-		shellout
-	fi
+		if [ cntr -gt 5 ]; then
+			logmsg "Torrent client not running"
+			shellout
+		fi
+	done
+
+	while : ; do
+		SEED=$(bittorrent_check_log $donepattern $bittorrent_log)
+		DOWNLOAD=$(bittorrent_check_log $downloadpattern $bittorrent_log)
+
+		if [ $SEED ]; then
+			echo -e "\nDownload complete"
+			break
+		elif [ $DOWNLOAD ]; then
+			echo -e "\rDownloading: $DOWNLOAD\c"
+		fi
+	done
 }
 #
 ################################################################################
@@ -897,6 +920,7 @@ ping_test() {
 }
 
 start_udhcpc_for(){
+	logmsg "udhcpc -i $1"
 	udhcpc -i $1
 
 	if [ -s /tmp/udhcpc ]; then
@@ -920,6 +944,7 @@ start_udhcpc_guess(){
 	for NIC in $(ls -1 /sys/class/net/)
 	do
 		if [ "$NIC" != "lo" ]; then
+			logmsg "start_udhcpc_for $NIC"
 			start_udhcpc_for $NIC
 		
 			if [ "$UDHCPRSLT" != "0" ]; then
@@ -1623,7 +1648,7 @@ start_report_task() {
             logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
             shellout
         fi
-        IMAGESIZE=`/bin/torrentinfo-console $torrent_file | sed -ne "s/file size\.*: \([0-9]*\) .*$/\1/p"`
+        IMAGESIZE=`aria2c -S $torrent_file | awk '/Total Length:/ { print $4}' | sed 's/[(),]*//g'`
     fi
     IMAGESIZE=`expr $IMAGESIZE / 1024`
     logmsg "  --> Image size = `expr $IMAGESIZE / 1024`MiB"
