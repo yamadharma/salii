@@ -79,7 +79,6 @@ include $(INITRD_MAKE_DIR)/rsync.rul
 include $(INITRD_MAKE_DIR)/udev.rul
 include $(INITRD_MAKE_DIR)/kexec.rul
 include $(INITRD_MAKE_DIR)/aria2.rul
-include $(INITRD_MAKE_DIR)/gzip.rul
 include $(INITRD_MAKE_DIR)/tar.rul
 
 
@@ -146,9 +145,9 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(LVM_DIR).install		\
 								$(KEXEC_DIR).install		\
 								$(OPENSSH_DIR).install 		\
-								$(GZIP_DIR).install 		\
 								$(TAR_DIR).install 		\
 								$(ARIA2_DIR).install
+
 
 	# Copy over the standard libs. -BEF-
 	cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
