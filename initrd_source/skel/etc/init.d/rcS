@@ -111,6 +111,7 @@ run_pre_install_scripts
 if [ -z $SCRIPTNAME ]; then
     logmsg
     logmsg "No script defined, opening console"
+    write_variables
     shellopen
 fi
 

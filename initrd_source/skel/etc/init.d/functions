@@ -759,17 +759,7 @@ ifconfig_loopback() {
     logmsg ifconfig_loopback
     ifconfig lo 127.0.0.1
 }
-#
-################################################################################
-#
-# Load any modules that were placed in the my_modules directory prior to
-# running "make initrd.gz".  -BEF-
-load_my_modules() {
-    logmsg
-    logmsg load_my_modules
-    cd /my_modules || shellout
-    sh ./INSMOD_COMMANDS
-}
+
 #
 ################################################################################
 #

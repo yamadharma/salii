@@ -196,11 +196,6 @@ endif
 	$(SI_INSTALL) -m 755 $(INITRD_DIR)/skel/etc/init.d/functions \
 	  $(INITRD_BUILD_DIR)/etc/init.d/functions
 
-	# Copy over modules required prior to retrieving the autoinstall
-	# binaries tarball. -BEF-
-	cp -a $(INITRD_DIR)/my_modules $(INITRD_BUILD_DIR)
-
-	# Clear out SVN cruft.
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
 	mkdir -p $(INITRD_BUILD_DIR)/new_root
 
@@ -227,9 +222,6 @@ $(INITRD_DIR)/initrd:	$(INITRD_BUILD_DIR).build
 	# Installing kernel modules
 	$(MAKE) INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_SRC) -j $(NCPUS) modules_install
 	
-	# Adding current modules
-	#$(MYMODULES) $(INITRD_BUILD_DIR) $(INITRD_BUILD_DIR)/my_modules/INSMOD_COMMANDS
-
 	cd "${INITRD_BUILD_DIR}" && find . | cpio --quiet -o -H newc > "$(INITRD_DIR)/initrd" || exit 1
 
 PHONY += install_initrd_template
