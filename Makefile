@@ -157,7 +157,7 @@ LIB_DEST = $(USR)/lib/systemimager/perl
 LOG_DIR = $(DESTDIR)/var/log/systemimager
 LOCK_DIR = $(DESTDIR)/var/lock/systemimager
 
-INITRD_DIR = $(TOPDIR)/initrd_source
+INITRD_DIR = $(TOPDIR)/initrd
 
 BOOT_BIN_DEST     = $(USR)/share/systemimager/boot/$(ARCH)/$(FLAVOR)
 
@@ -220,7 +220,7 @@ include $(TOPDIR)/make.d/kernel.rul
 include $(TOPDIR)/make.d/popt.rul
 include $(TOPDIR)/make.d/zlib.rul
 
-include $(TOPDIR)/initrd_source/initrd.rul
+include $(TOPDIR)/initrd/initrd.rul
 
 # a complete server install
 .PHONY:	install_server_all
@@ -637,7 +637,7 @@ show_build_deps:
 	@echo
 
 .PHONY:	show_all_targets
-SHOW_TARGETS_ALL_MAKEFILES = $(shell find . make.d/ initrd_source/ initrd_source/make.d/  -maxdepth 1 -name 'Makefile' -or -name '*.rul' )
+SHOW_TARGETS_ALL_MAKEFILES = $(shell find . make.d/ initrd/ initrd/make.d/  -maxdepth 1 -name 'Makefile' -or -name '*.rul' )
 show_all_targets:
 	@echo All Available Targets Include:
 	@echo ---------------------------------------------------------------------
