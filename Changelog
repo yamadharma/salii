@@ -1,0 +1,41 @@
+1.1.0:
+  * Removed the Python based bitorrent client. CX_Freeze as also been removed.
+
+  * Added aria2 to replace the removed bittorrent client. This client has support
+    for various other protocols. http://aria2.sourceforge.net/
+
+  * Some fine tuning to the udhcpc configuration
+
+  * Removed load_my_modules functionality. The current udev replaces this
+    functionality
+
+  * Changed the si_installbtimage slighty. The -S flag has been removed during the
+    creation of the tar.gz image file.
+
+  * Various other changes
+
+  Authors: Bas van der Vlies and Dennis Stam
+
+1.0.0:
+  * First version of Sali
+
+  * Moved boel_binaries to initrd_source
+
+  * Increased udev version from 120 to 151. With this 
+    version of udev hotplug is obsolete and therefore removed
+
+  * Removed the DHCP software and replaced this with the udhcpc from
+    busybox.
+
+  * Parted version has been increased to 2.2. With this version it's
+    possible to set the bios_grub flag on a partition. This flag is
+    used by GRUB2 when installed on a GPT based disk.
+
+  * Using kernel 2.6.33.3
+
+  * Various other changes to the used tools. Either they are replaced by
+    busybox or the version number has been increased.
+
+  Authors: Bas van der Vlies and Dennis Stam
+
+systemimager changelog can be found in file CHANGE.LOG
