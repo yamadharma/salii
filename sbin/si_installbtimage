@@ -320,7 +320,7 @@ sub bt_prepare {
             $tarball_file = "$TARBALL_DIR/$type-$name.tar"
         }
         unless (-f "$tarball_file") {
-            system "cd $dir/$name && tar -c${compress}Spf $tarball_file .";
+            system "cd $dir/$name && tar -c${compress}pf $tarball_file .";
             if ($?) {
                 die "ERROR: cannot create $type tarball file!\n";
             }
