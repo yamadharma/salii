@@ -25,8 +25,6 @@ SCRIPTS=scripts
 SCRIPTS_DIR=/scripts
 TORRENTS=torrents
 TORRENTS_DIR=/torrents
-FLAMETHROWER_DIRECTORY_DIR=/var/lib/systemimager/flamethrower
-BOEL_BINARIES_DIR=/tmp/boel_binaries
 VERSION="SYSTEMIMAGER_VERSION_STRING"
 FLAVOR="SYSTEMIMAGER_FLAVOR_STRING"
 #
@@ -239,6 +237,8 @@ shellout() {
     exec sh > /dev/console 2>&1
 }
 
+##
+# This function has been added to open a console without any errors
 shellopen() {
 	logmsg
 	logmsg "Starting console..."
@@ -293,23 +293,10 @@ get_torrents_directory() {
     logmsg
     logmsg get_torrents_directory
 
-    if [ ! -z $FLAMETHROWER_DIRECTORY_PORTBASE ]; then
-        #
-        # We're using Multicast, so we should already have a directory 
-        # full of scripts.  Break out here, so that we don't try to pull
-        # the scripts dir again (that would be redundant).
-        #
-        MODULE_NAME="autoinstall_torrents"
-        DIR="${SCRIPTS_DIR}"
-        RETRY=7
-        flamethrower_client
-
-    else
-        mkdir -p ${TORRENTS_DIR}
-        CMD="rsync -a ${IMAGESERVER}::${TORRENTS}/ ${TORRENTS_DIR}/"
-        logmsg "$CMD"
-        $CMD
-    fi
+    mkdir -p ${TORRENTS_DIR}
+    CMD="rsync -a ${IMAGESERVER}::${TORRENTS}/ ${TORRENTS_DIR}/"
+    logmsg "$CMD"
+    $CMD
 }
 #
 ################################################################################
@@ -320,178 +307,12 @@ get_scripts_directory() {
     logmsg
     logmsg get_scripts_directory
 
-    if [ ! -z $FLAMETHROWER_DIRECTORY_PORTBASE ]; then
-        #
-        # We're using Multicast, so we should already have a directory 
-        # full of scripts.  Break out here, so that we don't try to pull
-        # the scripts dir again (that would be redundant).
-        #
-        MODULE_NAME="autoinstall_scripts"
-        DIR="${SCRIPTS_DIR}"
-        RETRY=7
-        flamethrower_client
-
-    else
-        mkdir -p ${SCRIPTS_DIR}
-        CMD="rsync -a ${IMAGESERVER}::${SCRIPTS}/ ${SCRIPTS_DIR}/"
-        logmsg "$CMD"
-        $CMD
-    fi
+    mkdir -p ${SCRIPTS_DIR}
+    CMD="rsync -a ${IMAGESERVER}::${SCRIPTS}/ ${SCRIPTS_DIR}/"
+    logmsg "$CMD"
+    $CMD
 }
-#
-################################################################################
-#
-# Usage: get_flamethrower_directory
-#
-get_flamethrower_directory() {
-    logmsg
-    logmsg Using multicast...
-    logmsg get_flamethrower_directory
 
-    MODULE_NAME=flamethrower_directory
-    DIR=${FLAMETHROWER_DIRECTORY_DIR}
-    RETRY=7
-    PORTBASE=9000
-    flamethrower_client
-}
-#
-################################################################################
-#
-# Usage: 
-#
-#   MODULE_NAME=my_module   # Required
-#   DIR=/my/destination/dir # Required
-#   [RETRY=7]               # Optional
-#   [PORTBASE=9000]         # Required if a sourceable file called $MODULE_NAME
-#                           #   doesn't exist
-#   [FLAMETHROWER_TARPIPE]  # If not empty, untar received data directly,
-#                           # without storing it to a temporary file
-#
-#   flamethrower_client
-#
-flamethrower_client() {
-
-    if [ ! -z $FLAMETHROWER_TARPIPE ]; then
-	FLAMETHROWER_TARPIPE=tarpipe
-    fi
-    logmsg
-    logmsg "flamethrower_client(${MODULE_NAME}) $FLAMETHROWER_TARPIPE "
-    logmsg ---------------------------------------------------------------------
-
-    # validate
-    if [ -z $PORTBASE ]; then
-        if [ -f ${FLAMETHROWER_DIRECTORY_DIR}/${MODULE_NAME} ]; then
-	    . ${FLAMETHROWER_DIRECTORY_DIR}/${MODULE_NAME}
-	else
-	    logmsg WARNING WARNING WARNING WARNING WARNING
-            logmsg You must either set PORTBASE, or have a sourceable file called
-            logmsg ${FLAMETHROWER_DIRECTORY_DIR}/MODULE_NAME
-	    # allow for now to continue until overrides get their modules
-	    return
-            #shellout
-        fi
-    fi
-    if [ -z $DIR ]; then
-        logmsg "Must set DIR !!!"
-	shellout
-    else
-        mkdir -p $DIR
-    fi
-
-    # build command
-    UDP_RECEIVER_OPTIONS="--interface ${DEVICE} --portbase $PORTBASE --nokbd"
-    if [ ! -z $TTL ]; then
-        UDP_RECEIVER_OPTIONS="$UDP_RECEIVER_OPTIONS --ttl $TTL"
-    fi
-    if [ "$NOSYNC" = "on" ]; then
-        UDP_RECEIVER_OPTIONS="$UDP_RECEIVER_OPTIONS --nosync"
-    fi
-    if [ "$ASYNC" = "on" ]; then
-        UDP_RECEIVER_OPTIONS="$UDP_RECEIVER_OPTIONS --async"
-    fi
-    if [ ! -z $MCAST_ALL_ADDR ]; then
-        UDP_RECEIVER_OPTIONS="$UDP_RECEIVER_OPTIONS --mcast-all-addr $MCAST_ALL_ADDR"
-    fi
-
-    # Which tar opts should we use?  If our tar has --overwrite capability, use it.
-    #   Summary: busybox tar doesn't (boel_binaries and prior).
-    #            Debian patched gnu tar does (image and on).
-    #            We want this option enabled for the image to ensure proper directory
-    #            permissions. -BEF-
-    tar --help 2>&1 | grep -q overwrite && TAR_OPTS='--overwrite -xp' || TAR_OPTS='-x'
-
-    # set vars
-    [ -z $RETRY ] && RETRY=0
-    COUNT=0
-    FLAMETHROWER_CLIENT_SLEEP=3
-
-    # it's the new new style (loop)
-    SUCCESS="Not Yet"
-    until [ "$SUCCESS" = "yes" ]
-    do
-        # receive cast
-        #   example udp-receiver command:
-        #   udp-receiver --interface lo --portbase 9002 --nokbd --nosync --file /tmp/multicast.tar
-
-        if [ ! -z $FLAMETHROWER_TARPIPE ]; then
-	    TAR_OPTS="$TAR_OPTS -f -"
-	    logmsg "udp-receiver $UDP_RECEIVER_OPTIONS | tar $TAR_OPTS -C $DIR"
-	    udp-receiver $UDP_RECEIVER_OPTIONS | tar $TAR_OPTS -C $DIR
-	    TAR_EXIT_STATUS=$?
-	    UDP_RECEIVER_EXIT_STATUS=0
-	else
-	    logmsg udp-receiver $UDP_RECEIVER_OPTIONS --file /tmp/multicast.tar
-	    udp-receiver $UDP_RECEIVER_OPTIONS --file /tmp/multicast.tar
-	    UDP_RECEIVER_EXIT_STATUS=$?
-
-            # untar it
-	    if [ "$UDP_RECEIVER_EXIT_STATUS" = "0" ]; then
-		logmsg tar ${TAR_OPTS} -f /tmp/multicast.tar -C ${DIR}
-		tar ${TAR_OPTS} -f /tmp/multicast.tar -C ${DIR}
-		TAR_EXIT_STATUS=$?
-	    fi
-            # discard used tarball like an old sock (recommended by: Ramon Bastiaans <bastiaans@sara.nl>)
-	    rm -f /tmp/multicast.tar
-	fi
-
-        # did everything work properly
-        if [ $UDP_RECEIVER_EXIT_STATUS -eq 0 ] && [ $TAR_EXIT_STATUS -eq 0 ]; then
-            SUCCESS=yes
-        else
-            if [ $COUNT -lt $RETRY ]; then
-                COUNT=$(( $COUNT + 1 ))
-                logmsg "flamethrower_client: Proceeding with retry $COUNT of $RETRY"
-            else
-                logmsg
-                logmsg "flamethrower_client: FATAL: Initial attempt and $RETRY retries failed!"
-                shellout
-            fi
-        fi
-
-        # sleep apnea
-        sleep_loop $FLAMETHROWER_CLIENT_SLEEP
-    done
-
-    # done
-    logmsg 'finished!'
-    logmsg 
-
-    # Unset vars, so next module (which may not have them set) won't use then unintentially
-    unset TTL
-    unset NOSYNC
-    unset ASYNC
-    unset MCAST_ALL_ADDR
-    unset RETRY
-    unset COUNT
-    unset DIR
-    unset PORTBASE
-    unset UDP_RECEIVER_EXIT_STATUS
-    unset UDP_RECEIVER_OPTIONS
-    unset TAR_EXIT_STATUS
-    unset TAR_OPTS
-    unset SUCCESS
-    unset FLAMETHROWER_TARPIPE
-}
 #
 ################################################################################
 #
@@ -499,6 +320,7 @@ flamethrower_client() {
 #
 #   Usage: bittorrent_autodetect_staging_dir torrent
 #
+## SALI Replaced Bittorrent with Aria2
 bittorrent_autodetect_staging_dir() {
     torrent_file=$1
     if [ ! -f $torrent_file ]; then
@@ -530,23 +352,32 @@ bittorrent_autodetect_staging_dir() {
 #
 ################################################################################
 #
-#   Download a file using bittorrent.
+#   Check the output of aria2.
 #
-#   Usage: bittorrent_get_file torrent destination
+#   Usage: bittorrent_check_log pattern logfile
 #
+## SALI This function has been added to monitor the log of Aria2
 bittorrent_check_log(){
 	PATTERN=$1
 	FILE=$2
-	COLUMN=2
 
 	CURRENTLINE=$(tail -n 1 $FILE)
-	RSLT=$(echo $CURRENTLINE | egrep $PATTERN | cut -d " " -f $COLUMN)
+	RSLT=$(echo $CURRENTLINE | egrep $PATTERN | cut -d " " -f 2)
 
 	if [ $RSLT ]; then
 		echo "$RSLT"
 	fi
 }
 
+#
+################################################################################
+#
+#   Download a file using bittorrent.
+#
+#   Usage: bittorrent_get_file torrent destination
+#
+## SALI Replaced Bittorrent with Aria2, removed check when transfer drops
+## below a specified speed. Aria2c stops automaticly when the share ration is 1.0
 bittorrent_get_file() {
         torrent=$1
         destination=$2
@@ -605,6 +436,7 @@ bittorrent_get_file() {
 #
 #   Usage: bittorrent_stop
 #
+## SALI This function is decapricated
 bittorrent_stop() {
 	logmsg
 	logmsg "This function is decapricated, the bittorrent client keeps running until a reboot!"
@@ -741,6 +573,7 @@ monitor_save_dmesg() {
 #
 ################################################################################
 #
+## SALI Just start udev, don't use the static dev.tar.gz
 start_udevd() {
     #
     # Start udevd first, then hotplug
@@ -866,13 +699,13 @@ read_local_cfg() {
         . /tmp/local.cfg || shellout
     fi
 }
-#
+
 ################################################################################
 #
-#   Configure network interface using local.cfg settings if possible, else
-#   use DHCP. -BEF-
+# Usage: ping_test destination
 #
-#
+## SALI ping_test has been moved up, because this function is used to determine which
+## interface reaches the IMAGESERVER
 ping_test() {
 
     logmsg
@@ -910,6 +743,11 @@ ping_test() {
 
 }
 
+################################################################################
+#
+# Usage: start_udhpc_for device
+#
+## SALI this method has been added to enable networking for a specific interface
 start_udhcpc_for(){
 	logmsg "udhcpc -i $1"
 	udhcpc -i $1
@@ -928,6 +766,13 @@ start_udhcpc_for(){
 	fi
 }
 
+#################################################################################
+#
+# Usage: start_udhcp_guess
+#
+## SALI This method uses the /sys/class/net to determine wich interfaces are
+## available on the current machine. This function stops until an interface
+## is able to connect with the imageserver.
 start_udhcpc_guess(){
 
 	UDHCPGRSLT=1
@@ -952,6 +797,13 @@ start_udhcpc_guess(){
 
 }
 
+#
+################################################################################
+#
+#   Configure network interface using local.cfg settings if possible, else
+#   use DHCP. -BEF-
+#
+## SALI Some modification to use the udhcpc setup
 start_network() {
 
     logmsg
