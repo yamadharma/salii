@@ -26,7 +26,7 @@ $(XFSPROGS_DIR).build:	$(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL)
 	rm -rf $(XFSPROGS_DIR)
 	cd $(INITRD_SRC_DIR) && tar xfvz $(XFSPROGS_TARBALL)
 	chmod +x $(XFSPROGS_DIR)/configure
-	cd $(XFSPROGS_DIR) && ./configure
+	cd $(XFSPROGS_DIR) && ./configure --libdir=$(INITRD_BUILD_DIR)/lib/
 	$(MAKE) -j $(NCPUS) -C $(XFSPROGS_DIR)
 
 $(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL):
