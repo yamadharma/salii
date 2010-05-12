@@ -28,8 +28,6 @@
 #
 {
 
-#switch_root_to_tmpfs
-
 mount_proc
 
 monitor_save_dmesg
