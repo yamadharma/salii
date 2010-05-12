@@ -1,0 +1,305 @@
+
+################################################################################
+#
+#  logmsg
+#
+# Usage: log a message, redirects to console / syslog depending on usage
+logmsg() {
+    # log to console
+    echo $@
+    # log to temporary file (which will go away when we reboot)
+    # this is good for envs that have bad consoles
+    local FILE=/tmp/si.log
+    if fs_on_tmpfs / ; then
+        echo $@ >> $FILE || shellout
+    fi
+
+    # if syslog is running, log to it.  In order to avoid hangs we have to
+    # add the "logger: " part in case $@ is ""
+    if [ ! -z $USELOGGER ] ;
+        then logger "logger: $@"
+    fi
+}
+
+################################################################################
+#
+#  check_version
+#
+# Usage: check_version
+check_version() {
+    logmsg
+    logmsg check_version
+    INITRD_VERSION=$VERSION
+    KERNEL_VERSION=`uname -r | sed -e s/.*boel_v//`
+    if [ "$INITRD_VERSION" != "$KERNEL_VERSION" ] ; then
+        logmsg "FATAL: Kernel version ($KERNEL_VERSION) doesn't match initrd version ($INITRD_VERSION)!"
+        shellout
+    fi
+}
+
+#
+################################################################################
+#
+#  get_arch
+#
+# Usage: get_arch; echo $ARCH
+get_arch() {
+    logmsg
+    logmsg get_arch
+    ARCH=`uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/`
+}
+
+#
+################################################################################
+#
+#  adjust_arch
+#
+#  based on info in /proc adjust the ARCH variable.  This needs to run
+#  after proc is mounted.
+#
+adjust_arch() {
+    logmsg
+    logmsg adjust_arch
+    if [ "ppc64" = "$ARCH" ] ; then
+        # This takes a little bit of futzing with due to all the PPC platforms that exist.
+        if [ -d /proc/iSeries ] ; then
+            ARCH=ppc64-iSeries
+            logmsg "Detected ppc64 is really an iSeries partition..."
+        fi
+        if grep -qs PS3 /proc/cpuinfo; then
+            ARCH=ppc64-ps3
+        fi
+    fi
+}
+
+#
+################################################################################
+#
+#  write_variables
+#
+# Usage: write_variables
+write_variables() {
+
+    logmsg
+    logmsg write_variables
+
+    if fs_on_tmpfs / ; then
+        # pass all variables set here on to the hostname.sh script
+        rm -f /tmp/variables.txt
+
+        echo "HOSTNAME=$HOSTNAME"                   >> /tmp/variables.txt || shellout
+        echo "DOMAINNAME=$DOMAINNAME"               >> /tmp/variables.txt
+
+        echo "DEVICE=$DEVICE"                       >> /tmp/variables.txt
+        echo "IPADDR=$IPADDR"                       >> /tmp/variables.txt
+        echo "NETMASK=$NETMASK"                     >> /tmp/variables.txt
+        echo "NETWORK=$NETWORK"                     >> /tmp/variables.txt
+        echo "BROADCAST=$BROADCAST"                 >> /tmp/variables.txt
+
+        echo "GATEWAY=$GATEWAY"                     >> /tmp/variables.txt
+        echo "GATEWAYDEV=$GATEWAYDEV"               >> /tmp/variables.txt
+
+        echo "IMAGESERVER=$IMAGESERVER"             >> /tmp/variables.txt
+        echo "IMAGENAME=$IMAGENAME"                 >> /tmp/variables.txt
+
+        echo "LOG_SERVER=$LOG_SERVER"               >> /tmp/variables.txt
+        echo "LOG_SERVER_PORT=$LOG_SERVER_PORT"         >> /tmp/variables.txt
+        echo "USELOGGER=$USELOGGER"                 >> /tmp/variables.txt
+
+        echo "SSH=$SSH"                                 >> /tmp/variables.txt
+        echo "SSHD=$SSHD"                               >> /tmp/variables.txt
+        echo "SSH_USER=$SSH_USER"                       >> /tmp/variables.txt
+        echo "SSH_DOWNLOAD_URL=$SSH_DOWNLOAD_URL"       >> /tmp/variables.txt
+
+        echo "MONITOR_SERVER=$MONITOR_SERVER"           >> /tmp/variables.txt
+        echo "MONITOR_PORT=$MONITOR_PORT"               >> /tmp/variables.txt
+        echo "MONITOR_CONSOLE=$MONITOR_CONSOLE"         >> /tmp/variables.txt
+
+        echo "BITTORRENT=$BITTORRENT"                   >> /tmp/variables.txt
+        echo "BITTORRENT_STAGING=$BITTORRENT_STAGING"   >> /tmp/variables.txt
+        echo "BITTORRENT_POLLING_TIME=$BITTORRENT_POLLING_TIME" >> /tmp/variables.txt
+        echo "BITTORRENT_SEED_WAIT=$BITTORRENT_SEED_WAIT"       >> /tmp/variables.txt
+        echo "BITTORRENT_UPLOAD_MIN=$BITTORRENT_UPLOAD_MIN"     >> /tmp/variables.txt
+
+        echo "GROUPNAMES=\"$GROUPNAMES\""     >> /tmp/variables.txt
+        echo "GROUP_OVERRIDES=\"$GROUP_OVERRIDES\""     >> /tmp/variables.txt
+    fi
+}
+
+#
+################################################################################
+#
+#   Description:
+#   Exit with the message stored in /etc/issue.
+#
+#   Usage: $COMMAND || shellout
+#
+shellout() {
+    COUNT="$RETRY"
+    logmsg "Killing off running processes."
+    kill -9 $TMPFS_WATCHER_PID  >/dev/null 2>/dev/null
+    killall -9 udp-receiver rsync  >/dev/null 2>/dev/null
+    write_variables
+    cat /etc/issue
+    if [ ! -z $USELOGGER ] ;
+        then cat /etc/issue | logger
+    fi
+    if [ ! -z $MONITOR_SERVER ]; then
+        logmsg "Installation failed!! Stopping report task."
+        stop_report_task -1
+    fi
+    exec sh > /dev/console 2>&1
+}
+
+##
+# This function has been added to open a console without any errors
+shellopen() {
+        logmsg
+        logmsg "Starting console..."
+
+        if [ ! -z $MONITOR_SERVER ]; then
+                logmsg "Strating console, stopping monitoring"
+                stop_report_task -1
+        fi
+
+        exec sh > /dev/console 2>&1
+}
+
+#
+################################################################################
+#
+#   Description:
+#   Count the specified number, printing each number, and exit only the count
+#   loop when <ctrl>+<c> is hit (SIGINT, or Signal 2).  Thanks to
+#   CCB <ccb@acm.org> for this chunk of code.  -BEF-
+#
+#   Usage:
+#   count_loop 35
+#   count_loop $ETHER_SLEEP
+#
+count_loop() {
+
+  COUNT=$1
+
+  trap 'echo ; echo "Skipping ETHER_SLEEP -> Caught <ctrl>+<c>" ; I=$COUNT' INT
+
+  I=0
+  while [ $I -lt $COUNT ]; do
+    I=$(( $I + 1 ))
+    logmsg -n "$I "
+    sleep 1
+  done
+
+  trap INT
+
+  logmsg
+}
+
+#
+################################################################################
+#
+# read in varibles obtained from kernel appends
+#
+read_kernel_append_parameters() {
+    logmsg
+    logmsg read_kernel_append_parameters
+
+    . /tmp/kernel_append_parameter_variables.txt
+}
+#
+################################################################################
+#
+# Variable-ize /proc/cmdline arguments
+#
+variableize_kernel_append_parameters() {
+    logmsg
+    logmsg variableize_kernel_append_parameters
+    cat /proc/cmdline | tr ' ' '\n' | grep '=' > /tmp/kernel_append_parameter_variables.txt
+}
+
+#
+################################################################################
+#
+# Look for local.cfg file
+#   This code inspired by Ian McLeod <ian@valinux.com>
+#
+read_local_cfg() {
+    logmsg
+    logmsg read_local_cfg
+
+    if [ "x$SKIP_LOCAL_CFG" = "xy" ]; then
+        logmsg "skipping local.cfg: option SKIP_LOCAL_CFG=y has been specified"
+        return
+    fi
+
+    # Try with local.cfg directly from initrd.
+    if [ -f /local.cfg ]; then
+        cp -f /local.cfg /tmp/local.cfg
+    fi
+
+    #
+    # BEGIN try hard drive
+    #
+    if [ ! -z "$LAST_ROOT" ]; then
+
+        logmsg
+        logmsg "Checking for /local.cfg file on hard drive..."
+        mkdir /last_root
+        logmsg "Mounting hard drive..."
+        mount $LAST_ROOT /last_root -o ro > /dev/null 2>&1
+        if [ $? != 0 ]; then
+            logmsg "FATAL: Couldn't mount hard drive!"
+            logmsg "Your kernel must have all necessary block and filesystem drivers compiled in"
+            logmsg "statically (not modules) in order to use a local.cfg on your hard drive.  The"
+            logmsg "standard SystemImager kernel is modular, so you will need to compile your own"
+            logmsg "kernel.  See the SystemImager documentation for details.  To proceed at this"
+            logmsg "point, you will need to unset the LAST_ROOT append parameter by typing"
+            logmsg ""systemimager LAST_ROOT=", or similar, at your boot prompt.  This will not use"
+            logmsg "the local.cfg file on your hard drive, but will still use one on a floppy."
+            shellout
+        fi
+
+        if [ -f /last_root/local.cfg ]; then
+            logmsg "Found /local.cfg on hard drive."
+            logmsg "Copying /local.cfg settings to /tmp/local.cfg."
+            cat /last_root/local.cfg >> /tmp/local.cfg || shellout
+        else
+            logmsg "No /local.cfg on hard drive."
+        fi
+        logmsg "Unmounting hard drive..."
+        umount /last_root || shellout
+        logmsg
+    fi
+    # END try hard drive
+
+    ### BEGIN try floppy ###
+    logmsg "Checking for floppy diskette."
+    logmsg 'YOU MAY SEE SOME "wrong magic" ERRORS HERE, AND THAT IS NORMAL.'
+    mkdir -p /floppy
+    mount /dev/fd0 /floppy -o ro > /dev/null 2>&1
+    if [ $? = 0 ]; then
+        logmsg "Found floppy diskette."
+        if [ -f /floppy/local.cfg ]; then
+            logmsg "Found /local.cfg on floppy."
+            logmsg "Copying /local.cfg settings to /tmp/local.cfg."
+            logmsg "NOTE: local.cfg settings from a floppy will override settings from"
+            logmsg "      a local.cfg file on your hard drive and DHCP."
+            # We use cat instead of copy, so that floppy settings can
+            # override hard disk settings. -BEF-
+            cat /floppy/local.cfg >> /tmp/local.cfg || shellout
+        else
+            logmsg "No /local.cfg on floppy diskette."
+        fi
+    else
+        logmsg "No floppy diskette in drive."
+    fi
+    ### END try floppy ###
+
+    # /tmp/local.cfg may be created from a local.cfg file on the hard drive, or a
+    # floppy.  If both are used, settings on the floppy take precedence. -BEF-
+    if [ -f /tmp/local.cfg ]; then
+        logmsg "Reading configuration from /tmp/local.cfg"
+        . /tmp/local.cfg || shellout
+    fi
+}
+

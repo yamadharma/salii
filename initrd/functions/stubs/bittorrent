@@ -1,0 +1,167 @@
+
+#
+################################################################################
+#
+# Usage: get_torrents_directory
+#
+get_torrents_directory() {
+
+    if [ ! "x$BITTORRENT" = "xy" ]; then
+        return
+    fi
+
+    logmsg
+    logmsg get_torrents_directory
+
+    mkdir -p ${TORRENTS_DIR}
+    CMD="rsync -a ${IMAGESERVER}::${TORRENTS}/ ${TORRENTS_DIR}/"
+    logmsg "$CMD"
+    $CMD
+}
+
+#
+################################################################################
+#
+# Usage: get_scripts_directory
+#
+get_scripts_directory() {
+    logmsg
+    logmsg get_scripts_directory
+
+    mkdir -p ${SCRIPTS_DIR}
+    CMD="rsync -a ${IMAGESERVER}::${SCRIPTS}/ ${SCRIPTS_DIR}/"
+    logmsg "$CMD"
+    $CMD
+}
+
+#
+################################################################################
+#
+#   Autodetect a staging directory for the bittorrent tarball
+#
+#   Usage: bittorrent_autodetect_staging_dir torrent
+#
+## SALI Replaced Bittorrent with Aria2
+bittorrent_autodetect_staging_dir() {
+    torrent_file=$1
+    if [ ! -f $torrent_file ]; then
+        logmsg "warning: torrent file $torrent_file does not exist!"
+        return
+    fi
+
+    # List of preferred staging directory (/tmp = ramdisk staging)
+    logmsg "Getting disks for storing"
+    preferred_dirs="/tmp /a/tmp `df 2>/dev/null | sed '1d' | sed 's/[[:space:]]\+/ /g' | cut -d' ' -f6`"
+    logmsg "Disks: $preferred_dirs"
+
+    # Use a breathing room of 100MB (this should be enough for a lot of cases)
+    breathing_room=102400
+
+    # Evaluate torrent size
+    logmsg "Getting torrent size"
+    torrent_size=$(( $( (aria2c -S $torrent_file | awk '/Total Length:/ { print $4}' | sed 's/[(),]*//g' ) ) / 1024 + $breathing_room ))
+    logmsg "Torrent size: $torrent_size"
+
+    # Find a directory to host the image tarball
+    for dir in $preferred_dirs; do
+        [ ! -d $dir ] && continue;
+        dir_space=`df $dir 2>/dev/null | sed '1d' | sed 's/[[:space:]]\+/ /g' | cut -d' ' -f4 | sed -ne '$p'`
+        [ -z $dir_space ] && continue
+        [ $torrent_size -lt $dir_space ] && echo $dir && return
+    done
+}
+
+#
+################################################################################
+#
+#   Check the output of aria2.
+#
+#   Usage: bittorrent_check_log pattern logfile
+#
+## SALI This function has been added to monitor the log of Aria2
+bittorrent_check_log(){
+        PATTERN=$1
+        FILE=$2
+
+        CURRENTLINE=$(tail -n 1 $FILE)
+        RSLT=$(echo $CURRENTLINE | egrep $PATTERN | cut -d " " -f 2)
+
+        if [ $RSLT ]; then
+                echo "$RSLT"
+        fi
+}
+
+#
+################################################################################
+#
+#   Download a file using bittorrent.
+#
+#   Usage: bittorrent_get_file torrent destination
+#
+## SALI Replaced Bittorrent with Aria2, removed check when transfer drops
+## below a specified speed. Aria2c stops automaticly when the share ration is 1.0
+bittorrent_get_file() {
+        torrent=$1
+        destination=$2
+
+        # Bittorrent log file
+        bittorrent_log=/tmp/bittorrent.log
+
+        ##Starting aria2c and sending the stdout to a file
+        logmsg "/usr/bin/aria2c --human-readable=false --dir $destination $torrent_file > $bittorrent_log &"
+        /usr/bin/aria2c --human-readable=false --dir $destination $torrent_file > $bittorrent_log &
+
+        pid=$!
+        if [ ! -d /proc/$pid ]; then
+                logmsg "Bittorrent client not running"
+                shellout
+        fi
+
+        echo $pid > /var/run/aria2c.pid
+
+        downloadpattern="(SIZE:[0-9]+B/[0-9]+B\([0-9]{1,2}1{0,1}\%\))"
+        donepattern="(SEEDING\(ratio:[0-9.]+\))"
+
+
+        cntr=0
+        while : ; do
+                if [ -e $bittorrent_log ]; then
+                        break
+                else
+                        cntr=$(($cntr+1))
+                        sleep 5
+                fi
+
+                if [ cntr -gt 5 ]; then
+                        logmsg "Torrent client not running"
+                        shellout
+                fi
+        done
+
+        while : ; do
+                SEED=$(bittorrent_check_log $donepattern $bittorrent_log)
+                DOWNLOAD=$(bittorrent_check_log $downloadpattern $bittorrent_log)
+
+                if [ $SEED ]; then
+                        echo "Download complete"
+                        break
+                elif [ $DOWNLOAD ]; then
+                        echo "Downloading: $DOWNLOAD"
+                        sleep 2
+                fi
+        done
+}
+
+#
+################################################################################
+#
+#   Stop bittorrent client.
+#
+#   Usage: bittorrent_stop
+#
+## SALI This function is decapricated
+bittorrent_stop() {
+        logmsg
+        logmsg "This function is decapricated, the bittorrent client keeps running until a reboot!"
+}
+

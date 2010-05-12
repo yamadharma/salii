@@ -1,4 +1,14 @@
 
+#
+################################################################################
+#
+# Configure loopback interface (may as well)
+ifconfig_loopback() {
+    logmsg
+    logmsg ifconfig_loopback
+    ifconfig lo 127.0.0.1
+}
+
 ################################################################################
 #
 # Usage: ping_test destination
