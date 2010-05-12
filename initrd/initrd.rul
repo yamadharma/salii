@@ -93,6 +93,8 @@ $(INITRD_BUILD_DIR).prep:	$(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/dev
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/ssh
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/sali
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/sali/stubs
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/default
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/init.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib
@@ -193,7 +195,14 @@ endif
 	$(SI_INSTALL) -m 755 $(INITRD_DIR)/skel/etc/init.d/rcS \
 	  $(INITRD_BUILD_DIR)/etc/init.d/rcS
 
-	$(SI_INSTALL) -m 755 $(INITRD_DIR)/skel/etc/init.d/functions \
+	$(INITRD_DIR)/functions/sali_functions --makefile --stubsdir $(INITRD_DIR)/functions/stubs \
+	  --tmpfile $(INITRD_DIR)/functions/functions.mbm
+
+	$(SI_INSTALL) -m 644 $(INITRD_DIR)/functions/stubs/* $(INITRD_BUILD_DIR)/etc/sali/stubs/
+
+	$(SI_INSTALL) -m 755 $(INITRD_DIR)/functions/sali_functions $(INITRD_BUILD_DIR)/etc/sali/sali_functions
+
+	$(SI_INSTALL) -m 755 $(INITRD_DIR)/functions/functions.mbm \
 	  $(INITRD_BUILD_DIR)/etc/init.d/functions
 
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf

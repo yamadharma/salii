@@ -2,8 +2,8 @@
 
 VERSION="SYSTEMIMAGER_VERSION_STRING"
 STUBDIR="/etc/sali/stubs"
-FUNCTIONSFILE="/etc/init.c/functions"
-TMPDIR="/etc/sali"
+FUNCTIONSFILE="/etc/init.d/functions"
+TMPFILE="/etc/sali/functions.$$"
 
 stub_file(){
 	echo $(ls -1 $STUBDIR)
@@ -20,7 +20,8 @@ move_tmp_file(){
 	src_file=$1
 	dst_file=$2
 
-	mv $1 $2
+	mv $src_file $dst_file
+	chmod 755 $dst_file
 }
 
 while true
@@ -43,19 +44,21 @@ do
 			shift 2
 		;;
 		-t|--tmpfile)
-			TMPDIR=$2
-			if [ ! -e $TMPDIR ]; then
-				touch $TMPDIR
+			TMPFILE=$2
+			if [ ! -e $TMPFILE ]; then
+				touch $TMPFILE
 			fi
 			shift 2
+		;;
+		-m|--makefile)
+			BYMAKEFILE=true
+			shift
 		;;
 		*)
 			break
 		;;
 	esac
 done
-
-TMPFILE="$TMPDIR/sali_functions.$(date +%m%d%Y)"
 
 ## Showing some information about the directories
 echo "sali_functions for Sali $VERSION"
@@ -83,3 +86,7 @@ echo "# DATE         : $CURDATE" >> $TMPFILE
 echo "# STUBDIR      : $STUBDIR" >> $TMPFILE
 echo "# FUNCTIONSFILE: $FUNCTIONSFILE" >> $TMPFILE
 echo "################################################################################" >> $TMPFILE
+
+if [ -z $BYMAKEFILE ]; then
+	move_tmp_file $TMPFILE $FUNCTIONSFILE
+fi
