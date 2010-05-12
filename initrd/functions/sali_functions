@@ -1,0 +1,85 @@
+#!/bin/sh
+
+VERSION="SYSTEMIMAGER_VERSION_STRING"
+STUBDIR="/etc/sali/stubs"
+FUNCTIONSFILE="/etc/init.c/functions"
+TMPDIR="/etc/sali"
+
+stub_file(){
+	echo $(ls -1 $STUBDIR)
+}
+
+append_to_file(){
+	src_file=$1
+	dst_file=$2
+
+	cat $src_file >> $dst_file
+}
+
+move_tmp_file(){
+	src_file=$1
+	dst_file=$2
+
+	mv $1 $2
+}
+
+while true
+do
+	case "$1" in
+		-s|--stubsdir)
+			if [ -e $2 ]; then
+				STUBDIR=$2
+			else
+				echo "Specified stubsdir not found, stopping"
+				exit 1
+			fi
+			shift 2
+		;;
+		-f|--functionsfile)
+			FUNCTIONSFILE=$2
+			if [ ! -e $FUNCTIONSFILE ]; then
+				touch $FUNCTIONSFILE
+			fi
+			shift 2
+		;;
+		-t|--tmpfile)
+			TMPDIR=$2
+			if [ ! -e $TMPDIR ]; then
+				touch $TMPDIR
+			fi
+			shift 2
+		;;
+		*)
+			break
+		;;
+	esac
+done
+
+TMPFILE="$TMPDIR/sali_functions.$(date +%m%d%Y)"
+
+## Showing some information about the directories
+echo "sali_functions for Sali $VERSION"
+echo "stubs directory     : $STUBDIR"
+echo "functions file      : $FUNCTIONSFILE"
+echo "tmp functions file  : $TMPFILE"
+
+for file in $(stub_file $STUBDIR); do
+	if [ ! $( echo $file | grep header ) ]; then
+		echo "##BEGIN $file" >> $TMPFILE
+	fi
+
+	append_to_file $STUBDIR/$file $TMPFILE
+
+	if [ ! $( echo $file | grep header ) ]; then
+		echo "##END $file" >> $TMPFILE
+	fi
+done
+
+CURDATE=$(date)
+echo "\n\n\n" >> $TMPFILE
+echo "################################################################################" >> $TMPFILE
+echo "# This file has been created by sali_function for sali-$VERSION" >> $TMPFILE
+echo "# DATE         : $CURDATE" >> $TMPFILE
+echo "# STUBDIR      : $STUBDIR" >> $TMPFILE
+echo "# FUNCTIONSFILE: $FUNCTIONSFILE" >> $TMPFILE
+echo "################################################################################" >> $TMPFILE

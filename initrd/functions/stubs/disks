@@ -1,0 +1,40 @@
+
+## Sets the disklabel for a specified disk
+# Usage: set_disklabel label disk
+#   labels: bsd|dvh|gpt|loop|mac|msdos|pc98|sun
+
+set_disklabel(){
+
+        LABEL=$1
+        DISK=$2
+
+        if [ -e $DISK ]; then
+                case $LABEL in
+                bsd|dvh|gpt|loop|mac|msdos|pc98|sun)
+                        parted -s -- $DISK mklabel $LABEL
+                        ;;
+                esac
+        else
+                logmsg
+                logmsg "Disk not found!"
+                shellout
+        fi
+
+}
+
+
+## Shows the disksize
+# Usage: get_disksize disk
+get_disksize(){
+
+        DISK=$1
+
+        if [ -e $DISK ]; then
+                DISKSIZE=$(parted -s /dev/sda unit MB print|awk '/^Disk/ {print $3}'|sed 's/[Mm][Bb]//')
+        else
+                logmsg
+                logmsg "Disk not found!"
+                shellout
+        fi
+}
+
