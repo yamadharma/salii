@@ -1,0 +1,268 @@
+
+################################################################################
+#
+# Usage: ping_test destination
+#
+## SALI ping_test has been moved up, because this function is used to determine which
+## interface reaches the IMAGESERVER
+ping_test() {
+
+    logmsg
+    logmsg ping_test
+
+    PING_DESTINATION=$1
+
+    logmsg
+    logmsg "Pinging your IMAGESERVER"
+
+
+    # Ping test code submitted by Grant Noruschat <grant@eigen.ee.ualberta.ca>
+    # modified slightly by Brian Finley.
+    PING_COUNT=1
+    PING_EXIT_STATUS=1
+    while [ "$PING_EXIT_STATUS" != "0" ]
+    do
+        logmsg "PING ATTEMPT $PING_COUNT: "
+        ping -c 1 $PING_DESTINATION || shellout
+        PING_EXIT_STATUS=$?
+
+        if [ "$PING_EXIT_STATUS" = "0" ]; then
+            logmsg
+            logmsg "  We have connectivity to your IMAGESERVER!"
+        fi
+
+        PING_COUNT=$(( $PING_COUNT + 1 ))
+        if [ "$PING_COUNT" = "4" ]; then
+                return
+        fi
+    done
+
+    unset PING_DESTINATION
+    unset HOST_TYPE
+
+}
+
+###############################################################################
+#
+# Usage: start_udhpc_for device
+#
+## SALI this method has been added to enable networking for a specific interface
+start_udhcpc_for(){
+        logmsg "udhcpc -i $1"
+        udhcpc -i $1
+
+        if [ -s /tmp/udhcpc ]; then
+                . /tmp/udhcpc || shellout
+                ping_test $IMAGESERVER
+
+                if [ "$PING_EXIT_STATUS" != "0" ]; then
+                        UDHCPRSLT=1
+                else
+                        UDHCPRSLT=0
+                fi
+        else
+                UDHCPRSLT=1
+        fi
+}
+
+#################################################################################
+#
+# Usage: start_udhcp_guess
+#
+## SALI This method uses the /sys/class/net to determine wich interfaces are
+## available on the current machine. This function stops until an interface
+## is able to connect with the imageserver.
+start_udhcpc_guess(){
+
+        UDHCPGRSLT=1
+
+        for NIC in $(ls -1 /sys/class/net/)
+        do
+                if [ "$NIC" != "lo" ]; then
+                        logmsg "start_udhcpc_for $NIC"
+                        start_udhcpc_for $NIC
+
+                        if [ "$UDHCPRSLT" != "0" ]; then
+                                logmsg
+                                logmsg "Ip could not be set for $NIC"
+                                UDHCPGRSLT=1
+                        else
+                                UDHCPGRSLT=0
+                                DEVICE=$NIC
+                                break
+                        fi
+                fi
+        done
+
+}
+
+#
+################################################################################
+#
+#   Configure network interface using local.cfg settings if possible, else
+#   use DHCP. -BEF-
+#
+## SALI Some modification to use the udhcpc setup
+start_network() {
+
+    logmsg
+    logmsg start_network
+    if [ ! -z $IPADDR ]; then
+
+        # configure interface and add default gateway
+        ifconfig $DEVICE $IPADDR  netmask $NETMASK  broadcast $BROADCAST
+        if [ $? != 0 ]; then
+            logmsg
+            logmsg "I couldn't configure the network interface using your pre-boot settings:"
+            logmsg "  DEVICE:     $DEVICE"
+            logmsg "  IPADDR:     $IPADDR"
+            logmsg "  NETMASK:    $NETMASK"
+            logmsg "  BROADCAST:  $BROADCAST"
+            logmsg
+            shellout
+        fi
+
+        if [ ! -z $GATEWAY ]; then
+            route add default gw $GATEWAY
+            if [ $? != 0 ]; then
+                logmsg
+                logmsg "The command \"route add default gw $GATEWAY\" failed."
+                logmsg "Check your pre-boot network settings."
+                logmsg
+                shellout
+            fi
+        fi
+
+    else
+
+        ### try dhcp ###
+        logmsg "IP Address not set with pre-boot settings."
+
+        ### BEGIN ether sleep ###
+        # Give the switch time to start passing packets.  Some switches won't
+        # forward packets until 30 seconds or so after an interface comes up.
+        # This means the dhcp server won't even get the request for 30 seconds.
+        # Many ethernet cards aren't considered "up" by the switch until the
+        # driver is loaded.  Because the driver is compiled directly into the
+        # kernel here, the driver is definitely loaded at this point.
+        #
+        # Default is 0.  The recommended setting of ETHER_SLEEP=35 can be set
+        # with a local.cfg file. -BEF-
+        #
+        [ -z $ETHER_SLEEP ] && ETHER_SLEEP=0
+        logmsg
+        logmsg "sleep $ETHER_SLEEP:  This is to give your switch (if you're using one) time to"
+        logmsg "           recognize your ethernet card before we try the network."
+        logmsg "           Tip: You can use <ctrl>+<c> to pass the time (pun intended)."
+        logmsg
+        count_loop $ETHER_SLEEP
+        logmsg
+        ### END ether sleep ###
+
+        if [ ! -z $DEVICE ]; then
+                logmsg
+                logmsg "Param DEVICE specified, using $DEVICE"
+                start_udhcpc_for $DEVICE
+
+                if [ "$UDHCPRSLT" != "0" ]; then
+                   logmsg
+                   logmsg "Ip could not be set, guessing interface!"
+                   start_udhcpc_guess
+                fi
+        else
+                logmsg
+                logmsg "Param DEVICE not set, guesing interface"
+                start_udhcpc_guess
+        fi
+
+	if [ "$UDHCPGRSLT" != "0" ]; then
+                logmsg
+                logmsg "DHCP configuration failed"
+                logmsg
+                shellout
+        fi
+
+    fi
+}
+
+#
+################################################################################
+#
+get_hostname_by_hosts_file() {
+
+    logmsg
+    logmsg get_hostname_by_hosts_file
+
+    #
+    # Look in $FILE for that magic joy.
+    #
+    FILE=${SCRIPTS_DIR}/hosts
+    if [ -e $FILE ]; then
+
+        logmsg "Hosts file exists..."
+
+        # add escape characters to IPADDR so that it can be used to find HOSTNAME below
+        IPADDR_ESCAPED=`echo "$IPADDR" | sed -e 's/\./\\\./g'`
+
+        # get HOSTNAME by parsing hosts file
+        logmsg "Searching for this machine's hostname in $FILE by IP: $IPADDR"
+
+        # Command summary by line:
+        # 1: convert tabs to spaces -- contains a literal tab: <ctrl>+<v> then <tab>
+        # 2: remove comments
+        # 3: add a space at the beginning of every line
+        # 4: get line with IP address (no more no less)
+        # 5: strip out ip address
+        # 6: strip out space(s) before first hostname on line
+        # 7: remove any aliases on line
+        # 8: remove domain name, leaving naught but the hostname, naked as the day it were born
+
+        HOSTNAME=`
+            sed 's/[[:space:]]/ /g' $FILE | \
+            grep -v '^ *#' | \
+            sed 's/^/ /' | \
+            grep " $IPADDR_ESCAPED " | \
+            sed 's/ [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*//' | \
+            sed 's/ *//' | \
+            sed 's/ .*//' | \
+            sed 's/\..*$//g'
+        `
+    else
+        logmsg "No hosts file."
+    fi
+}
+
+#
+################################################################################
+#
+get_hostname_by_dns() {
+
+    logmsg
+    logmsg get_hostname_by_dns
+
+    # Get base hostname.  For example, www7.domain.com will become www7. -BEF-
+    HOSTNAME=`nslookup $IPADDR | sed -ne "s/^Address 1:[[:space:]]\+$IPADDR[[:space:]]\+\([^\.]\+\).*$/\1/p"`
+}
+#
+################################################################################
+#
+get_base_hostname() {
+    BASE_HOSTNAME=`echo $HOSTNAME | sed "s/[.0-9].*$//"`
+}
+#
+################################################################################
+#
+get_group_name() {
+    if [ -f ${SCRIPTS_DIR}/cluster.txt ]; then
+        [ -z "$GROUPNAMES" ] && \
+            GROUPNAMES=`unique $(grep "^${HOSTNAME}:" ${SCRIPTS_DIR}/cluster.txt | cut -d: -f2 | tr "\n" ' ')`
+        [ -z "$IMAGENAME" ] && \
+            IMAGENAME=`grep "^${HOSTNAME}:" ${SCRIPTS_DIR}/cluster.txt | cut -d: -f3 | grep -v '^[[:space:]]*$' | sed -ne '1p'`
+        if [ -z "$GROUP_OVERRIDES" ]; then
+            GROUP_OVERRIDES=`reverse $(unique $(grep "^${HOSTNAME}:" ${SCRIPTS_DIR}/cluster.txt | cut -d: -f4 | tr "\n" ' '))`
+            # Add the global override on top (least important).
+            GROUP_OVERRIDES="`sed -ne 's/^# global_override=:\([^:]*\):$/\1/p' ${SCRIPTS_DIR}/cluster.txt` $GROUP_OVERRIDES"
+        fi
+    fi
+}
+
