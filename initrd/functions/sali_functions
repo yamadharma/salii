@@ -10,6 +10,7 @@ stub_file(){
 }
 
 append_to_file(){
+	
 	src_file=$1
 	dst_file=$2
 
@@ -47,6 +48,8 @@ do
 			TMPFILE=$2
 			if [ ! -e $TMPFILE ]; then
 				touch $TMPFILE
+			else
+				cat /dev/null > $TMPFILE
 			fi
 			shift 2
 		;;
@@ -68,24 +71,26 @@ echo "tmp functions file  : $TMPFILE"
 
 for file in $(stub_file $STUBDIR); do
 	if [ ! $( echo $file | grep header ) ]; then
-		echo -e "##BEGIN $file" >> $TMPFILE
+		echo "##BEGIN $file" >> $TMPFILE
 	fi
 
 	append_to_file $STUBDIR/$file $TMPFILE
 
 	if [ ! $( echo $file | grep header ) ]; then
-		echo -e "##END $file" >> $TMPFILE
+		echo "##END $file" >> $TMPFILE
 	fi
 done
 
 CURDATE=$(date)
-echo -e "\n\n\n" >> $TMPFILE
-echo -e "################################################################################" >> $TMPFILE
-echo -e "# This file has been created by sali_function for sali-$VERSION" >> $TMPFILE
-echo -e "# DATE         : $CURDATE" >> $TMPFILE
-echo -e "# STUBDIR      : $STUBDIR" >> $TMPFILE
-echo -e "# FUNCTIONSFILE: $FUNCTIONSFILE" >> $TMPFILE
-echo -e "################################################################################" >> $TMPFILE
+echo "" >> $TMPFILE
+echo "" >> $TMPFILE
+echo "" >> $TMPFILE
+echo "################################################################################" >> $TMPFILE
+echo "# This file has been created by sali_function for sali-$VERSION" >> $TMPFILE
+echo "# DATE         : $CURDATE" >> $TMPFILE
+echo "# STUBDIR      : $STUBDIR" >> $TMPFILE
+echo "# FUNCTIONSFILE: $FUNCTIONSFILE" >> $TMPFILE
+echo "################################################################################" >> $TMPFILE
 
 if [ -z $BYMAKEFILE ]; then
 	move_tmp_file $TMPFILE $FUNCTIONSFILE
