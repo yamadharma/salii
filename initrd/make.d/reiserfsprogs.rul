@@ -3,12 +3,10 @@
 #   vi: set filetype=make:
 #
 
-REISERFSPROGS_VERSION := 3.6.19
+REISERFSPROGS_VERSION := 3.6.21
 REISERFSPROGS_DIR := $(INITRD_SRC_DIR)/reiserfsprogs-$(REISERFSPROGS_VERSION)
 REISERFSPROGS_TARBALL := reiserfsprogs-$(REISERFSPROGS_VERSION).tar.gz
 REISERFSPROGS_URL := http://ftp.kernel.org/pub/linux/utils/fs/reiserfs/$(REISERFSPROGS_TARBALL)
-
-REISERFSPROGS_PATCHES := $(shell ls $(INITRD_PATCH_DIR)/reiserfsprogs.*.patch 2>/dev/null | sort)
 
 MKREISERFS_BINARY := $(REISERFSPROGS_DIR)/mkreiserfs/mkreiserfs
 REISERFSTUNE_BINARY := $(REISERFSPROGS_DIR)/tune/reiserfstune
@@ -26,9 +24,7 @@ $(REISERFSPROGS_DIR).install:	$(REISERFSPROGS_DIR).build
 
 $(REISERFSPROGS_DIR).build:	$(INITRD_SRC_DIR)/$(REISERFSPROGS_TARBALL)
 	[ -d $(REISERFSPROGS_DIR) ] || \
-	  ( cd $(INITRD_SRC_DIR) && tar xvfz $(REISERFSPROGS_TARBALL) && \
-	    (cd $(REISERFSPROGS_DIR) && \
-		(cat $(REISERFSPROGS_PATCHES) < /dev/null | patch -p1))) 
+	  ( cd $(INITRD_SRC_DIR) && tar xvfz $(REISERFSPROGS_TARBALL) )
 	( cd $(REISERFSPROGS_DIR) && chmod +x ./configure && \
 	  CFLAGS="-O2 -Wall" ./configure --prefix=/usr )
 	$(MAKE) -j $(NCPUS) -C $(REISERFSPROGS_DIR)
