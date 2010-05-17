@@ -1,0 +1,221 @@
+#
+################################################################################
+#
+monitor_save_dmesg() {
+    if [ -z $MONITOR_SERVER ]; then
+        return
+    fi
+    logmsg
+    logmsg monitor_save_dmesg
+    dmesg -s 16392 > /tmp/si_monitor.log
+}
+
+#
+################################################################################
+#
+start_syslogd() {
+    logmsg
+    logmsg start_syslogd
+    if [ ! -z $LOG_SERVER ]; then
+        logmsg "Starting syslogd..."
+        [ -z $LOG_SERVER_PORT ] && LOG_SERVER_PORT="514"
+        syslogd -R ${LOG_SERVER}:${LOG_SERVER_PORT}
+        # as long as we are starting syslogd, start klogd as well, in case
+        # there is a kernel issue that happens
+        klogd
+        # set USELOGGER=1 so logmsg knows to do the right thing
+        USELOGGER=1
+        logmsg "Successfully started syslogd!"
+    fi
+}
+
+#
+################################################################################
+#
+#  send_monitor_msg
+#
+#   Description:
+#   Redirect a message to the monitor server.
+#
+#   Usage: send_monitor_msg "var=$msg"
+#
+
+send_monitor_msg() {
+    if [ -z $MONITOR_SERVER ]; then
+        return
+    fi
+    if [ -z $MONITOR_PORT ]; then
+        MONITOR_PORT=8181
+    fi
+
+    # Message to send.
+    msg=`echo "$@"`
+
+    # Get the client mac address.
+    if [ -z "$mac" ]; then
+        mac=`ifconfig $DEVICE 2>/dev/null | sed -ne "s/.*HWaddr //p" | sed "s/ //g" | sed s/:/./g`
+    fi
+
+    # Collect some special info only after proc file system is mounted.
+    if [ `mount 2>/dev/null | grep proc > /dev/null; echo $?` -eq 0 ]; then
+        # Collect the CPU info.
+        if [ -z "$cpu" ]; then
+            cpu=$(echo `cat /proc/cpuinfo | grep "cpu\|clock\|model name\|cpu MHz" | grep -v "cpu family" | sed -ne '1,2p' | sed "s/.*: //" | sed "s/^\([0-9\.]*\)MHz$/(\1 MHz)/" | sed "s/^\([0-9\.]*\)$/(\1 MHz)/"` | sed "s/\(MHz)\)/\1 |/g" | sed "s/ |$//")
+        fi
+
+        # Collect the number of CPUs.
+        if [ -z "$ncpus" ]; then
+            ncpus=$((`cat /proc/cpuinfo | grep "^processor" | sed -n '$p' | sed "s/.*: \([0-9]\)*$/\1/"` + 1))
+        fi
+
+        # Collect the kernel information.
+        if [ -z "$kernel_name" ]; then
+            kernel_name=`uname -r`
+        fi
+
+        # Collect the amount of phyisical memory.
+        if [ -z "$mem" ]; then
+            mem=`cat /proc/meminfo | sed -ne "s/MemTotal: *//p" | sed "s/ kB//"`
+        fi
+
+        # Evaluate the amount of available RAM.
+        tmpfs=`df | grep tmpfs | grep "/$" | sed "s/.* \([0-9]*%\) .*/\1/"`
+
+        # Evaluate the uptime of the client.
+        time=`cat /proc/uptime | sed "s/\..*//"`
+    fi
+
+    # Report the message to the monitor server.
+    send_msg=`echo "mac=$mac:ip=$IPADDR:host=$HOSTNAME:cpu=$cpu:ncpus=$ncpus:kernel=$kernel_name:mem=$mem:os=$IMAGENAME:tmpfs=$tmpfs:time=$time:$msg"`
+
+    # Send data to monitor server.
+    echo "$send_msg" | nc $MONITOR_SERVER $MONITOR_PORT
+}
+#
+################################################################################
+#
+#  send_monitor_stdout
+#
+#   Description:
+#   Redirect a stdout of a command to the monitor console.
+#
+#   Usage: <cmd> | send_monitor_stdout
+#
+
+send_monitor_stdout() {
+    while read l; do
+        # echo to the console -AR-
+        echo "$l"
+        # Send the message to the monitor daemon.
+        if [ "x$MONITOR_CONSOLE" = "xy" ]; then
+            MONITOR_CONSOLE=yes
+        fi
+        if [ "x$MONITOR_CONSOLE" = "xyes" ]; then
+            # Log message into the global monitor log.
+            if fs_on_tmpfs / ; then
+                echo "$l" >> /tmp/si_monitor.log
+            fi
+        fi
+    done
+}
+
+#
+################################################################################
+#
+#   Initialize the monitor server
+#
+
+init_monitor_server() {
+    # Send initialization status.
+    send_monitor_msg "status=0:first_timestamp=on:speed=0"
+    logmsg "Monitoring initialized."
+    # Start client log gathering server: for each connection
+    # to the local client on port 8181 the full log is sent
+    # to the requestor. -AR-
+    if [ "x$MONITOR_CONSOLE" = "xy" ]; then
+        MONITOR_CONSOLE=yes
+    fi
+    if [ "x$MONITOR_CONSOLE" = "xyes" ]; then
+        while :; do nc -p 8181 -l < /tmp/si_monitor.log; done &
+    fi
+}
+
+#
+################################################################################
+#
+#   Report installation status to the monitor server
+#
+
+start_report_task() {
+    # Reporting interval (in sec).
+    REPORT_INTERVAL=10
+
+    # Evaluate image size.
+    logmsg "Evaluating image size..."
+    if [ ! "x$BITTORRENT" = "xy" ]; then
+        IMAGESIZE=`rsync -av --numeric-ids $IMAGESERVER::$IMAGENAME | grep "total size" | sed -e "s/total size is \([0-9]*\).*/\1/"`
+    else
+        if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent" ]; then
+            torrent_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent"
+        elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent" ]; then
+            torrent_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent"
+        else
+            logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
+            shellout
+        fi
+        IMAGESIZE=`aria2c -S $torrent_file | awk '/Total Length:/ { print $4}' | sed 's/[(),]*//g'`
+    fi
+    IMAGESIZE=`expr $IMAGESIZE / 1024`
+    logmsg "  --> Image size = `expr $IMAGESIZE / 1024`MiB"
+
+    # Evaluate disks size.
+    LIST=`df 2>/dev/null | grep "/" | sed "s/  */ /g" | cut -d' ' -f3 | sed -ne 's/^\([0-9]*\)$/\1+/p'`0
+    DISKSIZE=`echo $LIST | bc`
+
+    # Spawn the report task -AR-
+    {
+    TOT=0; CURR_SIZE=0
+    while :; do
+        LIST=`df 2>/dev/null | grep "/" | sed "s/  */ /g" | cut -d' ' -f3 | sed -ne 's/^\([0-9]*\)$/\1+/p'`0
+        TOT=`echo $LIST | bc`
+
+        # Evaluate bandwidth.
+        speed=`echo "scale=2; (($TOT - $DISKSIZE) - $CURR_SIZE) / $REPORT_INTERVAL" | bc`
+        speed=`echo "scale=2; if ($speed >= 0) { print $speed; } else { print 0; }" | bc`
+
+        # Evaluate status.
+        CURR_SIZE=$(($TOT - $DISKSIZE))
+        status=`echo "scale=2; $CURR_SIZE * 100 / $IMAGESIZE" | bc`
+        if [ `echo "scale=2; $status <= 0" | bc` -eq 1 ]; then
+            status=1
+        elif [ `echo "scale=2; $status >= 100" | bc` -eq 1 ]; then
+            status=99
+        fi
+
+        # Send status and bandwidth to the monitor server.
+        send_monitor_msg "status=$status:speed=$speed"
+
+        # Wait $REPORT_INTERVAL sec between each report -AR-
+        sleep $REPORT_INTERVAL
+    done
+    }&
+
+    logmsg "Report task started."
+    REPORT_PID=$!
+}
+
+#
+################################################################################
+#
+#   Stop to report installation status to the monitor server
+#
+
+stop_report_task() {
+    if [ ! -z $REPORT_PID ]; then
+        kill -9 $REPORT_PID
+        logmsg "Report task stopped."
+    fi
+
+    # Try to report the error to the monitor server.
+    send_monitor_msg "status=$1:speed=0"
+}

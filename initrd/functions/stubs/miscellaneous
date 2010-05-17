@@ -1,0 +1,107 @@
+#
+################################################################################
+#
+# Description: remove duplicated elements from a list, preserving the order.
+#
+unique() {
+    ret=
+    for i in $*; do
+        flag=0
+        for j in $ret; do
+            [ "$i" = "$j" ] && flag=1 && break
+        done
+        [ $flag -eq 0 ] && ret="$ret $i"
+    done
+    echo $ret
+    unset i j flag ret
+}
+
+#
+################################################################################
+#
+# Description: reverse a list
+#
+reverse() {
+    ret=
+    for i in $*; do
+        ret="$i $ret"
+    done
+    echo $ret
+    unset i
+}
+
+#
+################################################################################
+#
+#   Beep incessantly
+#
+beep_incessantly() {
+    local SECONDS=1
+    local MINUTES
+    local MINUTES_X_SIXTY
+    { while :;
+        do
+            echo -n -e "\\a"
+            if [ $SECONDS -lt 60 ]; then
+                logmsg "I have been done for $SECONDS seconds.  Reboot me already!"
+            else
+                MINUTES=`echo "$SECONDS / 60"|bc`
+                MINUTES_X_SIXTY=`echo "$MINUTES * 60"|bc`
+                if [ "$MINUTES_X_SIXTY" = "$SECONDS" ]; then
+                    logmsg "I have been done for $MINUTES minutes now.  Reboot me already!"
+                fi
+            fi
+            sleep 1
+            SECONDS=`echo "$SECONDS + 1"|bc`
+        done
+    }
+}
+
+#
+################################################################################
+#
+#   Beep incessantly
+#
+# Usage: beep [$COUNT [$INTERVAL]]
+# Usage: beep
+beep() {
+    local COUNT=$1
+    local INTERVAL=$2
+
+    [ -z $COUNT ] && COUNT=1
+    [ -z $INTERVAL ] && INTERVAL=1
+
+    local COUNTED=0
+    until [ "$COUNTED" = "$COUNT" ]
+    do
+        echo -n -e "\\a"
+        sleep $INTERVAL
+        COUNTED=$(( $COUNTED + 1 ))
+    done
+}
+
+#
+################################################################################
+#
+#   Print out dots while sleeping
+#
+# Usage: sleep_loop [[$COUNT [$INTERVAL]] $CHARACTER]
+# Usage: sleep_loop
+sleep_loop() {
+    local COUNT=$1
+    local INTERVAL=$2
+    local CHARACTER=$3
+    local COUNTED
+
+    [ -z $COUNT ] && COUNT=1
+    [ -z $INTERVAL ] && INTERVAL=1
+    [ -z $CHARACTER ] && CHARACTER=.
+
+    COUNTED=0
+    until [ "$COUNTED" = "$COUNT" ]
+    do
+        echo -n "$CHARACTER"
+        sleep $INTERVAL
+        COUNTED=$(( $COUNTED + 1 ))
+    done
+}
