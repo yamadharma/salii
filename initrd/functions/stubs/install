@@ -1,0 +1,189 @@
+#
+################################################################################
+#
+choose_autoinstall_script() {
+
+    logmsg
+    logmsg choose_autoinstall_script
+
+    #
+    # Get the base hostname for the last attempt at choosing an autoinstall
+    # script.  For example, if the hostname is compute99, then try to get
+    # compute.master. -BEF-
+    #
+    get_base_hostname
+
+    # Get group name (defined in /etc/systemimager/cluster.xml on the image
+    # server). -AR-
+    get_group_name
+
+    #
+    # If SCRIPTNAME is specified as a kernel append, or via local.cfg, then use that script.
+    #
+    if [ ! -z $SCRIPTNAME ]; then
+        #
+        # SCRIPTNAME was specified, but let's be flexible.  Try explicit first, then .master, .sh. -BEF-
+        #
+        SCRIPTNAMES="${SCRIPTS_DIR}/${SCRIPTNAME} ${SCRIPTS_DIR}/${SCRIPTNAME}.sh ${SCRIPTS_DIR}/${SCRIPTNAME}.master"
+
+    else
+        #
+        # If SCRIPTNAME was not specified, choose one, in order of preference.  First hit wins.
+        # Order of preference is:
+        #   HOSTNAME                (i.e. node001.sh)
+        #   GROUPNAMES              (i.e. Login.sh) - see /etc/systemimager/cluster.xml on the image server
+        #   BASE_HOSTNAME           (i.e. node.sh)
+        #   IMAGENAME               (i.e. ubuntu7_04.sh)
+        #
+        [ ! -z $HOSTNAME ] && \
+            SCRIPTNAMES="${SCRIPTNAMES} ${SCRIPTS_DIR}/${HOSTNAME}.sh ${SCRIPTS_DIR}/${HOSTNAME}.master"
+        for GROUPNAME in $GROUPNAMES; do
+            SCRIPTNAMES="${SCRIPTNAMES} ${SCRIPTS_DIR}/${GROUPNAME}.sh ${SCRIPTS_DIR}/${GROUPNAME}.master"
+        done
+        unset GROUPNAME
+        [ ! -z $BASE_HOSTNAME ] && \
+            SCRIPTNAMES="${SCRIPTNAMES} ${SCRIPTS_DIR}/${BASE_HOSTNAME}.sh ${SCRIPTS_DIR}/${BASE_HOSTNAME}.master"
+        [ ! -z $IMAGENAME ] && \
+            SCRIPTNAMES="${SCRIPTNAMES} ${SCRIPTS_DIR}/${IMAGENAME}.sh ${SCRIPTS_DIR}/${IMAGENAME}.master"
+    fi
+
+    #
+    # Choose a winner!
+    #
+    for SCRIPTNAME in $SCRIPTNAMES
+    do
+        [ -e $SCRIPTNAME ] && break
+    done
+
+    # Did we really find one, or just exit the loop without a 'break'
+    if [ ! -e $SCRIPTNAME ]; then
+        logmsg "FATAL: couldn't find any of the following autoinstall scripts!"
+        logmsg "---"
+        logmsg ${SCRIPTNAMES}
+        logmsg "---"
+        logmsg "Be sure that at least one of the scripts above exists in"
+        logmsg "the autoinstall scripts directory on your image server."
+        logmsg
+        logmsg "See also: si_mkautoinstallscript(8)."
+        shellout
+    fi
+    logmsg "Using autoinstall script: ${SCRIPTNAME}"
+}
+
+#
+################################################################################
+#
+run_autoinstall_script() {
+
+    logmsg
+    logmsg run_autoinstall_script
+
+    # Run the autoinstall script.
+    chmod 755 $SCRIPTNAME || shellout
+    logmsg ">>> $SCRIPTNAME"
+    $SCRIPTNAME || shellout
+}
+
+#
+################################################################################
+#
+run_pre_install_scripts() {
+
+    logmsg
+    logmsg run_pre_install_scripts
+
+    get_base_hostname
+
+    # Get group name (defined in /etc/systemimager/cluster.xml on the image
+    # server). -AR-
+    get_group_name
+
+    if [ -e "${SCRIPTS_DIR}/pre-install/" ]; then
+
+        cd ${SCRIPTS_DIR}/pre-install/
+
+        PRE_INSTALL_SCRIPTS="$PRE_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]all\..*"`"
+        PRE_INSTALL_SCRIPTS="$PRE_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]${IMAGENAME}\..*"`"
+        PRE_INSTALL_SCRIPTS="$PRE_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]${BASE_HOSTNAME}\..*"`"
+        for GROUPNAME in ${GROUPNAMES}; do
+            PRE_INSTALL_SCRIPTS="$PRE_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]${GROUPNAME}\..*"`"
+        done
+        unset GROUPNAME
+        PRE_INSTALL_SCRIPTS="$PRE_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]${HOSTNAME}\..*"`"
+
+        # Now, to get rid of those pesky newlines. -BEF-
+        PRE_INSTALL_SCRIPTS=`echo $PRE_INSTALL_SCRIPTS | tr '\n' ' '`
+
+        if [ ! -z "`echo ${PRE_INSTALL_SCRIPTS}|sed 's/ //'`" ]; then
+
+            for PRE_INSTALL_SCRIPT in `unique $PRE_INSTALL_SCRIPTS`
+            do
+                logmsg ">>> $PRE_INSTALL_SCRIPT"
+                chmod +x $PRE_INSTALL_SCRIPT || shellout
+                ./$PRE_INSTALL_SCRIPT || shellout
+            done
+        else
+            logmsg "No pre-install scripts found."
+        fi
+
+        if [ -e "/tmp/pre-install_variables.txt" ]; then
+            . /tmp/pre-install_variables.txt
+        fi
+
+    fi
+}
+
+#
+################################################################################
+#
+run_post_install_scripts() {
+
+    logmsg
+    logmsg run_post_install_scripts
+
+    get_base_hostname
+
+    # Get group name (defined in /etc/systemimager/cluster.xml on the image
+    # server). -AR-
+    get_group_name
+
+    if [ -e "${SCRIPTS_DIR}/post-install/" ]; then
+
+        # make a copy of variables.txt available to post-install scripts -BEF-
+        cp -f /tmp/variables.txt ${SCRIPTS_DIR}/post-install/
+
+        cd ${SCRIPTS_DIR}/post-install/
+
+        POST_INSTALL_SCRIPTS="$POST_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]all\..*"`"
+        POST_INSTALL_SCRIPTS="$POST_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]${IMAGENAME}\..*"`"
+        POST_INSTALL_SCRIPTS="$POST_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]${BASE_HOSTNAME}\..*"`"
+        for GROUPNAME in ${GROUPNAMES}; do
+            POST_INSTALL_SCRIPTS="$POST_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]${GROUPNAME}\..*"`"
+        done
+        POST_INSTALL_SCRIPTS="$POST_INSTALL_SCRIPTS `ls | grep "^[0-9][0-9]${HOSTNAME}\..*"`"
+
+        # Now, to get rid of those pesky newlines. -BEF-
+        POST_INSTALL_SCRIPTS=`echo $POST_INSTALL_SCRIPTS | tr '\n' ' '`
+
+        if [ ! -z "`echo ${POST_INSTALL_SCRIPTS}|sed 's/ //'`" ]; then
+
+            mkdir -p /a/tmp/post-install/ || shellout
+
+            rsync -a ${SCRIPTS_DIR}/post-install/ /a/tmp/post-install/ || shellout
+
+            for POST_INSTALL_SCRIPT in `unique $POST_INSTALL_SCRIPTS`
+            do
+                if [ -e "$POST_INSTALL_SCRIPT" ]; then
+                    logmsg ">>> $POST_INSTALL_SCRIPT"
+                    chmod +x /a/tmp/post-install/$POST_INSTALL_SCRIPT || shellout
+                    chroot /a/ /tmp/post-install/$POST_INSTALL_SCRIPT || shellout
+                fi
+            done
+        else
+            logmsg "No post-install scripts found."
+        fi
+
+        # Clean up post-install script directory.
+        rm -rf /a/tmp/post-install/ || shellout
+    fi
+}
