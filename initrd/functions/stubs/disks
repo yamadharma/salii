@@ -13,7 +13,6 @@ find_all_disks(){
     done
 }
 
-
 disk_enumerate(){
         ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
         ALLDISKS=$(find_all_disks)
@@ -31,7 +30,6 @@ disk_enumerate(){
         done
 
 }
-
 
 ## Sets the disklabel for a specified disk
 # Usage: set_disklabel label disk
@@ -56,7 +54,6 @@ set_disklabel(){
 
 }
 
-
 ## Shows the disksize
 # Usage: get_disksize disk
 get_disksize(){
@@ -72,3 +69,167 @@ get_disksize(){
         fi
 }
 
+##
+# Creates partitions
+#
+# Usage: partition disk partitionstring
+#
+# partitionstring == size:type:mount:label
+#  size*
+#  type*
+#  mount
+#  label
+#
+# Swap example no label: 4096:swap
+# Swap example label: 4096:swap:swap
+# Disk xfs no label: 4096:xfs:/var
+# Disk xfs label: 4096:xfs:/var:var
+
+partition(){
+	DISK=$1
+	
+	if [ ! -e $DISK ]; then
+		logmsg
+		logmsg "Disk not found, stopping"
+		shellout
+	fi
+	
+	DISKSIZE=$(get_disksize $DISK)
+	END_OF_LAST=0
+	NUMPARTITIONS=0
+	
+	if [ ! -e /tmp/mounts ]; then
+		touch /tmp/mounts
+	fi
+	
+	shift
+
+	logmsg
+	logmsg "Partition disk: $DISK $DISKSIZE"
+
+	while [ $# -gt 0 ]; do
+
+		SIZE=$( echo $1 | awk -F ":" '{ print $1 }' )
+		TYPE=$( echo $1 | awk -F ":" '{ print $2 }' )
+		MOUNTPATH=$( echo $1 | awk -F ":" '{ print $3 }' ) ## If swap is used, this is the label
+		LABEL=$( echo $1 | awk -F ":" '{ print $4 }' )
+
+		if [ ! "$SIZE" ] && [ ! "$TYPE" ]; then
+			logmsg
+			logmsg "Size and input are required, size:type"
+			logmsg
+			break
+		fi
+
+		NUMPARTITIONS=$(( $NUMPARTITIONS + 1 ))
+		logmsg
+		logmsg "Partition $DISK$NUMPARTITIONS"
+
+		case "$SIZE" in
+			0)
+				START_MB=$END_OF_LAST
+				END_MB=$(( DISKSIZE - 0 ))
+				logmsg "   parted -s -- $DISK mkpart primary $START_MB $END_MB"
+				parted -s -- $DISK mkpart primary $START_MB $END_MB 
+				END_OF_LAST=$END_MB
+				sleep 1
+			;;
+			*)
+				START_MB=$END_OF_LAST
+				END_MB=$(($START_MB + $SIZE))
+				logmsg "   parted -s -- $DISK mkpart primary $START_MB $END_MB"
+				parted -s -- $DISK mkpart primary $START_MB $END_MB
+				END_OF_LAST=$END_MB
+				sleep 1
+			;;
+		esac
+
+		case "$TYPE" in
+			ext2|ext3|ext4)
+				logmsg "   mkfs.$TYPE -q $DISK$NUMPARTITIONS"
+				mkfs.$TYPE -q $DISK$NUMPARTITIONS || shellout
+				if [ "$LABEL" ]; then
+					logmsg "   tune2fs -L $LABEL $DISK$NUMPARTITIONS"
+					tune2fs -L $LABEL $DISK$NUMPARTITIONS || shellout
+				fi
+			;;
+			xfs)
+				logmsg "   mkfs.xfs -f -q $DISK$NUMPARTITIONS"
+				mkfs.xfs -f -q $DISK$NUMPARTITIONS || shellout
+				if [ "$LABEL" ]; then
+					logmsg "   xfs_db -x -c 'label $LABEL' $DISK$NUMPARTITIONS"
+					xfs_db -x -c "label $LABEL" $DISK$NUMPARTITIONS || shellout
+				fi
+			;;
+			swap)
+				if [ "$MOUNTPATH" ]; then
+					SWAPLABEL="-L $MOUNTPATH "
+					MOUNTPATH=""
+				else
+					SWAPLABEL=""
+				fi
+				logmsg "   mkswap $SWAPLABEL$DISK$NUMPARTITIONS"
+				mkswap $SWAPLABEL$DISK$NUMPARTITIONS || shellout
+			;;
+			grub2|grub_bios)
+				logmsg "   parted -s -- $DISK set $NUMPARTITIONS bios_grub on"
+				parted -s -- $DISK set $NUMPARTITIONS bios_grub on || shellout
+			;;
+			ext2.128)
+				logmsg "   mkfs.ext2 -I 128 -q $DISK$NUMPARTITIONS"
+				mkfs.ext2 -I 128 -q $DISK$NUMPARTITIONS || shellout
+				if [ "$LABEL" ]; then
+					logmsg "   tune2fs -L $LABEL $DISK$NUMPARTITIONS"
+					tune2fs -L $LABEL $DISK$NUMPARTITIONS || shellout
+				fi
+			;;
+		esac
+
+		if [ "$MOUNTPATH" ]; then
+			if [ "$(echo $MOUNTPATH | sed 's/\///g')" ]; then
+				echo "1;$DISK$NUMPARTITIONS;/a$MOUNTPATH;$TYPE" >> /tmp/mounts
+			else
+				echo "0;$DISK$NUMPARTITIONS;/a$MOUNTPATH;$TYPE" >> /tmp/mounts
+			fi
+		fi
+
+		shift
+	done
+
+}
+
+## Reads the /tmp/mounts file to mount
+mount_disks(){
+
+	for line in $(cat /tmp/mounts | sort -u ); do
+		mountpath=$(echo $line | awk -F ";" '{ print $3 }')
+		disk=$(echo $line | awk -F ";" '{ print $2 }')
+		type=$(echo $line | awk -F ";" '{ print $4 }')
+		
+		logmsg "mkdir -p $mountpath"
+		mkdir -p $mountpath
+		
+		sleep 1 
+		
+		logmsg "mount -t $type $disk $mountpath"
+		mount -t $type $disk $mountpath
+		logmsg
+	done
+
+}
+
+## Reads the /tmp/mounts file to umount
+umount_disks(){
+
+	logmsg "umount /a/*"
+	umount /a/*
+
+	sleep 1
+
+	logmsg "umount /a"
+	umount /a
+
+}
+#partition /dev/sda 1024:ext2:/boot:boot 1:grub2 4096:swap:swap 0:xfs:/:root
+#partition /dev/sdb 0:xfs:/scratch:scratch
+#mount_disks
