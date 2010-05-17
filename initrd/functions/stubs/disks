@@ -1,4 +1,38 @@
 
+find_all_disks(){
+
+    ## First find all disks
+    for disk in $( \
+                cat /proc/partitions \
+                | awk '$4 ~ /(sd|hd)([a-z])/ && $4 !~ /(sd|hd)([a-z][0-9])/ || $4 ~ /(c[0-9]d[0-9])/ && $4 !~ /(c[0-9]d[0-9]p[0-9])/ { print $4 }' \
+                | sort -u \
+        ); do
+
+        echo $disk
+
+    done
+}
+
+
+disk_enumerate(){
+        ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
+        ALLDISKS=$(find_all_disks)
+        NUMDISKS=-1
+
+        for order in $ORDER; do
+                for disk in $ALLDISKS; do
+                        found=$(echo $disk | grep $order)
+                        if [ $found ]; then
+                                echo "A disk found: $disk"
+                                NUMDISKS=$(( $NUMDISKS + 1 ))
+                                eval "DISK$NUMDISKS=/dev/$disk"
+                        fi
+                done
+        done
+
+}
+
+
 ## Sets the disklabel for a specified disk
 # Usage: set_disklabel label disk
 #   labels: bsd|dvh|gpt|loop|mac|msdos|pc98|sun
