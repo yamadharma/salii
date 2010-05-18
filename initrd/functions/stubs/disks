@@ -144,6 +144,10 @@ partition(){
 			;;
 		esac
 
+		if [ "$LABEL" == "none" ]; then
+			LABEL=""
+		fi
+
 		case "$TYPE" in
 			ext2|ext3|ext4)
 				logmsg "   mkfs.$TYPE -q $DISK$NUMPARTITIONS"
@@ -162,9 +166,8 @@ partition(){
 				fi
 			;;
 			swap)
-				if [ "$MOUNTPATH" ]; then
-					SWAPLABEL="-L $MOUNTPATH "
-					MOUNTPATH=""
+				if [ "$LABEL" ]; then
+					SWAPLABEL="-L $LABEL "
 				else
 					SWAPLABEL=""
 				fi
@@ -185,16 +188,19 @@ partition(){
 			;;
 		esac
 
-		if [ "$MOUNTPATH" ]; then
+		if [ "$MOUNTPATH" ] && [ "$MOUNTPATH" != "none" ]; then
 			if [ "$(echo $MOUNTPATH | sed 's/\///g')" ]; then
-				echo "1;$DISK$NUMPARTITIONS;/a$MOUNTPATH;$TYPE" >> /tmp/mounts
+				echo "$DISK$NUMPARTITIONS /a$MOUNTPATH $TYPE rw 0 1" >> /tmp/mounts
 			else
-				echo "0;$DISK$NUMPARTITIONS;/a$MOUNTPATH;$TYPE" >> /tmp/mounts
+				echo "$DISK$NUMPARTITIONS /a$MOUNTPATH $TYPE rw 0 2" >> /tmp/mounts
 			fi
 		fi
 
 		shift
 	done
+
+	# Copy as fstab
+	cat /tmp/mounts | sort -u > /etc/fstab
 
 }
 
