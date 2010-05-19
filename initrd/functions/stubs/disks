@@ -1,4 +1,8 @@
 
+blockdev(){
+	logmsg "Not implemented"
+}
+
 find_all_disks(){
 
     ## First find all disks
