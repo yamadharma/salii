@@ -83,7 +83,7 @@ get_disksize(){
 	
 	if [ -e $DISK ]
 	then
-		DISKSIZE=$(parted -s /dev/sda unit MB print|awk '/^Disk/ {print $3}'|sed 's/[Mm][Bb]//')
+		echo $(parted -s /dev/sda unit MB print|awk '/^Disk/ {print $3}'|sed 's/[Mm][Bb]//')
 	else
 		logmsg
 		logmsg "Disk not found!"
