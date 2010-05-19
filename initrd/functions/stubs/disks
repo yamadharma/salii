@@ -1,38 +1,49 @@
 
 blockdev(){
-	logmsg "Not implemented"
+	logmsg "blockdev is depricated"
 }
 
 find_all_disks(){
+	## 
+	# First find all disks, we are only interested the whole disk, eg: /dev/sda
+	# line to parse:
+	#  lrwxrwxrwx 1 root root  9 2010-04-05 12:40 pci-0000:02:0e.0-scsi-0:2:0:0 -> ../../sda
+	#  lrwxrwxrwx 1 root root 10 2010-04-05 12:40 pci-0000:02:0e.0-scsi-0:2:0:0-part1 -> ../../sda1
+	#
+	disks=$(ls -l /dev/disk/by-path | grep -v part | awk '{ print $NF }' | sort -u)
 
-    ## First find all disks
-    for disk in $( \
-                cat /proc/partitions \
-                | awk '$4 ~ /(sd|hd)([a-z])/ && $4 !~ /(sd|hd)([a-z][0-9])/ || $4 ~ /(c[0-9]d[0-9])/ && $4 !~ /(c[0-9]d[0-9]p[0-9])/ { print $4 }' \
-                | sort -u \
-        ); do
-
-        echo $disk
-
-    done
+	for d in $disks
+	do
+		case $d in
+			../*) 
+				echo $(basename $d)
+			;; 
+		esac
+	done
 }
 
 disk_enumerate(){
-        ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
-        ALLDISKS=$(find_all_disks)
-        NUMDISKS=-1
+	##  To support the following syntax's
+	#    - A=",a,b,,c" --> A="a b c"
+	#
+	ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
 
-        for order in $ORDER; do
-                for disk in $ALLDISKS; do
-                        found=$(echo $disk | grep $order)
-                        if [ $found ]; then
-                                echo "A disk found: $disk"
-                                NUMDISKS=$(( $NUMDISKS + 1 ))
-                                eval "DISK$NUMDISKS=/dev/$disk"
-                        fi
-                done
-        done
+	ALLDISKS=$(find_all_disks)
+	NUMDISKS=-1
 
+	for order in $ORDER
+	do
+		for disk in $ALLDISKS
+		do
+			found=$(echo $disk | grep $order)
+			if [ $found ]
+			then
+				echo "A disk found: $disk"
+				NUMDISKS=$(( $NUMDISKS + 1 ))
+				eval "DISK$NUMDISKS=/dev/$disk"
+			fi
+		done
+	done
 }
 
 ## Sets the disklabel for a specified disk
@@ -41,35 +52,42 @@ disk_enumerate(){
 
 set_disklabel(){
 
-        LABEL=$1
-        DISK=$2
+	DISK=$1
+	LABEL=$2
 
-        if [ -e $DISK ]; then
-                case $LABEL in
-                bsd|dvh|gpt|loop|mac|msdos|pc98|sun)
-                        parted -s -- $DISK mklabel $LABEL
+	if [ -e $DISK ]
+	then
+		case $LABEL in
+			bsd|dvh|gpt|loop|mac|msdos|pc98|sun)
+         	              	parted -s -- $DISK mklabel $LABEL
                         ;;
-                esac
-        else
-                logmsg
-                logmsg "Disk not found!"
-                shellout
-        fi
 
+			*)
+				logmsg
+				logmsg "Label not supported: $LABEL"
+				shellout
+			;;
+                esac
+	else
+		logmsg
+		logmsg "Disk not found: $DISK"
+		shellout
+	fi
 }
 
 ## Shows the disksize
 # Usage: get_disksize disk
 get_disksize(){
 
-        DISK=$1
-
-        if [ -e $DISK ]; then
-                DISKSIZE=$(parted -s /dev/sda unit MB print|awk '/^Disk/ {print $3}'|sed 's/[Mm][Bb]//')
-        else
-                logmsg
-                logmsg "Disk not found!"
-                shellout
+	DISK=$1 
+	
+	if [ -e $DISK ]
+	then
+		DISKSIZE=$(parted -s /dev/sda unit MB print|awk '/^Disk/ {print $3}'|sed 's/[Mm][Bb]//')
+	else
+		logmsg
+		logmsg "Disk not found!"
+		shellout
         fi
 }
 
