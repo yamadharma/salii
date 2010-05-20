@@ -30,8 +30,11 @@ find_all_disks(){
 	for d in $disks
 	do
 		case $d in
-			../*) 
-				echo $(basename $d)
+			../*)
+				if [ "$(cat /proc/partitions | grep $(basename $d))" ]
+				then
+					echo $(basename $d)
+				fi
 			;; 
 		esac
 	done
