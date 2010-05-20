@@ -136,8 +136,8 @@ mount_disks
 
 ### BEGIN mount proc in image for tools like System Configurator ###
 ### BEGIN mount sysfs in image for tools that might be run during chroot ### 
-logmsg "mount_system_fs"
-mount_system_fs
+logmsg "chroot_mount_system_fs"
+chroot_mount_system_fs
 ### END mount proc in image for tools like System Configurator ###
 ### END mount sysfs in image for tools that might be run during chroot ### 
 
@@ -203,8 +203,8 @@ fi
 #   Unmount filesystems
 #
 
-logmsg "umount_system_fs"
-umount_system_fs
+logmsg "chroot_umount_system_fs"
+chroot_umount_system_fs
 
 logmsg "umount_disks"
 umount_disks

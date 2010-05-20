@@ -332,7 +332,9 @@ mkdir -p /a || shellout
 logmsg "mount ${DISK0}4 /a -t xfs -o rw || shellout"
 mount ${DISK0}4 /a -t xfs -o rw || shellout
 
-logmsg "mke2fs -q ${DISK0}1 || shellout"
+# Added the blocksize of 128, by default the new e2fsprogs format the disk
+# with a Inode blocksize of 256. Grub 0.97 does not support this, only 128.
+logmsg "mke2fs -I 128 -q ${DISK0}1 || shellout"
 mke2fs -q ${DISK0}1 || shellout
 logmsg "tune2fs -L boot ${DISK0}1 || shellout"`
 tune2fs -L boot ${DISK0}1 || shellout"`
