@@ -13,18 +13,18 @@ start_sshd() {
     if [ ! -f /root/.ssh/authorized_keys ]; then
         if [ -z $SSH_DOWNLOAD_URL ]; then
             logmsg
-            logmsg "error: authorized_keys not found and SSH_DOWNLOAD_URL not defined in the installation parameters!"
-            logmsg "sshd can't be started!"
-            shellout
+            logmsg "authorized_keys shall not be downloaded, but sshd shall be start!"
+            logmsg
+	else
+        	CMD="wget ${SSH_DOWNLOAD_URL}/${ARCH}/ssh/authorized_keys"
+	        logmsg
+        	logmsg $CMD
+	        $CMD || shellout
+    
+		# set permissions to 600 -- otherwise, sshd will refuse to use it
+		chmod 600 /root/.ssh/authorized_keys || shellout
         fi
-        CMD="wget ${SSH_DOWNLOAD_URL}/${ARCH}/ssh/authorized_keys"
-        logmsg
-        logmsg $CMD
-        $CMD || shellout
     fi
-
-    # set permissions to 600 -- otherwise, sshd will refuse to use it
-    chmod 600 /root/.ssh/authorized_keys || shellout
 
     # must be owned by root
     chown -R 0.0 /root/
@@ -40,10 +40,6 @@ start_sshd() {
     if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
         ssh-keygen -t rsa -N "" -f /etc/ssh/ssh_host_rsa_key || shellout
     fi
-
-    # try to mount devpts (sometimes it's not really necessary)
-    mkdir -p /dev/pts
-    mount -t devpts none /dev/pts >/dev/null 2>&1
 
     # fire up sshd
     mkdir -p /var/run/sshd || shellout
