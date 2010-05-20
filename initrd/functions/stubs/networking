@@ -59,7 +59,7 @@ ping_test() {
 ## SALI this method has been added to enable networking for a specific interface
 start_udhcpc_for(){
         logmsg "udhcpc -i $1"
-        udhcpc -i $1
+        udhcpc -i $1 -n -t 12
 
         if [ -s /tmp/udhcpc ]; then
                 . /tmp/udhcpc || shellout
