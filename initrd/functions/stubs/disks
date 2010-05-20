@@ -122,7 +122,7 @@ partition(){
 	NUMPARTITIONS=0
 	
 	if [ ! -e /tmp/mounts ]; then
-		touch /tmp/mounts
+		touch /tmp/mounts.$DISKBASE
 	fi
 	
 	shift
@@ -213,9 +213,9 @@ partition(){
 
 		if [ "$MOUNTPATH" ] && [ "$MOUNTPATH" != "none" ]; then
 			if [ "$(echo $MOUNTPATH | sed 's/\///g')" ]; then
-				echo "$DISK$NUMPARTITIONS /a$MOUNTPATH $TYPE rw 0 1" >> /tmp/mounts.$DISKBASE
+				echo "1;/a$MOUNTPATH;$TYPE;$DISK$NUMPARTITIONS" >> /tmp/mounts.$DISKBASE
 			else
-				echo "$DISK$NUMPARTITIONS /a$MOUNTPATH $TYPE rw 0 2" >> /tmp/mounts.$DISKBASE
+				echo "0;/a$MOUNTPATH;$TYPE;$DISK$NUMPARTITIONS" >> /tmp/mounts.$DISKBASE
 			fi
 		fi
 
@@ -231,16 +231,16 @@ mount_disks(){
 
 	if [ $1 ]
 	then
-		DISK="$( basename $1)"
+		MOUNTFILE="/tmp/mounts.$( basename $1)"
 	else
-		DISK="*"
+		MOUNTFILE="/tmp/mounts.*"
 	fi
 
-	while read line
+	for line in $( sort -u $MOUNTFILE )
 	do
-		path=$(echo $line | awk '{ print $2 }')
-		type=$(echo $line | awk '{ print $3 }')
-		disk=$(echo $line | awk '{ print $4 }')
+		path=$(echo $line | awk -F ";" '{ print $2 }')
+		type=$(echo $line | awk -F ";" '{ print $3 }')
+		disk=$(echo $line | awk -F ";" '{ print $4 }')
 
 		if [ ! -e $path ]; then
 			logmsg "mkdir -p $path"
@@ -254,7 +254,7 @@ mount_disks(){
 	        	logmsg "mount -t $type $disk $path"
 			mount -t $type $disk $path
 		fi
-	done < /tmp/mounts.$DISK | sort -u
+	done
 
 }
 
@@ -265,22 +265,22 @@ umount_disks(){
 
 	if [ $1 ]
 	then
-		DISK="$( basename $1)"
+		MOUNTFILE="/tmp/mounts.$( basename $1)"
 	else
-		DISK="*"
+		MOUNTFILE="/tmp/mounts.*"
 	fi
 
-	while read line
+	for line in $( sort -ur $MOUNTFILE )
 	do
-		path=$(echo $line | awk '{ print $2 }')
-		disk=$(echo $line | awk '{ print $4 }')
+		path=$(echo $line | awk -F ";" '{ print $2 }')
+		disk=$(echo $line | awk -F ";" '{ print $4 }')
 
 		if [ $( df -h | grep $disk ) ] && [ -e $path ]
 		then
 	        	logmsg "mount -t $type $disk $path"
 			umount $path
 		fi
-	done < /tmp/mounts.$DISK | sort -ur
+	done
 
 }
 
