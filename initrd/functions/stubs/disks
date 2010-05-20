@@ -240,18 +240,13 @@ mount_disks(){
 
 	if [ $1 ]
 	then
-		MOUNTFILE="/tmp/mounts.$( basename $1)"
+		DISK=$( basename $1)
 	else
-		cat /tmp/mounts.* > /tmp/mounts.all
-		MOUNTFILE="/tmp/mounts.all"
+		DISK=*
 	fi
 
-	while read line
+	cat /tmp/mounts.$DISK | sort -u | while read priotity path type disk
 	do
-		path=$(echo $line | awk '{ print $2 }')
-		type=$(echo $line | awk '{ print $3 }')
-		disk=$(echo $line | awk '{ print $4 }')
-
 		if [ ! -e $path ]; then
 			logmsg "mkdir -p $path"
 			mkdir -p $path
@@ -259,14 +254,17 @@ mount_disks(){
 			logmsg "Directory exists!, $path"
 		fi
 
-		if [ ! $( df -h | grep $disk ) ]
+		if [ ! "$(df | grep $disk)" ]
 		then
-	        	logmsg "mount -t $type $disk $path"
+			sleep 2
+		        logmsg "mount -t $type $disk $path"
 			mount -t $type $disk $path
+			sleep 2
 		else
-			logmsg "disk is already mounted: $path -> $disk"
+			logmsg "disk already mounted: $path -> $disk"
 		fi
-	done < "$MOUNTFILE" | sort -u
+
+	done
 
 }
 
@@ -277,27 +275,22 @@ umount_disks(){
 
 	if [ $1 ]
 	then
-		MOUNTFILE="/tmp/mounts.$( basename $1)"
+		DISK=$( basename $1)
 	else
-		cat /tmp/mounts.* > /tmp/mounts.all
-		MOUNTFILE="/tmp/mounts.all"
+		DISK=*
 	fi
 
-	while read line
+	cat /tmp/mounts.$DISK | sort -ru | while read priotity path type disk
 	do
-		path=$(echo $line | awk '{ print $2 }')
-		disk=$(echo $line | awk '{ print $4 }')
-
-		if [ $( df -h | grep $disk ) ] && [ -e $path ]
+		if [ "$(df | grep $disk)" ]
 		then
-	        	logmsg "umount $path"
+		        logmsg "umount $path"
 			umount $path
+			sleep 2
 		else
 			logmsg "disk already umounted: $path -> $disk"
 		fi
-	done < "$MOUNTFILE" | sort -ur
+
+	done
 
 }
-
-#partition /dev/sdb 0:xfs:/scratch:scratch
-#mount_disks
