@@ -29,15 +29,25 @@ find_all_disks(){
 
 	for d in $disks
 	do
+		case $(dirname $d) in
+			../../*)
+				controller="$(basename $(dirname $d))/"
+			;;
+			*)
+				controller=""
+			;;
+		esac
+
 		case $d in
 			../*)
 				if [ "$(cat /proc/partitions | grep $(basename $d))" ]
 				then
-					echo $(basename $d)
+					echo "$controller$(basename $d)"
 				fi
 			;; 
 		esac
 	done
+
 }
 
 disk_enumerate(){
@@ -166,8 +176,9 @@ partition(){
 		fi
 
 		NUMPARTITIONS=$(( $NUMPARTITIONS + 1 ))
+		
 		logmsg
-		logmsg "Partition $DISK$NUMPARTITIONS"
+		logmsg "Create partition $NUMPARTITIONS on disk $DISK"
 
 		case "$SIZE" in
 			0)
@@ -188,27 +199,39 @@ partition(){
 			;;
 		esac
 
+		PARTITION=""
+		if [ ! -e $DISK$NUMPARTITIONS ]
+		then
+			if [ -e ${DISK}p$NUMPARTITIONS ]
+			then
+				PARTITION="${DISK}p$NUMPARTITIONS"
+			fi
+		else
+			PARTITION="$DISK$NUMPARTITIONS"
+		fi
+
 		##
 		# If the value of the $LABEL is none, clear it.
 		if [ "$LABEL" == "none" ]; then
 			LABEL=""
 		fi
 
+
 		case "$TYPE" in
 			ext2|ext3|ext4)
-				logmsg "   mkfs.$TYPE -q $DISK$NUMPARTITIONS"
-				mkfs.$TYPE -q $DISK$NUMPARTITIONS || shellout
+				logmsg "   mkfs.$TYPE -q $PARTITION"
+				mkfs.$TYPE -q $PARTITION || shellout
 				if [ "$LABEL" ]; then
-					logmsg "   tune2fs -L $LABEL $DISK$NUMPARTITIONS"
-					tune2fs -L $LABEL $DISK$NUMPARTITIONS || shellout
+					logmsg "   tune2fs -L $LABEL $PARTITION"
+					tune2fs -L $LABEL $PARTITION || shellout
 				fi
 			;;
 			xfs)
-				logmsg "   mkfs.xfs -f -q $DISK$NUMPARTITIONS"
-				mkfs.xfs -f -q $DISK$NUMPARTITIONS || shellout
+				logmsg "   mkfs.xfs -f -q $PARTITION"
+				mkfs.xfs -f -q $PARTITION || shellout
 				if [ "$LABEL" ]; then
-					logmsg "   xfs_db -x -c 'label $LABEL' $DISK$NUMPARTITIONS"
-					xfs_db -x -c "label $LABEL" $DISK$NUMPARTITIONS || shellout
+					logmsg "   xfs_db -x -c 'label $LABEL' $PARTITION"
+					xfs_db -x -c "label $LABEL" $PARTITION || shellout
 				fi
 			;;
 			swap)
@@ -217,20 +240,20 @@ partition(){
 				else
 					SWAPLABEL=""
 				fi
-				logmsg "   mkswap $SWAPLABEL$DISK$NUMPARTITIONS"
-				mkswap $SWAPLABEL$DISK$NUMPARTITIONS || shellout
+				logmsg "   mkswap $SWAPLABEL$PARTITION"
+				mkswap $SWAPLABEL$PARTITION || shellout
 			;;
 			grub2|grub_bios)
-				logmsg "   parted -s -- $DISK set $NUMPARTITIONS bios_grub on"
-				parted -s -- $DISK set $NUMPARTITIONS bios_grub on || shellout
+				logmsg "   parted -s -- $DISK set $PARTITION bios_grub on"
+				parted -s -- $DISK set $PARTITION bios_grub on || shellout
 			;;
 			ext2.128)
 				TYPE=$( echo $TYPE | awk -F "." '{print $1}')
-				logmsg "   mkfs.ext2 -I 128 -q $DISK$NUMPARTITIONS"
-				mkfs.ext2 -I 128 -q $DISK$NUMPARTITIONS || shellout
+				logmsg "   mkfs.ext2 -I 128 -q $PARTITION"
+				mkfs.ext2 -I 128 -q $PARTITION || shellout
 				if [ "$LABEL" ]; then
-					logmsg "   tune2fs -L $LABEL $DISK$NUMPARTITIONS"
-					tune2fs -L $LABEL $DISK$NUMPARTITIONS || shellout
+					logmsg "   tune2fs -L $LABEL $PARTITION"
+					tune2fs -L $LABEL $PARTITION || shellout
 				fi
 			;;
 		esac
@@ -246,14 +269,14 @@ partition(){
 		case "$MOUNTPATH" in
 			none)
 				logmsg
-				logmsg "$DISK$NUMPARTITION does not need a mount"
+				logmsg "$PARTITION does not need a mount"
 				logmsg
 			;;
 			/)
-				echo "0 /a$MOUNTPATH $TYPE $DISK$NUMPARTITIONS" >> /tmp/mounts.$DISKBASE
+				echo "0 /a$MOUNTPATH $TYPE $PARTITION" >> /tmp/mounts.$DISKBASE
 			;;
 			*)
-				echo "1 /a$MOUNTPATH $TYPE $DISK$NUMPARTITIONS" >> /tmp/mounts.$DISKBASE
+				echo "1 /a$MOUNTPATH $TYPE $PARTITION" >> /tmp/mounts.$DISKBASE
 			;;
 		esac
 
