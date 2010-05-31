@@ -43,7 +43,6 @@ NON_BOOT_PKGS := -p $(PKG)-client \
                  -p $(PKG)-common \
                  -p $(PKG)-doc \
                  -p $(PKG)-server \
-                 -p $(PKG)-server-flamethrowerd \
                  -p $(PKG)-server-bittorrent
 
 BOOTARCHS = alpha i386 ia64 parisc ppc64-iSeries ppc64-ps3 ppc64 ppc64ydl ppc amd64
@@ -106,10 +105,8 @@ clean:
 	#rm -rf $(BUILD_DIR)
 	cd $(CURDIR)/debian && \
 	  rm -rf $(PKG)-client $(PKG)-server $(PKG)-common $(PKG)-doc \
-	  $(BOOTPKG) $(INITRD_TEMPLATE_PKG) \
-	  $(PKG)-boot $(PKG)-server-flamethrowerd $(PKG)-server-bittorrent
+	  $(BOOTPKG) $(INITRD_TEMPLATE_PKG) 
 	rm -f debian/$(PKG)-server.init
-	rm -f debian/$(PKG)-server-flamethrowerd.init
 	rm -f debian/$(PKG)-server-bittorrent.init
 	dh_clean
 
@@ -170,10 +167,6 @@ install-indep:	build-indep
 	$(MAKE) -C $(BUILD_DIR) install_docs \
 	  DESTDIR=$(CURDIR)/debian/$(PKG)-doc
 
-	mkdir -p $(CURDIR)/debian/$(PKG)-server-flamethrowerd/etc/systemimager
-	mv $(CURDIR)/debian/$(PKG)-server/etc/systemimager/flamethrower.conf \
-	  $(CURDIR)/debian/$(PKG)-server-flamethrowerd/etc/systemimager/
-	
 	# prepare the bittorrent package
 	mkdir -p $(CURDIR)/debian/$(PKG)-server-bittorrent/etc/init.d
 	mkdir -p $(CURDIR)/debian/$(PKG)-server-bittorrent/etc/systemimager
@@ -223,11 +216,6 @@ binary-indep: build-indep install-indep
 	cp $(BUILD_DIR)/etc/init.d/$(PKG)-server-monitord \
 	  ./debian/$(PKG)-server.init
 	dh_installinit --no-start -p$(PKG)-server --init-script=$(PKG)-server-monitord
-
-	cp $(BUILD_DIR)/etc/init.d/$(PKG)-server-flamethrowerd \
-	  ./debian/$(PKG)-server-flamethrowerd.init
-	dh_installinit --no-start -p$(PKG)-server-flamethrowerd \
-	  --init-script=$(PKG)-server-flamethrowerd
 
 	cp $(BUILD_DIR)/etc/init.d/$(PKG)-server-bittorrent \
 		./debian/$(PKG)-server-bittorrent.init

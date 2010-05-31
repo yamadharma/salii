@@ -219,6 +219,7 @@ binaries: kernel $(INITRD_DIR)/initrd.img
 include $(TOPDIR)/make.d/kernel.rul
 include $(TOPDIR)/make.d/popt.rul
 include $(TOPDIR)/make.d/zlib.rul
+include $(TOPDIR)/make.d/bittorrent.rul
 
 include $(TOPDIR)/initrd/initrd.rul
 
