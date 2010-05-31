@@ -244,8 +244,8 @@ partition(){
 				mkswap $SWAPLABEL$PARTITION || shellout
 			;;
 			grub2|grub_bios)
-				logmsg "   parted -s -- $DISK set $PARTITION bios_grub on"
-				parted -s -- $DISK set $PARTITION bios_grub on || shellout
+				logmsg "   parted -s -- $DISK set $NUMPARTITIONS bios_grub on"
+				parted -s -- $DISK set $NUMPARTITIONS bios_grub on || shellout
 			;;
 			ext2.128)
 				TYPE=$( echo $TYPE | awk -F "." '{print $1}')
