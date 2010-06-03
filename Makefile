@@ -217,7 +217,6 @@ binaries: kernel $(INITRD_DIR)/initrd.img
 # abstracted out. Its much more robust to include *.rul... -dannf
 #
 include $(TOPDIR)/make.d/kernel.rul
-include $(TOPDIR)/make.d/popt.rul
 include $(TOPDIR)/make.d/zlib.rul
 include $(TOPDIR)/make.d/bittorrent.rul
 
