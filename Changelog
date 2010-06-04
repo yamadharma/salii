@@ -1,3 +1,19 @@
+1.1.1:
+  * Increased kernel version to 2.6.33.4
+
+  * Splitted the /etc/init.d/functions file in seperate files for easy editing, 
+    during compiling these separate files are combined
+
+  * Added a some functions which replaces a lot of code in Master script ( old Matser scripts still work )
+
+  * Completly removed floppy and flamethrower support
+
+  * ReiserFS version increased to 3.6.20, patching is not required anymore
+
+  * Added kernel config for i386
+
+  Authors: Bas van der Vlies and Dennis Stam
+
 1.1.0:
   * Removed the Python based bitorrent client. CX_Freeze as also been removed.
 
