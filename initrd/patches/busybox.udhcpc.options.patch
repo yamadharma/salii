@@ -13,7 +13,7 @@ diff -ru busybox-1.16.1/networking/udhcp/options.c busybox-1.16.1-sali/networkin
   * for udhcpc stript */
  /* Must match dhcp_options[] order */
  const char dhcp_option_strings[] ALIGN1 =
-+	"sisrv" "\0"       /* SALI_IMAGESERVER    */
++	"saliimgsrv" "\0"       /* SALI_IMAGESERVER    */
  	"subnet" "\0"      /* DHCP_SUBNET         */
  	"timezone" "\0"    /* DHCP_TIME_OFFSET    */
  	"router" "\0"      /* DHCP_ROUTER         */

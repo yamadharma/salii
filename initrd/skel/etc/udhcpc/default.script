@@ -6,7 +6,7 @@
 
 DHCPVARFILE=/tmp/udhcpc
 
-echo "IMAGESERVER=$sisrv" > $DHCPVARFILE
+echo "IMAGESERVER=$saliimgsrv" > $DHCPVARFILE
 echo "IPADDR=$ip" >> $DHCPVARFILE
 echo "HOSTNAME=$hostname" >> $DHCPVARFILE
 echo "NETMASK=$subnet" >> $DHCPVARFILE
