@@ -4,7 +4,7 @@
 
 ARIA2_VERSION	= 1.9.3
 ARIA2_TARBALL	= aria2-$(ARIA2_VERSION).tar.bz2
-ARIA2_URL 	= ftp://ftp.sara.nl/pub/outgoing/aria2-$(ARIA2_VERSION).tar.bz2
+ARIA2_URL 	= ftp://ftp.sara.nl/pub/sali/sources/aria2-$(ARIA2_VERSION).tar.bz2
 ARIA2_DIR	= $(INITRD_SRC_DIR)/aria2-$(ARIA2_VERSION)
 
 ALL_SOURCE += $(INITRD_SRC_DIR)/$(ARIA2_TARBALL)

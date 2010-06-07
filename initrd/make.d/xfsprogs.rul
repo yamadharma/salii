@@ -5,7 +5,7 @@ ifndef IS_PPC64
 XFSPROGS_VERSION := 3.1.1
 XFSPROGS_DIR := $(INITRD_SRC_DIR)/xfsprogs-$(XFSPROGS_VERSION)
 XFSPROGS_TARBALL := xfsprogs-$(XFSPROGS_VERSION).tar.gz
-XFSPROGS_URL := ftp://oss.sgi.com/projects/xfs/cmd_tars/$(XFSPROGS_TARBALL)
+XFSPROGS_URL := ftp://ftp.sara.nl/pub/sali/sources/$(XFSPROGS_TARBALL)
 
 ## Disabled
 #XFSPROGS_PATCHES := $(shell ls $(PATCH_DIR)/xfsprogs.*.patch 2>/dev/null | sort)

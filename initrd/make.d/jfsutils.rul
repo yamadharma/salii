@@ -6,7 +6,7 @@
 JFSUTILS_VERSION := 1.1.14
 JFSUTILS_DIR := $(INITRD_SRC_DIR)/jfsutils-$(JFSUTILS_VERSION)
 JFSUTILS_TARBALL := jfsutils-$(JFSUTILS_VERSION).tar.gz
-JFSUTILS_URL := http://jfs.sourceforge.net/project/pub/$(JFSUTILS_TARBALL)
+JFSUTILS_URL := ftp://ftp.sara.nl/pub/sali/sources/$(JFSUTILS_TARBALL)
 
 ## Disabled
 #JFSUTILS_PATCHES := $(shell ls $(PATCH_DIR)/jfsutils.*.patch 2>/dev/null | sort)

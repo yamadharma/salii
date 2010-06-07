@@ -3,6 +3,8 @@
     is to be more dynamic with other protcol types (eg. http, ftp )
 
   * Removed option for rsync to TMPFS.
+
+  * Changed download location to ftp://ftp.sara.nl/pub/sali/sources
 1.1.1:
   * Increased kernel version to 2.6.33.4
 
