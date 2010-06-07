@@ -25,10 +25,13 @@
 #
 PATH=/sbin:/bin:/usr/bin:/usr/sbin:/tmp
 LD_LIBRARY_PATH=/lib
+
 SCRIPTS=scripts
 SCRIPTS_DIR=/scripts
+
 TORRENTS=torrents
 TORRENTS_DIR=/torrents
+
 VERSION="SYSTEMIMAGER_VERSION_STRING"
 FLAVOR="SYSTEMIMAGER_FLAVOR_STRING"
 #

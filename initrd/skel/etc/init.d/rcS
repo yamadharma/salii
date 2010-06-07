@@ -55,20 +55,12 @@ read_local_cfg
 read_kernel_append_parameters
 
 start_network
-beep
 
 if [ ! -z $MONITOR_SERVER ]; then
     init_monitor_server
 fi
 
 start_syslogd
-
-if [ ! -z $FLAMETHROWER_DIRECTORY_PORTBASE ]; then
-    get_flamethrower_directory
-fi
-
-get_torrents_directory
-beep
 
 tmpfs_watcher
 
@@ -87,6 +79,8 @@ if [ "x$SSH" = "xy" ]; then
     start_ssh
 fi
 
+old_getimage
+get_torrents_directory
 get_scripts_directory
 
 # HOSTNAME may already be set via local.cfg -BEF-
@@ -136,7 +130,6 @@ write_variables
 choose_autoinstall_script
 
 write_variables
-beep
 
 run_autoinstall_script
 

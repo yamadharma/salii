@@ -1,3 +1,15 @@
+old_getimage(){
+
+    if [ "x$BITTORRENT" = "xy" ]
+    then
+	PROTOCOL="bittorrent"
+	STAGING=$BITTORRENT_STAGING
+    else
+	PROTOCOL="rsync"
+    fi
+
+}
+
 ## Contents of this function has been copied from the master file
 getimage_bittorrent(){
 
@@ -14,10 +26,10 @@ getimage_bittorrent(){
     fi
 
     # Evaluate the staging directory
-    if [ -z $BITTORRENT_STAGING ]; then
+    if [ -z $STAGING ]; then
         logmsg bittorrent_autodetect_staging_dir
-        BITTORRENT_STAGING=`bittorrent_autodetect_staging_dir ${TORRENTS_DIR}/${bittorrent_tarball}.torrent`
-        if [ -z $BITTORRENT_STAGING ]; then
+        STAGING=`bittorrent_autodetect_staging_dir ${TORRENTS_DIR}/${bittorrent_tarball}.torrent`
+        if [ -z $STAGING ]; then
             logmsg ""
             logmsg "error: cannot find a staging directory to save file: $bittorrent_tarball"
             logmsg "Try to increase the size of a partition (like /tmp) in your patitioning schema"
@@ -25,7 +37,7 @@ getimage_bittorrent(){
             logmsg ""
             shellout
         fi
-        logmsg "--> staging in: $BITTORRENT_STAGING"
+        logmsg "--> staging in: $STAGING"
     fi
 
     # Download image from peers
@@ -33,68 +45,57 @@ getimage_bittorrent(){
     logmsg ""
     logmsg "--> INFO: remember to start /etc/init.d/systemimager-server-bittorrent on the image server!"
     logmsg ""
-    bittorrent_get_file ${TORRENTS_DIR}/${bittorrent_tarball}.torrent ${BITTORRENT_STAGING}
+
+    bittorrent_get_file ${TORRENTS_DIR}/${bittorrent_tarball}.torrent ${STAGING}
+
     if [ ! -z $MONITOR_SERVER ]; then
         stop_report_task 101
     fi
+
     # Extract image.
     logmsg "Extracting image from ${bittorrent_tarball} ..."
     cd /a/ || shellout
 
     case $compress in
         'z')
-                zcat ${BITTORRENT_STAGING}/${bittorrent_tarball} | tar -px${VERBOSE_OPT}f -
+                zcat ${STAGING}/${bittorrent_tarball} | tar -px${VERBOSE_OPT}f -
         ;;
 
         *)
-                tar -px${VERBOSE_OPT}f {BITTORRENT_STAGING}/${bittorrent_tarball}
+                tar -px${VERBOSE_OPT}f {STAGING}/${bittorrent_tarball}
         ;;
      esac
 
-    rm -f ${BITTORRENT_STAGING}/${bittorrent_tarball}
+    rm -f ${STAGING}/${bittorrent_tarball}
     unset bittorrent_tarball
 
 }
 
 getimage_rsync(){
 
-    # Use rsync
-    if [ "${TMPFS_STAGING}" = "yes" ]; then
-
-        # Deposit image into tmpfs
-        DIR=/tmp/tmpfs_staging
-        logmsg
-        logmsg "TMPFS_STAGING=${TMPFS_STAGING} -- Staging in ${DIR}"
-        mkdir -p ${DIR}
-
-        logmsg "rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ ${DIR}/"
-        rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids \
-              ${IMAGESERVER}::${IMAGENAME}/ ${DIR}/ > /dev/console || shellout
-
-        if [ ! -z $MONITOR_SERVER ]; then
-            stop_report_task 101
-        fi
-
-        # Move from staging in tmpfs to disk
-        rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --numeric-ids ${DIR}/ /a/ > /dev/console || shellout
-    else
-        logmsg "rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/"
-        rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/ > /dev/console || shellout
-        if [ ! -z $MONITOR_SERVER ]; then
-            stop_report_task 101
-        fi
-    fi
-
+   logmsg "rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/"
+   rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/ > /dev/console || shellout
+   if [ ! -z $MONITOR_SERVER ]; then
+	stop_report_task 101
+   fi
 
 }
 
 getimage(){
 
-	if [ "x$BITTORRENT" = "xy" ]
-	then
-		getimage_bittorrent
-	else
-		getimage_rsync
-	fi
-
+	# New way of checking which method must be used!
+	case $PROTOCOL in
+		bittorrent|torrent|BITTORRENT)
+			getimage_bittorrent
+		;;
+		rsync|RSYNC)
+			getimage_rsync
+		;;
+		*)
+			logmsg
+			logmsg "Could not find a way to retrieve a image"
+			logmsg
+			shellout
+		;;
+	esac
 }

@@ -75,7 +75,7 @@ disk_enumerate(){
 }
 
 ## Sets the disklabel for a specified disk
-# Usage: set_disklabel label disk
+# Usage: set_disklabel disk label
 #   labels: bsd|dvh|gpt|loop|mac|msdos|pc98|sun
 
 set_disklabel(){
