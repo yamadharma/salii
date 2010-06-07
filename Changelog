@@ -1,3 +1,8 @@
+1.1.*:
+  * Added variable PROTOCOL and STAGING to replace BITTORRENT and BITTORRENT_STAGING. Reason herefore
+    is to be more dynamic with other protcol types (eg. http, ftp )
+
+  * Removed option for rsync to TMPFS.
 1.1.1:
   * Increased kernel version to 2.6.33.4
 
