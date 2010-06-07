@@ -84,11 +84,11 @@ getimage_rsync(){
 getimage(){
 
 	# New way of checking which method must be used!
-	case $PROTOCOL in
-		bittorrent|torrent|BITTORRENT)
+	case "$PROTOCOL" in
+		"bittorrent")
 			getimage_bittorrent
 		;;
-		rsync|RSYNC)
+		"rsync")
 			getimage_rsync
 		;;
 		*)

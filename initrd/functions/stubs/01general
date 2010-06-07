@@ -119,6 +119,9 @@ write_variables() {
         echo "MONITOR_PORT=$MONITOR_PORT"               >> /tmp/variables.txt
         echo "MONITOR_CONSOLE=$MONITOR_CONSOLE"         >> /tmp/variables.txt
 
+	echo "PROTOCOL=$PROTOCOL" 			>> /tmp/variables.txt
+	echo "STAGING=$STAGING" 			>> /tmp/variables.txt
+
         echo "BITTORRENT=$BITTORRENT"                   >> /tmp/variables.txt
         echo "BITTORRENT_STAGING=$BITTORRENT_STAGING"   >> /tmp/variables.txt
         echo "BITTORRENT_POLLING_TIME=$BITTORRENT_POLLING_TIME" >> /tmp/variables.txt
