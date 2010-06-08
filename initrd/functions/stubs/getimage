@@ -13,16 +13,15 @@ old_getimage(){
 ## Contents of this function has been copied from the master file
 getimage_bittorrent(){
 
-    # Use BitTorrent
     if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent" ]; then
-        bittorrent_tarball="image-${IMAGENAME}.tar.gz"
-        compress='z'
+       	bittorrent_tarball="image-${IMAGENAME}.tar.gz"
+       	compress='z'
     elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent" ]; then
-        bittorrent_tarball="image-${IMAGENAME}.tar"
-        compress=''
+       	bittorrent_tarball="image-${IMAGENAME}.tar"
+       	compress=''
     else
-        logmsg "error: cannot find a valid torrent file for the image ${IMAGENAME}"
-        shellout
+       	logmsg "error: cannot find a valid torrent file for the image ${IMAGENAME}"
+       	shellout
     fi
 
     # Evaluate the staging directory

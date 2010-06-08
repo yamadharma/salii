@@ -6,17 +6,17 @@
 #
 get_torrents_directory() {
 
-    if [ ! "x$BITTORRENT" = "xy" ]; then
-        return
+    if [ "x$PROTOCOL" = "xbittorrent" ]
+    then
+	logmsg
+	logmsg get_torrents_directory
+
+	mkdir -p ${TORRENTS_DIR}
+	CMD="rsync -a ${IMAGESERVER}::${TORRENTS}/ ${TORRENTS_DIR}/"
+	logmsg "$CMD"
+	$CMD
     fi
 
-    logmsg
-    logmsg get_torrents_directory
-
-    mkdir -p ${TORRENTS_DIR}
-    CMD="rsync -a ${IMAGESERVER}::${TORRENTS}/ ${TORRENTS_DIR}/"
-    logmsg "$CMD"
-    $CMD
 }
 
 #
@@ -43,9 +43,9 @@ get_scripts_directory() {
 #
 ## SALI Replaced Bittorrent with Aria2
 bittorrent_autodetect_staging_dir() {
-    torrent_file=$1
-    if [ ! -f $torrent_file ]; then
-        logmsg "warning: torrent file $torrent_file does not exist!"
+    torrent=$1
+    if [ ! -f $torrent ]; then
+        logmsg "warning: torrent file $torrent does not exist!"
         return
     fi
 
@@ -59,7 +59,7 @@ bittorrent_autodetect_staging_dir() {
 
     # Evaluate torrent size
     logmsg "Getting torrent size"
-    torrent_size=$(( $( (aria2c -S $torrent_file | awk '/Total Length:/ { print $4}' | sed 's/[(),]*//g' ) ) / 1024 + $breathing_room ))
+    torrent_size=$(( $( (aria2c -S $torrent | awk '/\|.*\([0-9,]+\)/ { gsub("[),(]","",$2); print $2}' ) ) / 1024 + $breathing_room ))
     logmsg "Torrent size: $torrent_size"
 
     # Find a directory to host the image tarball
@@ -108,8 +108,8 @@ bittorrent_get_file() {
         bittorrent_log=/tmp/bittorrent.log
 
         ##Starting aria2c and sending the stdout to a file
-        logmsg "/usr/bin/aria2c --human-readable=false --dir $destination $torrent_file > $bittorrent_log &"
-        /usr/bin/aria2c --human-readable=false --dir $destination $torrent_file > $bittorrent_log &
+        logmsg "/usr/bin/aria2c --human-readable=false --dir $destination $torrent > $bittorrent_log &"
+        /usr/bin/aria2c --human-readable=false --dir $destination $torrent > $bittorrent_log &
 
         pid=$!
         if [ ! -d /proc/$pid ]; then
@@ -121,7 +121,6 @@ bittorrent_get_file() {
 
         downloadpattern="(SIZE:[0-9]+B/[0-9]+B\([0-9]{1,2}1{0,1}\%\))"
         donepattern="(SEEDING\(ratio:[0-9.]+\))"
-
 
         cntr=0
         while : ; do

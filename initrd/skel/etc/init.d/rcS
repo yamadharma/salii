@@ -79,7 +79,13 @@ if [ "x$SSH" = "xy" ]; then
     start_ssh
 fi
 
-old_getimage
+logmsg "$PROTOCOL"
+if [ "x$PROTOCOL" = "x" ]
+then
+	old_getimage
+fi
+
+logmsg "$PROTOCOL"
 get_torrents_directory
 get_scripts_directory
 

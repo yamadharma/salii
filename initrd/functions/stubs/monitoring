@@ -163,7 +163,7 @@ start_report_task() {
             logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
             shellout
         fi
-        IMAGESIZE=`aria2c -S $torrent_file | awk '/Total Length:/ { print $4}' | sed 's/[(),]*//g'`
+        IMAGESIZE=`aria2c -S $torrent_file | awk '/\|.*\([0-9,]+\)/ { gsub("[),(]","",$2); print $2}'`
     fi
     IMAGESIZE=`expr $IMAGESIZE / 1024`
     logmsg "  --> Image size = `expr $IMAGESIZE / 1024`MiB"
