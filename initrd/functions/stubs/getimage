@@ -10,91 +10,93 @@ old_getimage(){
 
 }
 
-## Contents of this function has been copied from the master file
-getimage_bittorrent(){
+getimage_rsync(){
 
-    if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent" ]; then
-       	bittorrent_tarball="image-${IMAGENAME}.tar.gz"
-       	compress='z'
-    elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent" ]; then
-       	bittorrent_tarball="image-${IMAGENAME}.tar"
-       	compress=''
+     logmsg "rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/"
+     rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/ > /dev/console || shellout
+     if [ ! -z $MONITOR_SERVER ]; then
+         stop_report_task 101
+     fi
+}
+
+getimage_aria(){
+
+    METHOD=$1
+    BASENAME="${TORRENTS_DIR}/image-${IMAGENAME}"
+
+    if [ -f "${BASENAME}.tar.gz.${METHOD}" ]
+    then
+        tarball="image-${IMAGENAME}.tar.gz"
+        compress="z"
+    elif [ -f "${BASENAME}.tar.${METHOD}" ]
+    then
+        tarball="image-${IMAGENAME}.tar"
+        compress=""
     else
-       	logmsg "error: cannot find a valid torrent file for the image ${IMAGENAME}"
-       	shellout
+        logmsg ""
+        logmsg "There is no ${METHOD} file available for image ${IMAGENAME} in directory ${TORRENTS_DIR}"
+        logmsg ""
+        shellout
     fi
 
-    # Evaluate the staging directory
-    if [ -z $STAGING ]; then
-        logmsg bittorrent_autodetect_staging_dir
-        STAGING=`bittorrent_autodetect_staging_dir ${TORRENTS_DIR}/${bittorrent_tarball}.torrent`
-        if [ -z $STAGING ]; then
-            logmsg ""
-            logmsg "error: cannot find a staging directory to save file: $bittorrent_tarball"
-            logmsg "Try to increase the size of a partition (like /tmp) in your patitioning schema"
-            logmsg "to fit the image into a staging directory."
-            logmsg ""
-            shellout
-        fi
-        logmsg "--> staging in: $STAGING"
+    if [ -z $STAGING ]
+    then
+        logmsg "aria_autodetect_staging_dir"
+	STAGING=$(aria_autodetect_staging_dir ${TORRENTS_DIR}/${tarball}.${METHOD})
+	if [ -z $STAGING ]
+	then
+	   logmsg ""
+	   logmsg "Error: Cannot find a staging directory to save file: $tarball"
+	   logmsg "Increase the size of your TMPFS or use rsync"
+	   logmsg ""
+	   shellout
+	fi
     fi
 
-    # Download image from peers
-    logmsg "Start downloading image using torrent ${bittorrent_tarball}.torrent"
-    logmsg ""
-    logmsg "--> INFO: remember to start /etc/init.d/systemimager-server-bittorrent on the image server!"
-    logmsg ""
+    logmsg "Starting download tarball ${tarball} via ${METHOD} to location ${STAGING}"
 
-    bittorrent_get_file ${TORRENTS_DIR}/${bittorrent_tarball}.torrent ${STAGING}
-
-    if [ ! -z $MONITOR_SERVER ]; then
-        stop_report_task 101
+    if [ "x$METHOD" = "xbittorrent" ]
+    then
+	logmsg "--> INFO: Don't forget to start /etc/init.d/systemimager-server-bittorrent on the image server"
     fi
 
-    # Extract image.
-    logmsg "Extracting image from ${bittorrent_tarball} ..."
+    ## Get file via aria
+    aria_get_file "${BASENAME}.tar.gz.${METHOD}" $STAGING
+
+    ## Extracting the image
+    logmsg "Extracting image from ${tarball}"
     cd /a/ || shellout
 
     case $compress in
-        'z')
-                zcat ${STAGING}/${bittorrent_tarball} | tar -px${VERBOSE_OPT}f -
-        ;;
+	"z")
+		zcat ${STAGING}/${tarball} | tar -px${VERBOSE_OPT}f -
+	;;
+	*)
+		tar -px${VERBOSE_OPT}f ${STAGING}/${tarball}
+	;;
+    esac
 
-        *)
-                tar -px${VERBOSE_OPT}f {STAGING}/${bittorrent_tarball}
-        ;;
-     esac
-
-    rm -f ${STAGING}/${bittorrent_tarball}
-    unset bittorrent_tarball
-
-}
-
-getimage_rsync(){
-
-   logmsg "rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/"
-   rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/ > /dev/console || shellout
-   if [ ! -z $MONITOR_SERVER ]; then
-	stop_report_task 101
-   fi
-
+   rm -f ${STAGING}/${tarball}
+   unset tarball
 }
 
 getimage(){
 
-	# New way of checking which method must be used!
-	case "$PROTOCOL" in
-		"bittorrent")
-			getimage_bittorrent
-		;;
-		"rsync")
-			getimage_rsync
-		;;
-		*)
-			logmsg
-			logmsg "Could not find a way to retrieve a image"
-			logmsg
-			shellout
-		;;
-	esac
+   logmsg ""
+   logmsg "Getting image via protocol: $PROTOCOL"
+   logmsg ""
+
+
+   case "$PROTOCOL" in
+       "bittorrent")
+           getimage_aria torrent
+       ;;
+       "metalink")
+           getimage_aria metalink
+       ;;
+       "rsync")
+          getimage_rsync
+       ;;
+    esac
+
 }

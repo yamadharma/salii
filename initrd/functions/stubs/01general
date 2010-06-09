@@ -310,3 +310,37 @@ read_local_cfg() {
     fi
 }
 
+#
+################################################################################
+#
+# Usage: get_torrents_directory
+#
+get_torrents_directory() {
+
+    if [ "x$PROTOCOL" = "xbittorrent" ] || [ "x$PROTOCOL" = "xmetalink" ]
+    then
+        logmsg
+        logmsg get_torrents_directory
+
+        mkdir -p ${TORRENTS_DIR}
+        CMD="rsync -a ${IMAGESERVER}::${TORRENTS}/ ${TORRENTS_DIR}/"
+        logmsg "$CMD"
+        $CMD
+    fi
+
+}
+
+#
+################################################################################
+#
+# Usage: get_scripts_directory
+#
+get_scripts_directory() {
+    logmsg
+    logmsg get_scripts_directory
+
+    mkdir -p ${SCRIPTS_DIR}
+    CMD="rsync -a ${IMAGESERVER}::${SCRIPTS}/ ${SCRIPTS_DIR}/"
+    logmsg "$CMD"
+    $CMD
+}

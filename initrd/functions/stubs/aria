@@ -1,0 +1,85 @@
+
+aria_autodetect_staging_dir() {
+    metafile=$1
+    if [ ! -f $metafile ]; then
+        logmsg "warning: metafile file $metafile does not exist!"
+        return
+    fi
+
+    # List of preferred staging directory (/tmp = ramdisk staging)
+    logmsg "Getting disks for storing"
+    preferred_dirs="/tmp /a/tmp `df 2>/dev/null | sed '1d' | sed 's/[[:space:]]\+/ /g' | cut -d' ' -f6`"
+    logmsg "Disks: $preferred_dirs"
+
+    # Use a breathing room of 100MB (this should be enough for a lot of cases)
+    breathing_room=102400
+
+    # Evaluate torrent size
+    logmsg "Getting size of image"
+    metalink_size=$(( $( (aria2c -S $metalink | awk '/\|.*\([0-9,]+\)/ { gsub("[),(]","",$2); print $2}' ) ) / 1024 + $breathing_room ))
+    logmsg "Torrent size: $metalink"
+
+    # Find a directory to host the image tarball
+    for dir in $preferred_dirs; do
+        [ ! -d $dir ] && continue;
+        dir_space=`df $dir 2>/dev/null | sed '1d' | sed 's/[[:space:]]\+/ /g' | cut -d' ' -f4 | sed -ne '$p'`
+        [ -z $dir_space ] && continue
+        [ $metalink_size -lt $dir_space ] && echo $dir && return
+    done
+}
+
+aria_monitor_log(){
+    FILE=$1
+
+    DONE=0
+    while [ $DONE -lt 1 ]
+    do              
+        LINE=$(tail -n1 $FILE)
+                      
+        case $LINE in
+                *"download completed"*|*SEEDING*)
+                        echo "Done with downloading file"
+                        DONE=1
+                ;;                                                              
+
+                *)
+                        echo $LINE                                              
+        		sleep 5
+                ;;
+        esac            
+    done 
+}
+
+aria_get_file() {
+    metafile=$1
+    destination=$2
+
+    # Bittorrent log file
+    metafile_log=/tmp/aria.log
+
+    ##Starting aria2c and sending the stdout to a file
+    logmsg "/usr/bin/aria2c --dir $destination $metafile > $metafile_log &"
+    /usr/bin/aria2c --dir $destination $metafile > $metafile_log &
+
+    pid=$!
+    if [ ! -d /proc/$pid ]; then
+         logmsg "aria2c is not running"
+         shellout
+    fi
+
+    cntr=0
+    while : ; do
+        if [ -e $metafile_log ]; then
+    	    aria_monitor_log $metafile_log
+            break
+        else
+            cntr=$(($cntr+1))
+            sleep 5
+        fi
+
+        if [ cntr -gt 5 ]; then
+            logmsg "Logfile could not be located, something is wrong!"
+            shellout
+        fi
+    done
+}
