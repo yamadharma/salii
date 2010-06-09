@@ -61,7 +61,7 @@ getimage_aria(){
     fi
 
     ## Get file via aria
-    aria_get_file "${BASENAME}.tar.gz.${METHOD}" $STAGING
+    aria_get_file "${TORRENTS_DIR}/${tarball}.${METHOD}" $STAGING
 
     ## Extracting the image
     logmsg "Extracting image from ${tarball}"

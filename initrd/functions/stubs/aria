@@ -67,7 +67,6 @@ aria_get_file() {
          shellout
     fi
 
-    cntr=0
     while : ; do
         if [ -e $metafile_log ]; then
     	    aria_monitor_log $metafile_log
