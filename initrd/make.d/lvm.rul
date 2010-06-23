@@ -27,11 +27,16 @@ LVM_BINARY	:= $(INITRD_SRC_DIR)/$(LVM_DIR)/tools/lvm
 PHONY += lvm
 lvm:	$(LVM_DIR).build
 
+# By default, `make install' will install all the files in
+# `/usr/bin', `/usr/lib' etc.  You can specify
+# an installation prefix other than `/usr' using `--prefix',
+# for instance `--prefix=$HOME'.
+#
 $(LVM_DIR).build:	$(INITRD_SRC_DIR)/$(LVM_TARBALL)
 	rm -rf $(LVM_DIR)
 	cd $(INITRD_SRC_DIR) && tar -xvzf $(LVM_TARBALL)
 	cd $(LVM_DIR) && \
-		./configure --prefix=/usr --disable-nls --with-optimisation=-Os
+		./configure 
 	cd $(LVM_DIR) && $(MAKE) -j $(NCPUS)
 
 PHONY += lvm_install
