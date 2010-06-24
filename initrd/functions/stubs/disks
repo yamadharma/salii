@@ -119,6 +119,60 @@ get_disksize(){
         fi
 }
 
+## Create Filesystem
+#
+# This function will format the TARGET and put a LABEL on it 
+# if specified. The TARGET can be a partition or volume
+#
+# Usage create_filesystem <target> <fs_type> [LABEL]
+#   
+create_filesystem(){
+
+	TARGET=$1
+	FS_TYPE=$2
+	DISK_LABEL=$3
+
+	logmsg
+	logmsg "create_filesystem: $TARGET $FS_TYPE $DISK_LABEL"
+
+	case "$FS_TYPE" in
+		ext2|ext3|ext4)
+			logmsg "   mkfs.$FS_TYPE -q $TARGET"
+			mkfs.$FS_TYPE -q $TARGET || shellout
+			if [ "$DISK_LABEL" ]; then
+				logmsg "   tune2fs -L $DISK_LABEL $TARGET"
+				tune2fs -L $DISK_LABEL $TARGET || shellout
+			fi
+		;;
+		xfs)
+			logmsg "   mkfs.xfs -f -q $TARGET"
+			mkfs.xfs -f -q $TARGET || shellout
+			if [ "$LABEL" ]; then
+				logmsg "   xfs_db -x -c 'label $DISK_LABEL' $TARGET"
+				xfs_db -x -c "label $DISK_LABEL" $TARGET || shellout
+			fi
+		;;
+		swap)
+			if [ "$DISK_LABEL" ]; then
+				DISK_LABEL="-L $DISK_LABEL "
+			else
+				DISK_LABEL=""
+			fi
+			logmsg "   mkswap $SWAPLABEL$PARTITION"
+			mkswap $DISK_LABEL $TARGET || shellout
+		;;
+		ext2.128)
+			logmsg "   mkfs.ext2 -I 128 -q $TARGET"
+			mkfs.ext2 -I 128 -q $TARGET || shellout
+			if [ "$DISK_LABEL" ]; then
+				logmsg "   tune2fs -L $DISK_LABEL $TARGET"
+				tune2fs -L $DISK_LABEL $TARGET || shellout
+			fi
+			;;
+	esac
+}
+	
+
 ##
 # Creates partitions
 #
@@ -165,7 +219,7 @@ partition(){
 
 		SIZE=$( echo $1 | awk -F ":" '{ print $1 }' )
 		TYPE=$( echo $1 | awk -F ":" '{ print $2 }' )
-		MOUNTPATH=$( echo $1 | awk -F ":" '{ print $3 }' ) ## If swap is used, this is the label
+		MOUNTPATH=$( echo $1 | awk -F ":" '{ print $3 }' ) 
 		LABEL=$( echo $1 | awk -F ":" '{ print $4 }' )
 
 		if [ ! "$SIZE" ] && [ ! "$TYPE" ]; then
@@ -216,45 +270,17 @@ partition(){
 			LABEL=""
 		fi
 
-
+		## There is an exception for grub2
+		#
 		case "$TYPE" in
-			ext2|ext3|ext4)
-				logmsg "   mkfs.$TYPE -q $PARTITION"
-				mkfs.$TYPE -q $PARTITION || shellout
-				if [ "$LABEL" ]; then
-					logmsg "   tune2fs -L $LABEL $PARTITION"
-					tune2fs -L $LABEL $PARTITION || shellout
-				fi
-			;;
-			xfs)
-				logmsg "   mkfs.xfs -f -q $PARTITION"
-				mkfs.xfs -f -q $PARTITION || shellout
-				if [ "$LABEL" ]; then
-					logmsg "   xfs_db -x -c 'label $LABEL' $PARTITION"
-					xfs_db -x -c "label $LABEL" $PARTITION || shellout
-				fi
-			;;
-			swap)
-				if [ "$LABEL" ]; then
-					SWAPLABEL="-L $LABEL "
-				else
-					SWAPLABEL=""
-				fi
-				logmsg "   mkswap $SWAPLABEL$PARTITION"
-				mkswap $SWAPLABEL$PARTITION || shellout
-			;;
+
 			grub2|grub_bios)
 				logmsg "   parted -s -- $DISK set $NUMPARTITIONS bios_grub on"
 				parted -s -- $DISK set $NUMPARTITIONS bios_grub on || shellout
 			;;
-			ext2.128)
-				TYPE=$( echo $TYPE | awk -F "." '{print $1}')
-				logmsg "   mkfs.ext2 -I 128 -q $PARTITION"
-				mkfs.ext2 -I 128 -q $PARTITION || shellout
-				if [ "$LABEL" ]; then
-					logmsg "   tune2fs -L $LABEL $PARTITION"
-					tune2fs -L $LABEL $PARTITION || shellout
-				fi
+
+			*) 
+				create_filesystem $PARTITION $TYPE $LABEL
 			;;
 		esac
 
