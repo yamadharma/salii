@@ -104,13 +104,16 @@ $(INITRD_BUILD_DIR).prep:	$(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/sbin
 	mkdir -p -m 1777 $(INITRD_BUILD_DIR)/tmp
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/usr
+
 	#cd $(INITRD_BUILD_DIR)/usr && ln -s ../lib lib
+
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/usr/bin
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/usr/sbin
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/var
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/var/run
-	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib/udev
-	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib/udev/devices
+
+	#mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib/udev
+	#mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib/udev/devices
 
 	cd $(INITRD_BUILD_DIR)/dev && mknod -m 666 tty1 c 4 1
 	cd $(INITRD_BUILD_DIR)/dev && mknod -m 666 tty2 c 4 2
@@ -134,17 +137,17 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(SKEL_FILES) 			\
 								$(SRC_DIR)/modules_build-stamp 	\
 								$(BUSYBOX_DIR).install 		\
-								$(UDEV_DIR).install 		\
 								$(RSYNC_DIR).install 		\
 								$(BC_DIR).install 		\
+								$(UDEV_DIR).install 		\
 								$(E2FSPROGS_DIR).install 	\
+								$(LVM_DIR).install		\
 								$(PARTED_DIR).install 		\
 								$(MDADM_DIR).install 		\
 								$(REISERFSPROGS_DIR).install	\
 								$(XFSPROGS_DIR).install		\
 								$(KERNELTOOLS_DIR).install		\
 								$(JFSUTILS_DIR).install		\
-								$(LVM_DIR).install		\
 								$(KEXEC_DIR).install		\
 								$(OPENSSH_DIR).install 		\
 								$(TAR_DIR).install 		\
@@ -161,26 +164,39 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 ifeq ($(ARCH),x86_64)
 	( \
 		cd $(INITRD_BUILD_DIR) && \
-		$(PYTHON) $(INITRD_DIR)/mklibs -L $(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib:/lib64:/usr/lib64:/lib:/usr/lib -v -d lib64 ./*bin/* ./usr/*bin/*\
+		mkdir libbas && \
+		mklibs -d libbas -L lib:usr/lib bin/lsmod  \
+			usr/bin/tar usr/bin/ssh sbin/lvdisplay \
+			sbin/udevd sbin/mkfs.ext4 sbin/xfs_db usr/sbin/parted \
+			usr/bin/aria2c usr/sbin/sshd \
 	)
+		
 	# copy libnss files as they are not automatically included
+	#
 	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib64
+	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/libbas
+
 else
 	( \
 		cd $(INITRD_BUILD_DIR) && \
 		$(PYTHON) $(INITRD_DIR)/mklibs -L $(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib/lib:/usr/lib:/lib64:/usr/lib64 -v -d lib ./*bin/* ./usr/*bin/*\
 	)
+
+	# Also dislabled by BvdV: 25 June 2010
 	# copy libnss files as they are not automatically included
-	cp -a /lib/libnss* $(INITRD_BUILD_DIR)/lib
+
+	# cp -a /lib/libnss* $(INITRD_BUILD_DIR)/lib
+
+	# We need dns resolving, so copy the libresolv libs
+	# cp -a /lib/libresolv* $(INITRD_BUILD_DIR)/lib
 endif
+
 	# Undo prelinking. -AR-
 	#[ -x `which prelink` ] && (find $(INITRD_BUILD_DIR) -type f -exec prelink -u {} \; 2>&1 | grep -v "does not have .gnu.prelink_undo section\|is not an ELF file") || true
 
 	# Strip 'em. -BEF- HvB
 	strip $(INITRD_BINARIES)
 
-	# We need dns resolving, so copy the libresolv libs
-	cp -a /lib/libresolv* $(INITRD_BUILD_DIR)/lib
 
 	# Copy over text files from the skel directory.
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
