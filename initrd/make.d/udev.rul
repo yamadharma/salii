@@ -17,7 +17,7 @@ udev:	$(UDEV_DIR).build
 $(UDEV_DIR).build:  $(UDEV_DIR).unpack
 	#cd $(UDEV_DIR) && make EXTRAS="`ls -c1 extras/ | sed 's:\(.*\):extras/\1:' | tr '\n' ' '`"
 	#cd $(UDEV_DIR) && ./configure --prefix=$(INITRD_BUILD_DIR)  && make
-	cd $(UDEV_DIR) && ./configure --prefix=/usr --sysconfdir=/etc --sbindir=/sbin --with-rootlibdir=/lib --libexecdir=/lib/udev && make
+	cd $(UDEV_DIR) && ./configure --prefix=/usr --sysconfdir=/etc --sbindir=/sbin --libdir=/lib --with-rootlibdir=/lib --libexecdir=/lib/udev && make
 	touch $@
 
 PHONY += udev_install
