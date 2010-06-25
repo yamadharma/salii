@@ -194,7 +194,7 @@ create_filesystem(){
 
 partition(){
 	DISK=$1
-	DISKBASE=$(basename $1)
+	DISKNAME=$(basename $1)
 	
 	if [ ! -e $DISK ]; then
 		logmsg
@@ -206,11 +206,6 @@ partition(){
 	END_OF_LAST=1
 	NUMPARTITIONS=0
 	
-	if [ ! -e /tmp/mounts ]; then
-		touch /tmp/mounts.$DISKBASE
-	fi
-	
-	shift
 
 	logmsg
 	logmsg "Partition disk: $DISK $DISKSIZE"
@@ -286,7 +281,11 @@ partition(){
 
 		if [ ! "$MOUNTPATH" ]
 		then
-			MOUNTPATH="none"
+			logmsg
+			logmsg "$PARTITION does not need a mount"
+			logmsg
+		else
+			create_	
 		fi
 
 		##
@@ -298,19 +297,51 @@ partition(){
 				logmsg "$PARTITION does not need a mount"
 				logmsg
 			;;
-			/)
-				echo "0 /a$MOUNTPATH $TYPE $PARTITION" >> /tmp/mounts.$DISKBASE
-			;;
+			
 			*)
-				echo "1 /a$MOUNTPATH $TYPE $PARTITION" >> /tmp/mounts.$DISKBASE
+				create_disk_mount_file $DISKNAME $MOUNTPATH $TYPE $PARTITION 
 			;;
+		
 		esac
-
 		shift
-	done
+
+	done  # end while
 
 	logmsg
 }
+
+##
+# Create a mount file for disk in /tmp. The format is:
+#  <mount path> <FS_TYPE> <TARGET>
+#
+# create_disk_mount_file DISK MOUNTPATH FS_TYPE TARGET
+#
+create_disk_mount_file(){
+
+	if [ $# -lt 4 ]
+	then
+		echo "Usage: create_disk_mount_file DISK MOUNTPATH FS_TYPE TARGET"
+		shellout
+	fi
+
+	FILE=/tmp/mounts.$1
+	touch $FILE
+
+	## 
+	# The root filesystem must be mounted first and then the rest
+	#
+	case $2 in
+		/)
+			echo "0 /a$2 $3 $4" >> $FILE
+		;;
+
+		*)
+			echo "1 /a$2 $3 $4" >> $FILE
+		;;
+	esac
+}
+
+
 
 chroot_mount_system_fs(){
 
