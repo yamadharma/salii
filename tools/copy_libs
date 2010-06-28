@@ -1,0 +1,14 @@
+#/bin/sh
+
+if [ $# -lt 1 ]
+then
+	echo "Usage: $(basename $0) <executable> [excutables]"
+	exit 0
+fi
+
+FILES=$@
+
+for f in  $FILES
+do
+	ldd $f  | awk '{ print $3 }' | grep ^/
+done | sort | uniq 
