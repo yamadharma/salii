@@ -87,6 +87,6 @@ start_udevd() {
     logmsg
     logmsg start_udevd
     /etc/init.d/udev start
-
 }
+
 

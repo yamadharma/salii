@@ -42,6 +42,11 @@ ifconfig_loopback
 
 start_udevd
 
+modprobe uhci_hcd
+modprobe ehci_hcd
+
+shellopen
+
 # Need to do this prior to read_local_cfg to get last_root parameter, 
 # if specified. -BEF-
 variableize_kernel_append_parameters

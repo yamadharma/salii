@@ -154,36 +154,34 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(ARIA2_DIR).install
 
 
-	# Copy over the standard libs. -BEF-
-	cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
-	test ! -d /lib64 || cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib64
-	# Explicitly include more w/mklibs -L.  -dawild-
-
 # Mischien gaat het een en ander hier ook fout HvB
 #
 ifeq ($(ARCH),x86_64)
-	( \
-		cd $(INITRD_BUILD_DIR) && \
-		mkdir libbas && \
-		mklibs -d libbas -L lib:usr/lib bin/lsmod  \
-			usr/bin/tar usr/bin/ssh sbin/lvdisplay \
-			sbin/udevd sbin/mkfs.ext4 sbin/xfs_db usr/sbin/parted \
-			usr/bin/aria2c usr/sbin/sshd \
-	)
-		
 	# copy libnss files as they are not automatically included
 	#
-	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib64
-	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/libbas
+	cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib
+	#cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib
+	#cp -a /lib64/libc.so* $(INITRD_BUILD_DIR)/lib
+	#cp -a /lib64/libc-* $(INITRD_BUILD_DIR)/lib
+	#cp -a /lib64/libuuid* $(INITRD_BUILD_DIR)/lib
+	#cp -a /lib64/librt* $(INITRD_BUILD_DIR)/lib
+	#cp -a /lib64/libpthread* $(INITRD_BUILD_DIR)/lib
+	#cp -a /lib64/libblkid* $(INITRD_BUILD_DIR)/lib
+
+	#( \
+	#	cd $(INITRD_BUILD_DIR) && \
+	#	mklibs -d lib -L lib:usr/lib bin/lsmod sbin/modprobe  \
+	#		usr/bin/tar usr/bin/ssh sbin/lvdisplay \
+	#		sbin/udevd sbin/mkfs.ext4 sbin/xfs_db usr/sbin/parted \
+	#		usr/bin/aria2c usr/sbin/sshd \
+	#)
+		
 
 else
 	( \
 		cd $(INITRD_BUILD_DIR) && \
 		$(PYTHON) $(INITRD_DIR)/mklibs -L $(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib/lib:/usr/lib:/lib64:/usr/lib64 -v -d lib ./*bin/* ./usr/*bin/*\
 	)
-
-	# Also dislabled by BvdV: 25 June 2010
-	# copy libnss files as they are not automatically included
 
 	# cp -a /lib/libnss* $(INITRD_BUILD_DIR)/lib
 
@@ -195,7 +193,7 @@ endif
 	#[ -x `which prelink` ] && (find $(INITRD_BUILD_DIR) -type f -exec prelink -u {} \; 2>&1 | grep -v "does not have .gnu.prelink_undo section\|is not an ELF file") || true
 
 	# Strip 'em. -BEF- HvB
-	strip $(INITRD_BINARIES)
+	#strip $(INITRD_BINARIES)
 
 
 	# Copy over text files from the skel directory.
