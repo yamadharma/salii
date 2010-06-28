@@ -1,4 +1,12 @@
 #/bin/sh
+#
+# Author: Bas van der Vlies
+# Date  : 28 Juni 2010
+# Desc. : Copy the needed libraries in the initrd. A simple mklibs replacement
+#
+# SVn Info:
+# 	$Id$
+#       $URL$
 
 if [ $# -lt 1 ]
 then
