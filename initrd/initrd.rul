@@ -157,7 +157,7 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 # Mischien gaat het een en ander hier ook fout HvB
 #
 ifeq ($(ARCH),x86_64)
-	# copy libnss files as they are not automatically included
+	# copy libnss files and the loader file.  As they are not automatically included
 	#
 	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib
 	cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib
@@ -177,12 +177,8 @@ else
 
 endif
 
-	# Undo prelinking. -AR-
-	#[ -x `which prelink` ] && (find $(INITRD_BUILD_DIR) -type f -exec prelink -u {} \; 2>&1 | grep -v "does not have .gnu.prelink_undo section\|is not an ELF file") || true
-
 	# Strip 'em. -BEF- HvB
 	strip $(INITRD_BINARIES)
-
 
 	# Copy over text files from the skel directory.
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
