@@ -311,7 +311,7 @@ partition(){
 }
 
 ##
-# Create a mount file for disk in /tmp. The format is:
+# Create a mount file for diskname in /tmp/mounts.<diskname>. The format is:
 #  <mount path> <FS_TYPE> <TARGET>
 #
 # create_disk_mount_file DISK MOUNTPATH FS_TYPE TARGET
@@ -393,7 +393,7 @@ mount_disks(){
 		DISK=*
 	fi
 
-	cat /tmp/mounts.$DISK | sort -u | while read priotity path type disk
+	cat /tmp/mounts.$DISK | sort -u | while read priority path type device
 	do
 		if [ ! -e $path ]; then
 			logmsg "mkdir -p $path"
@@ -402,14 +402,14 @@ mount_disks(){
 			logmsg "Directory exists!, $path"
 		fi
 
-		if [ ! "$(df | grep $disk)" ]
+		if [ ! "$(df | grep $device)" ]
 		then
 			sleep 2
-		        logmsg "mount -t $type $disk $path"
-			mount -t $type $disk $path
+		        logmsg "mount -t $type $device $path"
+			mount -t $type $device $path
 			sleep 2
 		else
-			logmsg "disk already mounted: $path -> $disk"
+			logmsg "device already mounted: $path -> $device"
 		fi
 
 	done
@@ -418,8 +418,8 @@ mount_disks(){
 }
 
 ## Allows you to umount disks according the information stored in /tmp/mounts.*
-#   - umount_disks --> umount all possible partitions
-#   - umount_disks /dev/sdb --> only umount partitions of disk sdb
+#   - umount_disks --> umount all possible devices
+#   - umount_disks /dev/sdb --> only umount devices for disk sdb
 umount_disks(){
 
 	if [ $1 ]
@@ -429,15 +429,15 @@ umount_disks(){
 		DISK=*
 	fi
 
-	cat /tmp/mounts.$DISK | sort -ru | while read priotity path type disk
+	cat /tmp/mounts.$DISK | sort -ru | while read priority path type device
 	do
-		if [ "$(df | grep $disk)" ]
+		if [ "$(df | grep $device)" ]
 		then
 		        logmsg "umount $path"
 			umount $path
 			sleep 2
 		else
-			logmsg "disk already umounted: $path -> $disk"
+			logmsg "device already umounted: $path -> $device"
 		fi
 
 	done
