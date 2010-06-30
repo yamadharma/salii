@@ -12,4 +12,3 @@ svn copy $SERVER/trunk $SERVER/tags/$1
 
 #svn export $SERVER/tags/$1 sali-$1
 #tar cvzf sali-$1.tar.gz sali-$1
-~                                           
