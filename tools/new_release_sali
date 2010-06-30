@@ -1,0 +1,15 @@
+#!/bin/sh
+
+SERVER=https://subtrac.sara.nl/oss/svn/sali
+
+if [ $# -lt 1 ]
+then
+        echo "Usage: `basename $0` <release>"
+        exit 0
+fi
+
+svn copy $SERVER/trunk $SERVER/tags/$1
+
+#svn export $SERVER/tags/$1 sali-$1
+#tar cvzf sali-$1.tar.gz sali-$1
+~                                           
