@@ -63,13 +63,20 @@ start_udhcpc_for(){
 
         if [ -s /tmp/udhcpc ]; then
                 . /tmp/udhcpc || shellout
-                ping_test $IMAGESERVER
 
-                if [ "$PING_EXIT_STATUS" != "0" ]; then
-                        UDHCPRSLT=1
-                else
-                        UDHCPRSLT=0
-                fi
+		if [ $IPADDR ]
+		then
+	                ping_test $IMAGESERVER
+
+        	        if [ "$PING_EXIT_STATUS" != "0" ]; then
+                	        UDHCPRSLT=1
+	                else
+        	                UDHCPRSLT=0
+                	fi
+		else
+             		UDHCPRSLT=1
+		fi
+			
         else
                 UDHCPRSLT=1
         fi
@@ -178,7 +185,10 @@ start_network() {
                    logmsg
                    logmsg "Ip could not be set, guessing interface!"
                    start_udhcpc_guess
+                else
+                   UDHCPGRSLT=0
                 fi
+
         else
                 logmsg
                 logmsg "Param DEVICE not set, guesing interface"
