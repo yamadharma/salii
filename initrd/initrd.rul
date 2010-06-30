@@ -162,6 +162,10 @@ ifeq ($(ARCH),x86_64)
 	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib
 	cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib
 
+	# LVM tools are depend on SELINUX
+	#
+	cp -a /lib/libse*   $(INITRD_BUILD_DIR)/lib
+
 	( \
 		cd $(INITRD_BUILD_DIR) && \
 		cp `$(INITRD_DIR)/copy_libs sbin/modprobe usr/bin/tar usr/bin/ssh sbin/lvdisplay \
