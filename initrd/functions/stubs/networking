@@ -45,7 +45,7 @@ ping_test() {
         if [ "$PING_COUNT" = "4" ]; then
                 return
         fi
-    done
+    PRSLT
 
     unset PING_DESTINATION
     unset HOST_TYPE
@@ -57,9 +57,14 @@ ping_test() {
 # Usage: start_udhpc_for device
 #
 ## SALI this method has been added to enable networking for a specific interface
+#
 start_udhcpc_for(){
         logmsg "udhcpc -i $1"
         udhcpc -i $1 -n -t 12
+
+	## Default return CODE
+	#
+        UDHCPRSLT=1
 
         if [ -s /tmp/udhcpc ]; then
                 . /tmp/udhcpc || shellout
@@ -68,17 +73,12 @@ start_udhcpc_for(){
 		then
 	                ping_test $IMAGESERVER
 
-        	        if [ "$PING_EXIT_STATUS" != "0" ]; then
-                	        UDHCPRSLT=1
-	                else
-        	                UDHCPRSLT=0
-                	fi
-		else
-             		UDHCPRSLT=1
+			case $PING_EXIT_STATUS in
+				0)
+        	                	UDHCPRSLT=0
+				;;
+			esac
 		fi
-			
-        else
-                UDHCPRSLT=1
         fi
 }
 
