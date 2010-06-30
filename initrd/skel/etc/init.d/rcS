@@ -42,10 +42,9 @@ ifconfig_loopback
 
 start_udevd
 
-modprobe uhci_hcd
-modprobe ehci_hcd
-
-shellopen
+# BvdV
+# modprobe uhci_hcd
+# modprobe ehci_hcd
 
 # Need to do this prior to read_local_cfg to get last_root parameter, 
 # if specified. -BEF-
