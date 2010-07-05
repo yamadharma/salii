@@ -2,7 +2,7 @@
 #  vi: set filetype=make:
 #
 
-UDEV_VERSION	= 157
+UDEV_VERSION	= 158
 UDEV_TARBALL	= udev-$(UDEV_VERSION).tar.bz2
 UDEV_URL	= ftp://ftp.sara.nl/pub/sali/sources/
 UDEV_DIR	= $(INITRD_SRC_DIR)/udev-$(UDEV_VERSION)
