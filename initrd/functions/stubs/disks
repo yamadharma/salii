@@ -168,7 +168,7 @@ create_filesystem(){
 				logmsg "   tune2fs -L $DISK_LABEL $TARGET"
 				tune2fs -L $DISK_LABEL $TARGET || shellout
 			fi
-			;;
+		;;
 	esac
 }
 	

@@ -32,6 +32,7 @@ ping_test() {
     PING_EXIT_STATUS=1
     while [ "$PING_EXIT_STATUS" != "0" ]
     do
+
         logmsg "PING ATTEMPT $PING_COUNT: "
         ping -c 1 $PING_DESTINATION || shellout
         PING_EXIT_STATUS=$?
@@ -45,7 +46,8 @@ ping_test() {
         if [ "$PING_COUNT" = "4" ]; then
                 return
         fi
-    PRSLT
+
+    done
 
     unset PING_DESTINATION
     unset HOST_TYPE
