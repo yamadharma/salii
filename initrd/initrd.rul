@@ -161,6 +161,7 @@ ifeq ($(ARCH),x86_64)
 	#
 	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib
 	cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib
+	cp -a /lib64/libacl* $(INITRD_BUILD_DIR)/lib
 
 	# LVM tools are depend on SELINUX
 	#
