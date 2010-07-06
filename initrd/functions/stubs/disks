@@ -195,6 +195,7 @@ create_filesystem(){
 partition(){
 	DISK=$1
 	DISKNAME=$(basename $1)
+	shift
 	
 	if [ ! -e $DISK ]; then
 		logmsg
@@ -281,11 +282,7 @@ partition(){
 
 		if [ ! "$MOUNTPATH" ]
 		then
-			logmsg
-			logmsg "$PARTITION does not need a mount"
-			logmsg
-		else
-			create_	
+			MOUNTPATH="none"
 		fi
 
 		##
@@ -321,7 +318,6 @@ create_disk_mount_file(){
 	if [ $# -lt 4 ]
 	then
 		echo "Usage: create_disk_mount_file DISK MOUNTPATH FS_TYPE TARGET"
-		shellout
 	fi
 
 	FILE=/tmp/mounts.$1
