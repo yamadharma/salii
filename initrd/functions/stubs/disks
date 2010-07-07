@@ -323,16 +323,20 @@ create_disk_mount_file(){
 	FILE=/tmp/mounts.$1
 	touch $FILE
 
+	## Normalize FS_TYPE, eg: ext2.128 --> ext2
+	#
+	FS_TYPE=$(echo $3 | awk -F. '{ print $1 }')
+	
 	## 
 	# The root filesystem must be mounted first and then the rest
 	#
 	case $2 in
 		/)
-			echo "0 /a$2 $3 $4" >> $FILE
+			echo "0 /a$2 $FS_TYPE $4" >> $FILE
 		;;
 
 		*)
-			echo "1 /a$2 $3 $4" >> $FILE
+			echo "1 /a$2 $FS_TYPE $4" >> $FILE
 		;;
 	esac
 }

@@ -164,6 +164,11 @@ shellopen() {
         logmsg
         logmsg "Starting console..."
 
+	## Just load the USB drivers
+	#
+	modprobe uhci_hcd
+	modprobe ehci_hcd
+
         if [ ! -z $MONITOR_SERVER ]; then
                 logmsg "Strating console, stopping monitoring"
                 stop_report_task -1
