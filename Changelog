@@ -1,10 +1,24 @@
-1.1.*:
+1.2.2:
   * Added variable PROTOCOL and STAGING to replace BITTORRENT and BITTORRENT_STAGING. Reason herefore
     is to be more dynamic with other protcol types (eg. http, ftp )
 
   * Removed option for rsync to TMPFS.
 
+  * Added support lvm2 udev rules
+
   * Changed download location to ftp://ftp.sara.nl/pub/sali/sources
+
+  * Changed some disk functions so it can be used for LVM2
+
+  * Updated 
+     - kernel to 2.6.33.6 
+     - busybox to 1.16.2
+     - aria2 to 1.9.5 
+     - e2fsprogs to 1.9.5 
+     - lvm2 to 2.2.02.68
+     - parted to 2.3
+     - parted to 158
+
 1.1.1:
   * Increased kernel version to 2.6.33.4
 

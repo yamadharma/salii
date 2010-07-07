@@ -199,7 +199,7 @@ include config.inc
 
 # build everything, install nothing
 .PHONY:	all
-all:	kernel $(INITRD_DIR)/initrd.img manpages #dev_tarball
+all:	kernel $(INITRD_DIR)/initrd.img manpages 
 
 binaries: kernel $(INITRD_DIR)/initrd.img
 
@@ -379,24 +379,6 @@ install_configs:
 
 ########## END initrd ##########
 
-
-########## BEGIN dev_tarball ##########
-.PHONY:	dev_tarball install_dev_tarball
-dev_tarball: $(TOPDIR)/tmp/dev.tar.gz
-
-$(TOPDIR)/tmp/dev.tar.gz:
-	mkdir -p $(TOPDIR)/tmp
-	rm -rf $(TOPDIR)/tmp/dev
-	$(TOPDIR)/tools/makedevs $(TOPDIR)/tmp/dev
-	cd $(TOPDIR)/tmp && tar -czf $@ dev
-	rm -rf $(TOPDIR)/tmp/dev
-
-install_dev_tarball: $(TOPDIR)/tmp/dev.tar.gz
-	$(SI_INSTALL) -m 600 tmp/dev.tar.gz $(BOOT_BIN_DEST)/initrd_template/
-
-########## END dev_tarball ##########
-
-
 ########## BEGIN man pages ##########
 # build all of the manpages
 .PHONY:	manpages install_server_man install_client_man install_common_man install_docs docs
@@ -445,8 +427,7 @@ install:
 .PHONY:	install_binaries
 install_binaries:	install_kernel \
 			install_initrd \
-			install_initrd_template #\
-			#install_dev_tarball
+			install_initrd_template
 
 .PHONY:	complete_source_tarball
 complete_source_tarball:	$(TOPDIR)/tmp/systemimager-$(VERSION)-complete_source.tar.bz2.sign
