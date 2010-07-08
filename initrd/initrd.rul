@@ -67,19 +67,14 @@ include $(INITRD_MAKE_DIR)/lvm.rul
 include $(INITRD_MAKE_DIR)/kerneltools.rul
 
 ## Original
-#include $(INITRD_MAKE_DIR)/cx_freeze.rul
 include $(INITRD_MAKE_DIR)/busybox.rul
-#include $(INITRD_MAKE_DIR)/bittorrent.rul
 include $(INITRD_MAKE_DIR)/rsync.rul
-#include $(INITRD_MAKE_DIR)/hotplug.rul
-
-# Not needed HvB 7 mei 2010
-#include $(INITRD_MAKE_DIR)/sysvinit.rul
-
 include $(INITRD_MAKE_DIR)/udev.rul
 include $(INITRD_MAKE_DIR)/kexec.rul
 include $(INITRD_MAKE_DIR)/aria2.rul
-include $(INITRD_MAKE_DIR)/tar.rul
+
+# HvB 7 Jul 2010
+#include $(INITRD_MAKE_DIR)/tar.rul
 
 
 PHONY += build_dir 
@@ -146,13 +141,13 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(MDADM_DIR).install 		\
 								$(REISERFSPROGS_DIR).install	\
 								$(XFSPROGS_DIR).install		\
-								$(KERNELTOOLS_DIR).install		\
+								$(KERNELTOOLS_DIR).install	\
 								$(JFSUTILS_DIR).install		\
 								$(KEXEC_DIR).install		\
 								$(OPENSSH_DIR).install 		\
-								$(TAR_DIR).install 		\
 								$(ARIA2_DIR).install
 
+#$(TAR_DIR).install 		\
 
 # Mischien gaat het een en ander hier ook fout HvB
 #

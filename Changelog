@@ -10,9 +10,11 @@
 
   * Changed some disk functions so it can be used for LVM2
 
+  * replace tar with the busybox tar
+
   * Updated 
      - kernel to 2.6.33.6 
-     - busybox to 1.16.2
+     - busybox to 1.17.0
      - aria2 to 1.9.5 
      - e2fsprogs to 1.9.5 
      - lvm2 to 2.2.02.68
