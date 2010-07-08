@@ -41,7 +41,6 @@ adjust_arch
 ifconfig_loopback
 
 start_udevd
-shellopen
 
 # Need to do this prior to read_local_cfg to get last_root parameter, 
 # if specified. -BEF-
