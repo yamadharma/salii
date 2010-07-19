@@ -83,7 +83,7 @@
 # To include the ctcs test suite, and associated files, do a 'make WITH_CTCS=1 all'
 #
 
-DESTDIR := "/var/tmp/dennis"
+DESTDIR := "/var/tmp/sali"
 VERSION := $(shell cat VERSION)
 
 ## is this an unstable release?
