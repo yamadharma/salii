@@ -1,12 +1,15 @@
 1.X.X
-  * Fixed version number of openssl
-
-  * Removed some obsolete files
-
   * update kernel 2.6.34.1
      - added 10G network drivers
      - added more SCSI device support
      - added NFS client support for v3 and v4
+
+  * Updated the initrd.rul, it now supports 32bit compilation 
+
+1.2.4:
+  * Fixed version number of openssl
+
+  * Removed some obsolete files
 
 1.2.3:
   * replace tar with the busybox tar
