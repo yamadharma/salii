@@ -151,11 +151,6 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 
 # Mischien gaat het een en ander hier ook fout HvB
 #
-ifeq ($(ARCH),x86_64)
-	# copy libnss files and the loader file.  As they are not automatically included
-	#
-	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib
-	cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib
 
 	# LVM tools are depend on SELINUX
 	#
@@ -167,13 +162,15 @@ ifeq ($(ARCH),x86_64)
 			sbin/udevd sbin/mkfs.ext4 sbin/xfs_db usr/sbin/parted \
 			usr/bin/aria2c usr/sbin/sshd usr/bin/rsync` lib \
 	)
-		
-else
-	( \
-		cd $(INITRD_BUILD_DIR) && \
-		$(PYTHON) $(INITRD_DIR)/mklibs -L $(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib/lib:/usr/lib:/lib64:/usr/lib64 -v -d lib ./*bin/* ./usr/*bin/*\
-	)
 
+# copy libnss files and the loader file.  As they are not automatically included
+#
+ifeq ($(ARCH),x86_64)
+	cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib
+	cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib
+else
+	cp -a /lib/libnss* $(INITRD_BUILD_DIR)/lib
+	cp -a /lib/ld* $(INITRD_BUILD_DIR)/lib
 endif
 
 	# Strip 'em. -BEF- HvB
