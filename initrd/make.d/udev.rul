@@ -2,9 +2,12 @@
 #  vi: set filetype=make:
 #
 
-UDEV_VERSION	= 158
+UDEV_VERSION	= 160
 UDEV_TARBALL	= udev-$(UDEV_VERSION).tar.bz2
+
+#### http://www.kernel.org/pub/linux/utils/kernel/hotplug/ ####
 UDEV_URL	= ftp://ftp.sara.nl/pub/sali/sources/
+
 UDEV_DIR	= $(INITRD_SRC_DIR)/udev-$(UDEV_VERSION)
 
 UDEV_PATCHES = $(shell ls $(INITRD_PATCH_DIR)/udev.*.patch 2>/dev/null | sort)

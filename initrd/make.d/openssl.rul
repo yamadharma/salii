@@ -14,7 +14,10 @@ OPENSSL_DIR             := $(INITRD_SRC_DIR)/openssl-$(OPENSSL_VERSION)
 OPENSSL_TARBALL         := openssl-$(OPENSSL_VERSION).tar.gz
 OPENSSL_MD5SUM          := 89eaa86e25b2845f920ec00ae4c864ed
 OPENSSL_TARBALL_TARGET  := $(SRC_DIR)/$(OPENSSL_TARBALL)
+
+#### http://www.openssl.org/source/ ####
 OPENSSL_URL             := ftp://ftp.sara.nl/pub/sali/sources/$(OPENSSL_TARBALL)
+
 OPENSSL_BINARIES        := $(SRC_DIR)/$(OPENSSL_DIR)/apps/openssl
 OPENSSL_PATCHES 		:= $(shell ls $(PATCH_DIR)/openssl.*.patch 2>/dev/null | sort)
 

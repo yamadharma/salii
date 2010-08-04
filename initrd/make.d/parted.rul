@@ -9,7 +9,10 @@
 PARTED_VERSION := 2.3
 PARTED_DIR := $(INITRD_SRC_DIR)/parted-$(PARTED_VERSION)
 PARTED_TARBALL := parted-$(PARTED_VERSION).tar.gz
+
+#### http://ftp.gnu.org/gnu/parted/ ####
 PARTED_URL := ftp://ftp.sara.nl/pub/sali/sources/$(PARTED_TARBALL)
+
 PARTED_BINARY := $(INITRD_SRC_DIR)/$(PARTED_DIR)/parted/.libs/parted
 
 ## Disabled
