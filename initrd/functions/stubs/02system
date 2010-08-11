@@ -103,14 +103,3 @@ mount_sys() {
         logmsg "sysfs is not supported by the kernel: `uname -r`"
     fi
 }
-
-#
-################################################################################
-#
-mount_pts() {
-    logmsg
-    logmsg mount_pts
-    mkdir -p /dev/pts || shellout
-    mount devpts /dev/pts -t devpts || shellout
-}
-
