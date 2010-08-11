@@ -41,42 +41,6 @@ FLAVOR="SYSTEMIMAGER_FLAVOR_STRING"
 #
 ################################################################################
 
-#
-################################################################################
-#
-#   Switch root to tmpfs
-#
-switch_root_to_tmpfs() {
-    local MODULE=tmpfs
-    logmsg
-    logmsg switch_root_to_tmpfs
-    logmsg
-    logmsg "Loading $MODULE... "
-    modprobe $MODULE 2>/dev/null && logmsg "done!" || logmsg "Didn't load -- assuming it's built into the kernel."
-    parse_tmpfs_opts
-
-    # Switch root over to tmpfs so we don't have to worry about the size of
-    # the tarball and binaries that users may decide to copy over. -BEF-
-    if [ -d /old_root ]; then
-        logmsg
-        logmsg "already switched to tmpfs..."
-    else
-        logmsg
-        logmsg "switching root to tmpfs..."
-
-        mkdir -p /new_root || shellout
-        mount tmpfs /new_root -t tmpfs $tmpfs_opts || shellout
-        cd / || shellout
-        cp -a `/bin/ls | grep -v new_root` /new_root/ || shellout
-        cd /new_root || shellout
-        mkdir -p old_root || shellout
-        pivot_root . old_root || switch_root
-    fi
-
-    unset tmpfs_opts
-}
-
-#
 ################################################################################
 #
 ## SALI Just start udev, don't use the static dev.tar.gz
@@ -88,5 +52,3 @@ start_udevd() {
     logmsg start_udevd
     /etc/init.d/udev start
 }
-
-
