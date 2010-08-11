@@ -25,22 +25,6 @@ logmsg() {
     fi
 }
 
-################################################################################
-#
-#  check_version
-#
-# Usage: check_version
-check_version() {
-    logmsg
-    logmsg check_version
-    INITRD_VERSION=$VERSION
-    KERNEL_VERSION=`uname -r | sed -e s/.*boel_v//`
-    if [ "$INITRD_VERSION" != "$KERNEL_VERSION" ] ; then
-        logmsg "FATAL: Kernel version ($KERNEL_VERSION) doesn't match initrd version ($INITRD_VERSION)!"
-        shellout
-    fi
-}
-
 #
 ################################################################################
 #
