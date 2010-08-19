@@ -1,4 +1,9 @@
 1.3.0
+  * Added function shutdown for better support for the systmimager generated install script
+
+  * Fixed bad number cntr when using bittorrent
+  * Fixed Evaluating image size when using bittorrent
+
   * update kernel 2.6.34.4
      - added 10G network drivers
      - added more SCSI device support
