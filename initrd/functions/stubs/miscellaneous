@@ -105,3 +105,11 @@ sleep_loop() {
         COUNTED=$(( $COUNTED + 1 ))
     done
 }
+
+## Emulate the shutdown command
+shutdown() {
+
+  logmsg "Command shutdown is decapricated, doing a reboot"
+  reboot
+
+}
