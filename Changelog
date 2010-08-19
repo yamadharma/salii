@@ -1,10 +1,25 @@
-1.X.X
-  * update kernel 2.6.34.1
+1.3.0
+  * update kernel 2.6.34.4
      - added 10G network drivers
      - added more SCSI device support
      - added NFS client support for v3 and v4
 
   * Updated the initrd.rul, it now supports 32bit compilation 
+
+  * updated busybox 1.17.1
+  * updated aria2 1.10.0
+  * updated e2fsprogs 1.41.12
+  * updated udev 160
+  * updated lvm2 2.2.02.72
+  * updated kexec-tools 2.0.2
+  * updated openssh 5.5p1
+  
+  * removed tar source from build process. Is replaced by busybox utility
+
+  * removed some obsolete functions from /etc/init.d/functions
+     - parse_tmpfs_opts 
+     - mount_pts 
+     - switch_root_to_tmpfs
 
 1.2.4:
   * Fixed version number of openssl
