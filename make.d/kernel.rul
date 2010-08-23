@@ -66,7 +66,6 @@ kernel:	$(LINUX_IMAGE)
 
 $(LINUX_IMAGE): $(SRC_DIR)/patched_kernel-stamp
 	$(MAKE) -C $(LINUX_SRC) -j $(NCPUS) $(LINUX_TARGET)
-	mkdir -p $(TOPDIR)/tmp
 
 PHONY += patched_kernel-stamp
 patched_kernel-stamp:	$(SRC_DIR)/patched_kernel-stamp
@@ -96,7 +95,6 @@ PHONY += modules
 modules:	$(SRC_DIR)/modules_build-stamp
 
 $(SRC_DIR)/modules_build-stamp: $(LINUX_IMAGE)
-	rm -fr $(TOPDIR)/tmp/kernel_modules
 	$(MAKE) -C $(LINUX_SRC) -j $(NCPUS) modules
 	touch $(SRC_DIR)/modules_build-stamp
 

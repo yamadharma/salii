@@ -5,7 +5,7 @@
 #   2005.12.18 Erich Focht
 #
 
-MDADM_VERSION := 3.1.2
+MDADM_VERSION := 3.1.3
 MDADM_DIR := $(INITRD_SRC_DIR)/mdadm-$(MDADM_VERSION)
 MDADM_TARBALL := mdadm-$(MDADM_VERSION).tar.gz
 MDADM_URL := ftp://ftp.sara.nl/pub/sali/sources/$(MDADM_TARBALL)
