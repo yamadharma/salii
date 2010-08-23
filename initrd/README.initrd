@@ -1,9 +1,18 @@
 #
+#   "SALI"
+#
+#   Copyright (C) 2010 SARA Computing and Networking Services
+#
+#   $Id$
+#    vi: set filetype=make:
+#
+# ----
+#
 # "SystemImager"
 #
 #  Copyright (C) 1999-2002 Brian Elliott Finley <brian@baldguysoftware.com>
 #
-#  $Id: README.initrd 1940 2002-10-02 22:52:42Z brianfinley $
+#  $Id$
 #
 
 Steps for the Chronically Impatient

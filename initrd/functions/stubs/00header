@@ -1,11 +1,19 @@
 #!/bin/sh
 #
-# "Sali" 
+#   "SALI"
 #
-#  Copyright (C) 2010 SARA Computing and Networking Services
+#   Copyright (C) 2010 SARA Computing and Networking Services
+#
+#   $Id$
+#    vi: set filetype=make:
+#
+# ----
+#
+#  "SystemImager"
+#
 #  Copyright (C) 1999-2005 Brian Elliott Finley
 #
-#  $Id: functions 4468 2009-04-10 00:40:13Z bli $
+#  $Id$
 #  vi: set filetype=sh et ts=4:
 #
 #  Authors:

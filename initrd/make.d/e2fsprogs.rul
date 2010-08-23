@@ -1,5 +1,5 @@
 #
-# $Id: e2fsprogs.rul 4344 2007-11-24 16:40:35Z arighi $
+# $Id$
 #
 E2FSPROGS_VERSION := 1.41.12
 E2FSPROGS_DIR := $(INITRD_SRC_DIR)/e2fsprogs-$(E2FSPROGS_VERSION)

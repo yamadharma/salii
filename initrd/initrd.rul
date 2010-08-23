@@ -1,8 +1,14 @@
 #
-#	"SystemImager"
+#   "SALI"
 #
-#   $Id: initrd.rul 4448 2008-04-24 13:38:10Z arighi $
+#   Copyright (C) 2010 SARA Computing and Networking Services
+#
+#   $Id$
 #    vi: set filetype=make:
+#
+# ----
+#
+#	"SystemImager"
 #
 #	Copyright (C) 1999-2006 Brian Elliott Finley
 #	Copyright (C) 2002-2004 dann frazier <dannf@hp.com>

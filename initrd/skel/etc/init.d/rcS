@@ -1,10 +1,17 @@
 #!/bin/sh
 #
+#   "SALI"
+#
+#   Copyright (C) 2010 SARA Computing and Networking Services
+#
+#   $Id$
+#    vi: set filetype=make:
+#
+# ----
+#
 #   "SystemImager" 
 #
 #   Copyright (C) 1999-2004 Brian Elliott Finley 
-#
-#   $Id: rcS 4448 2008-04-24 13:38:10Z arighi $
 #
 #   Others who have contributed to this code:
 #       Charles C. Bennett, Jr. <ccb@acm.org>

@@ -4,8 +4,7 @@
 # Initial Authors: Bas van der Vlies and Jaap Dijkshoorn
 #
 # SVN Info:
-#	$Id: sara_install 3863 2009-06-10 12:37:52Z bas $
-#	$URL: https://subtrac.sara.nl/hpcv/svn/beowulf/trunk/systemimager/boot_scripts/sara_install $
+#	$Id$
 
 # This master autoinstall script was created with SystemImager v3.7.6
 

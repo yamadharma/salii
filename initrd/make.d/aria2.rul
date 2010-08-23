@@ -1,5 +1,6 @@
 #
-#  vi: set filetype=make:
+#       $Id$
+#   vi: set filetype=make:
 #
 
 ARIA2_VERSION	= 1.10.0
