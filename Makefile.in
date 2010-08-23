@@ -1,0 +1,110 @@
+#
+#	"SALI"  
+#
+#   Copyright (C) 2010 SARA Computing and Networking Services
+#   
+#   $Id: Makefile 4413 2008-02-26 10:57:17Z arighi $
+# 	 vi: set filetype=make:
+#
+
+# force CC to gcc incase the default compilers are different
+CC=@GCC@
+CXX=@GXX@
+
+VERSION := $(shell cat VERSION)
+FLAVOR = $(shell cat FLAVOR)
+TOPDIR  := $(CURDIR)
+ARCH = $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/)
+
+# RELEASE_DOCS are toplevel files that should be included with all posted
+# tarballs, but aren't installed onto the destination machine by default
+RELEASE_DOCS = CHANGELOG LICENSE CREDITS README VERSION
+
+#
+# To be used by "make" for rules that can take it!
+NCPUS := $(shell egrep -c '^processor' /proc/cpuinfo )
+
+PATCH_DIR = $(TOPDIR)/patches
+INITRD_DIR = $(TOPDIR)/initrd
+SRC_DIR = $(TOPDIR)/src
+
+GETSOURCE = $(TOPDIR)/tools/getsource
+
+#
+# Now include the other targets.  Some of these may have order dependencies.
+# Order as appropriate. -BEF-
+#
+# Why does ordered dependencies matter? Make will read all these
+# snippets before it evaluates the rule. If there are dependencies caused
+# by setting a variable in one and using it in another, then that should be
+# abstracted out. Its much more robust to include *.rul... -dannf
+#
+include $(TOPDIR)/make.d/kernel.rul
+include $(TOPDIR)/make.d/zlib.rul
+include $(TOPDIR)/initrd/initrd.rul
+
+# build everything, install nothing
+.PHONY:	all
+all:	kernel $(INITRD_DIR)/initrd.img
+
+.PHONY: build
+build: 	all
+	mkdir -p $(TOPDIR)/build
+	cp $(LINUX_SRC)/arch/$(ARCH)/boot/bzImage $(TOPDIR)/build/kernel
+	cp $(INITRD_DIR)/initrd.img $(TOPDIR)/build/initrd.img
+
+	$(foreach doc, $(RELEASE_DOCS), \
+		cp $(TOPDIR)/$(doc) $(TOPDIR)/build/$(doc);)
+
+.PHONY: tarball
+tarball: build
+	cd $(TOPDIR)/build && \
+		tar -pczf $(TOPDIR)/sali-$(ARCH)-$(VERSION).tar.gz *
+
+# pre-download the source to other packages that are needed by 
+# the build system
+.PHONY:	get_source
+get_source:	$(ALL_SOURCE)
+
+# removes object files, docs, editor backup files, etc.
+.PHONY:	clean
+clean:	$(subst .rul,_clean,$(shell cd $(TOPDIR)/make.d && ls *.rul)) initrd_clean
+
+	## editor backups
+	-find . -name "*~" -exec rm -f {} \;
+	-find . -name "#*#" -exec rm -f {} \;
+	-find . -name ".#*" -exec rm -f {} \;
+
+	rm -f config.log config.status
+
+# same as clean, but also removes downloaded source, stamp files, etc.
+.PHONY:	distclean
+distclean:	clean initrd_distclean
+	-rm -rf $(SRC_DIR) $(INITRD_SRC_DIR)
+	-rm -rf $(TOPDIR)/build
+	
+	rm -f Makefile sali-$(ARCH)-$(VERSION).tar.gz
+
+.PHONY:	help
+help:  show_targets
+
+#
+#
+# Show me a list of all targets in this entire build heirarchy
+.PHONY:	show_targets
+show_targets:
+	@echo
+	@echo Makefile targets you are probably most interested in:
+	@echo ---------------------------------------------------------------------
+	@echo "build"
+	@echo "    Build everything."
+	@echo "	"
+	@echo "tarball"
+	@echo "    Build and create a nice tarball."
+	@echo "	"
+	@echo "kernel"
+	@echo "    Only build the kernel."
+	@echo " "
+	@echo "initrd.img"
+	@echo "    Only build the initrd.img"
+
