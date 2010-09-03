@@ -89,8 +89,11 @@ getimage(){
 
 
    case "$PROTOCOL" in
-       "bittorrent"|"metalink")
+       "bittorrent")
            getimage_aria_bm torrent
+       ;;
+       "metalink")
+           getimage_aria_bm metalink
        ;;
        "http"|"ftp")
            getimage_aria_hf $URL

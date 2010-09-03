@@ -29,6 +29,7 @@ INITRD_DIR = $(TOPDIR)/initrd
 SRC_DIR = $(TOPDIR)/src
 
 GETSOURCE = $(TOPDIR)/tools/getsource
+COPYLIBS  = $(TOPDIR)/tools/copy_libs
 
 #
 # Now include the other targets.  Some of these may have order dependencies.

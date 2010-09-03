@@ -166,7 +166,7 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 
 	( \
 		cd $(INITRD_BUILD_DIR) && \
-		cp `$(INITRD_DIR)/copy_libs sbin/modprobe usr/bin/ssh sbin/lvdisplay \
+		cp `$(COPYLIBS) sbin/modprobe usr/bin/ssh sbin/lvdisplay \
 			sbin/udevd sbin/mkfs.ext4 sbin/xfs_db usr/sbin/parted \
 			usr/bin/aria2c usr/sbin/sshd usr/bin/rsync usr/bin/curl` lib \
 	)
