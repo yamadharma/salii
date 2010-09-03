@@ -1,9 +1,27 @@
 
+aria_getsize() {
+    type=$1
+    source=$2
+
+    case "$type" in
+        "metalink"|"bittorrent")
+            imagesize=$(aria2c -S $source | awk '/\|.*\([0-9,]+\)/ { gsub("[),(]","",$2); print $2}')
+        ;;
+        "http"|"ftp")
+            imagesize=$(curl $source -I -s | awk '/Content-Length: [0-9]+/ { print $2}')
+        ;;
+    esac
+
+    echo $imagesize
+}
+
+
 aria_autodetect_staging_dir() {
-    metafile=$1
-    if [ ! -f $metafile ]; then
-        logmsg "warning: metafile file $metafile does not exist!"
-        return
+    imagesize=$1
+    if [ "x$imagesize" == "x" ]
+    then
+        logmsg "imagesize not given!"
+        exit 1
     fi
 
     # List of preferred staging directory (/tmp = ramdisk staging)
@@ -13,18 +31,14 @@ aria_autodetect_staging_dir() {
 
     # Use a breathing room of 100MB (this should be enough for a lot of cases)
     breathing_room=102400
-
-    # Evaluate torrent size
-    logmsg "Getting size of image"
-    metalink_size=$(( $( (aria2c -S $metalink | awk '/\|.*\([0-9,]+\)/ { gsub("[),(]","",$2); print $2}' ) ) / 1024 + $breathing_room ))
-    logmsg "Torrent size: $metalink"
+    imagesize=$(( $imagesize + $breathing_room ))
 
     # Find a directory to host the image tarball
     for dir in $preferred_dirs; do
         [ ! -d $dir ] && continue;
         dir_space=`df $dir 2>/dev/null | sed '1d' | sed 's/[[:space:]]\+/ /g' | cut -d' ' -f4 | sed -ne '$p'`
         [ -z $dir_space ] && continue
-        [ $metalink_size -lt $dir_space ] && echo $dir && return
+        [ $imagesize -lt $dir_space ] && echo $dir && return
     done
 }
 

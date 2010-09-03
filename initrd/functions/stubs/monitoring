@@ -152,19 +152,35 @@ start_report_task() {
 
     # Evaluate image size.
     logmsg "Evaluating image size..."
-    if [ "x$BITTORRENT" = "xy" -o "x$PROTOCOL" = "xbittorrent" ]; then
-        if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent" ]; then
-            torrent_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent"
-        elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent" ]; then
-            torrent_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent"
-        else
-            logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
-            shellout
-        fi
-        IMAGESIZE=`aria2c -S $torrent_file | awk '/\|.*\([0-9,]+\)/ { gsub("[),(]","",$2); print $2}'`
-    else
-        IMAGESIZE=`rsync -av --numeric-ids $IMAGESERVER::$IMAGENAME | grep "total size" | sed -e "s/total size is \([0-9]*\).*/\1/"`
-    fi
+    
+    case "$PROTOCOL" in
+        "bittorrent")
+            if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent" ]; then
+                bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent"
+            elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent" ]; then
+                bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent"
+            else
+                logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
+                shellout
+            fi
+            IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
+        ;;
+        "metalink")
+            if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.metafile" ]; then
+                bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.metafile"
+            elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.metafile" ]; then
+                bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.metafile"
+            else
+                logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
+                shellout
+            fi
+            IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
+        ;;
+        "rsync")
+            IMAGESIZE=`rsync -av --numeric-ids $IMAGESERVER::$IMAGENAME | grep "total size" | sed -e "s/total size is \([0-9]*\).*/\1/"`
+        ;;
+    esac
+
     IMAGESIZE=`expr $IMAGESIZE / 1024`
     logmsg "  --> Image size = `expr $IMAGESIZE / 1024`MiB"
 

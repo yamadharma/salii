@@ -19,7 +19,7 @@ getimage_rsync(){
      fi
 }
 
-getimage_aria(){
+getimage_aria_bm(){
 
     METHOD=$1
     BASENAME="${TORRENTS_DIR}/image-${IMAGENAME}"
@@ -42,7 +42,8 @@ getimage_aria(){
     if [ -z $STAGING ]
     then
         logmsg "aria_autodetect_staging_dir"
-	STAGING=$(aria_autodetect_staging_dir ${TORRENTS_DIR}/${tarball}.${METHOD})
+	SIZE=$(aria_getsize $METHOD ${TORRENTS_DIR}/${tarball}.${METHOD})
+	STAGING=$(aria_autodetect_staging_dir $SIZE)
 	if [ -z $STAGING ]
 	then
 	   logmsg ""
@@ -88,11 +89,11 @@ getimage(){
 
 
    case "$PROTOCOL" in
-       "bittorrent")
-           getimage_aria torrent
+       "bittorrent"|"metalink")
+           getimage_aria_bm torrent
        ;;
-       "metalink")
-           getimage_aria metalink
+       "http"|"ftp")
+           getimage_aria_hf $URL
        ;;
        "rsync")
           getimage_rsync

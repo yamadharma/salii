@@ -19,8 +19,8 @@ PHONY += xfsprogs_install
 xfsprogs_install: $(XFSPROGS_DIR).install)
 
 $(XFSPROGS_DIR).install: $(XFSPROGS_DIR).build
-	$(SI_INSTALL) -m 755 $(XFSPROGS_DIR)/mkfs/mkfs.xfs $(INITRD_SBIN_DIR)
-	$(SI_INSTALL) -m 755 $(XFSPROGS_DIR)/db/xfs_db $(INITRD_SBIN_DIR)
+	install -m 755 $(XFSPROGS_DIR)/mkfs/mkfs.xfs $(INITRD_SBIN_DIR)
+	install -m 755 $(XFSPROGS_DIR)/db/xfs_db $(INITRD_SBIN_DIR)
 
 $(XFSPROGS_DIR).build:	$(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL)
 	rm -rf $(XFSPROGS_DIR)

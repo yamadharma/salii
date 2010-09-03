@@ -1,0 +1,41 @@
+#
+#       $Id: curl.rul 235 2010-08-23 09:12:15Z dennis $
+#   vi: set filetype=make:
+#
+
+CURL_VERSION	= 7.21.1
+CURL_TARBALL	= curl-$(CURL_VERSION).tar.gz
+
+CURL_URL 	= ftp://ftp.sara.nl/pub/sali/sources/curl-$(CURL_VERSION).tar.gz
+
+CURL_DIR	= $(INITRD_SRC_DIR)/curl-$(CURL_VERSION)
+
+ALL_SOURCE += $(INITRD_SRC_DIR)/$(CURL_TARBALL)
+
+PHONY += curl
+curl:	$(CURL_DIR).build
+
+$(CURL_DIR).build:  $(CURL_DIR).unpack
+	cd $(CURL_DIR) && ./configure --prefix=/usr && make
+	touch $@
+
+PHONY += curl_install
+curl_install:	$(CURL_DIR).install
+
+$(CURL_DIR).install:	$(CURL_DIR).build
+	cd $(CURL_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
+
+$(CURL_DIR).unpack:   	$(INITRD_DIR)/make.d/curl.rul	\
+			$(INITRD_SRC_DIR)/$(CURL_TARBALL)
+	rm -rf $(CURL_DIR)
+	cd $(INITRD_SRC_DIR) && tar -xvzf $(INITRD_SRC_DIR)/$(CURL_TARBALL)
+	touch $@
+
+$(INITRD_SRC_DIR)/$(CURL_TARBALL):
+	mkdir -p $(INITRD_SRC_DIR)
+	$(GETSOURCE) $(CURL_URL) $(INITRD_SRC_DIR)
+
+PHONY += curl_clean
+curl_clean:
+	rm -rf $(CURL_DIR)
+	rm -f  $(CURL_DIR).build $(CURL_DIR).unpack $(CURL_DIR).install

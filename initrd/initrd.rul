@@ -78,6 +78,7 @@ include $(INITRD_MAKE_DIR)/rsync.rul
 include $(INITRD_MAKE_DIR)/udev.rul
 include $(INITRD_MAKE_DIR)/kexec.rul
 include $(INITRD_MAKE_DIR)/aria2.rul
+include $(INITRD_MAKE_DIR)/curl.rul
 
 # HvB 7 Jul 2010
 #include $(INITRD_MAKE_DIR)/tar.rul
@@ -151,7 +152,8 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(JFSUTILS_DIR).install		\
 								$(KEXEC_DIR).install		\
 								$(OPENSSH_DIR).install 		\
-								$(ARIA2_DIR).install
+								$(ARIA2_DIR).install 		\
+								$(CURL_DIR).install
 
 #$(TAR_DIR).install 		\
 
@@ -164,9 +166,9 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 
 	( \
 		cd $(INITRD_BUILD_DIR) && \
-		cp `$(INITRD_DIR)/copy_libs sbin/modprobe usr/bin/tar usr/bin/ssh sbin/lvdisplay \
+		cp `$(INITRD_DIR)/copy_libs sbin/modprobe usr/bin/ssh sbin/lvdisplay \
 			sbin/udevd sbin/mkfs.ext4 sbin/xfs_db usr/sbin/parted \
-			usr/bin/aria2c usr/sbin/sshd usr/bin/rsync` lib \
+			usr/bin/aria2c usr/sbin/sshd usr/bin/rsync usr/bin/curl` lib \
 	)
 
 # copy libnss files and the loader file.  As they are not automatically included
@@ -193,18 +195,17 @@ ifeq ($(ARCH),ppc64-iSeries)
 		$(INITRD_BUILD_DIR)/etc/inittab
 endif
 
-	$(SI_INSTALL) -m 755 $(INITRD_DIR)/skel/etc/init.d/rcS \
+	install -m 755 $(INITRD_DIR)/skel/etc/init.d/rcS \
 	  $(INITRD_BUILD_DIR)/etc/init.d/rcS
 
 	$(INITRD_DIR)/functions/sali_functions --makefile --stubsdir $(INITRD_DIR)/functions/stubs \
 	  --tmpfile $(INITRD_DIR)/functions/functions.mbm
 
-	$(SI_INSTALL) -m 644 $(INITRD_DIR)/functions/stubs/* $(INITRD_BUILD_DIR)/etc/sali/stubs/
+	install -m 644 $(INITRD_DIR)/functions/stubs/* $(INITRD_BUILD_DIR)/etc/sali/stubs/
 
-	$(SI_INSTALL) -m 755 $(INITRD_DIR)/functions/sali_functions $(INITRD_BUILD_DIR)/etc/sali/sali_functions
+	install -m 755 $(INITRD_DIR)/functions/sali_functions $(INITRD_BUILD_DIR)/etc/sali/sali_functions
 
-	$(SI_INSTALL) -m 755 $(INITRD_DIR)/functions/functions.mbm \
-	  $(INITRD_BUILD_DIR)/etc/init.d/functions
+	install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
 	mkdir -p $(INITRD_BUILD_DIR)/new_root
@@ -244,7 +245,7 @@ install_initrd_template:	$(INITRD_BUILD_DIR).build
 PHONY += install_initrd
 install_initrd:	$(INITRD_DIR)/initrd.img
 	mkdir -p $(BOOT_BIN_DEST)
-	$(SI_INSTALL) -m 644 $(INITRD_DIR)/initrd.img \
+	install -m 644 $(INITRD_DIR)/initrd.img \
 	    $(BOOT_BIN_DEST)/initrd.img
 
 initrd_get_source:	$(INITRD_SRC_DIR)/$(BUSYBOX_TARBALL) \

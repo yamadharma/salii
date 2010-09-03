@@ -1,11 +1,12 @@
 export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:."
 export SHELL="/bin/sh"
 export TERM=linux
-export PS1="# "
 ulimit -c 0
 umask 022
 
-ls() {
-/bin/ls -F "$@"
-}
-
+if [ $(id -u) -eq 0 ]
+then                 
+   export PS1="\h:\w \u\# "
+else
+   export PS1="\h:\w \u\$ " 
+fi
