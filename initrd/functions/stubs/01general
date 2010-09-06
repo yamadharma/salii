@@ -75,24 +75,24 @@ write_variables() {
         # pass all variables set here on to the hostname.sh script
         rm -f /tmp/variables.txt
 
-        echo "HOSTNAME=$HOSTNAME"                   >> /tmp/variables.txt || shellout
-        echo "DOMAINNAME=$DOMAINNAME"               >> /tmp/variables.txt
+        echo "HOSTNAME=$HOSTNAME"                       >> /tmp/variables.txt || shellout
+        echo "DOMAINNAME=$DOMAINNAME"                   >> /tmp/variables.txt
 
-        echo "DEVICE=$DEVICE"                       >> /tmp/variables.txt
-        echo "IPADDR=$IPADDR"                       >> /tmp/variables.txt
-        echo "NETMASK=$NETMASK"                     >> /tmp/variables.txt
-        echo "NETWORK=$NETWORK"                     >> /tmp/variables.txt
-        echo "BROADCAST=$BROADCAST"                 >> /tmp/variables.txt
+        echo "DEVICE=$DEVICE"                           >> /tmp/variables.txt
+        echo "IPADDR=$IPADDR"                           >> /tmp/variables.txt
+        echo "NETMASK=$NETMASK"                         >> /tmp/variables.txt
+        echo "NETWORK=$NETWORK"                         >> /tmp/variables.txt
+        echo "BROADCAST=$BROADCAST"                     >> /tmp/variables.txt
 
-        echo "GATEWAY=$GATEWAY"                     >> /tmp/variables.txt
-        echo "GATEWAYDEV=$GATEWAYDEV"               >> /tmp/variables.txt
+        echo "GATEWAY=$GATEWAY"                         >> /tmp/variables.txt
+        echo "GATEWAYDEV=$GATEWAYDEV"                   >> /tmp/variables.txt
 
-        echo "IMAGESERVER=$IMAGESERVER"             >> /tmp/variables.txt
-        echo "IMAGENAME=$IMAGENAME"                 >> /tmp/variables.txt
+        echo "IMAGESERVER=$IMAGESERVER"                 >> /tmp/variables.txt
+        echo "IMAGENAME=$IMAGENAME"                     >> /tmp/variables.txt
 
-        echo "LOG_SERVER=$LOG_SERVER"               >> /tmp/variables.txt
+        echo "LOG_SERVER=$LOG_SERVER"                   >> /tmp/variables.txt
         echo "LOG_SERVER_PORT=$LOG_SERVER_PORT"         >> /tmp/variables.txt
-        echo "USELOGGER=$USELOGGER"                 >> /tmp/variables.txt
+        echo "USELOGGER=$USELOGGER"                     >> /tmp/variables.txt
 
         echo "SSH=$SSH"                                 >> /tmp/variables.txt
         echo "SSHD=$SSHD"                               >> /tmp/variables.txt
@@ -106,13 +106,11 @@ write_variables() {
 	echo "PROTOCOL=$PROTOCOL" 			>> /tmp/variables.txt
 	echo "STAGING=$STAGING" 			>> /tmp/variables.txt
 
+	# Keep these two variables for compatibility
         echo "BITTORRENT=$BITTORRENT"                   >> /tmp/variables.txt
         echo "BITTORRENT_STAGING=$BITTORRENT_STAGING"   >> /tmp/variables.txt
-        echo "BITTORRENT_POLLING_TIME=$BITTORRENT_POLLING_TIME" >> /tmp/variables.txt
-        echo "BITTORRENT_SEED_WAIT=$BITTORRENT_SEED_WAIT"       >> /tmp/variables.txt
-        echo "BITTORRENT_UPLOAD_MIN=$BITTORRENT_UPLOAD_MIN"     >> /tmp/variables.txt
 
-        echo "GROUPNAMES=\"$GROUPNAMES\""     >> /tmp/variables.txt
+        echo "GROUPNAMES=\"$GROUPNAMES\""               >> /tmp/variables.txt
         echo "GROUP_OVERRIDES=\"$GROUP_OVERRIDES\""     >> /tmp/variables.txt
     fi
 }

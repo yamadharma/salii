@@ -177,30 +177,30 @@ start_report_task() {
             IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
         ;;
         "rsync")
-            IMAGESIZE=`rsync -av --numeric-ids $IMAGESERVER::$IMAGENAME | grep "total size" | sed -e "s/total size is \([0-9]*\).*/\1/"`
+            IMAGESIZE=$(rsync -av --numeric-ids $IMAGESERVER::$IMAGENAME | grep "total size" | sed -e "s/total size is \([0-9]*\).*/\1/")
         ;;
     esac
 
-    IMAGESIZE=`expr $IMAGESIZE / 1024`
-    logmsg "  --> Image size = `expr $IMAGESIZE / 1024`MiB"
+    IMAGESIZE=$(( $IMAGESIZE / 1024 ))
+    logmsg "  --> Image size = $(( $IMAGESIZE / 1024 ))MiB"
 
     # Evaluate disks size.
-    LIST=`df 2>/dev/null | grep "/" | sed "s/  */ /g" | cut -d' ' -f3 | sed -ne 's/^\([0-9]*\)$/\1+/p'`0
-    DISKSIZE=`echo $LIST | bc`
+    LIST=$(df 2>/dev/null | grep "/" | awk '{ print $4}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
+    AVAILDISKSIZE=$(( $LIST ))
 
     # Spawn the report task -AR-
     {
     TOT=0; CURR_SIZE=0
     while :; do
-        LIST=`df 2>/dev/null | grep "/" | sed "s/  */ /g" | cut -d' ' -f3 | sed -ne 's/^\([0-9]*\)$/\1+/p'`0
-        TOT=`echo $LIST | bc`
+    	LIST=$(df 2>/dev/null | grep "/" | awk '{ print $4}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
+        AVAILTOT=$(( $LIST ))
 
         # Evaluate bandwidth.
-        speed=`echo "scale=2; (($TOT - $DISKSIZE) - $CURR_SIZE) / $REPORT_INTERVAL" | bc`
+        speed=`echo "scale=2; (($AVAILDISKSIZE - $AVAILTOT) - $CURR_SIZE) / $REPORT_INTERVAL" | bc`
         speed=`echo "scale=2; if ($speed >= 0) { print $speed; } else { print 0; }" | bc`
 
         # Evaluate status.
-        CURR_SIZE=$(($TOT - $DISKSIZE))
+        CURR_SIZE=$(($AVAILDISKSIZE - $AVAILTOT))
         status=`echo "scale=2; $CURR_SIZE * 100 / $IMAGESIZE" | bc`
         if [ `echo "scale=2; $status <= 0" | bc` -eq 1 ]; then
             status=1
