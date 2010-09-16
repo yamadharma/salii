@@ -4,7 +4,7 @@
 
   * added curl 7.21.1 for fetching the headers when using http/ftp protocol
 
-  * update kernel 2.6.34.6
+  * update kernel 2.6.34.7
   * update xfsprogs 3.1.2
   * update lvm 2.2.02.73
   * update mdadm 3.1.3
