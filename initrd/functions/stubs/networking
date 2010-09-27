@@ -23,7 +23,7 @@ ping_test() {
     PING_DESTINATION=$1
 
     logmsg
-    logmsg "Pinging your IMAGESERVER"
+    logmsg "Pinging your IMAGESERVER: $PING_DESTINATION"
 
 
     # Ping test code submitted by Grant Noruschat <grant@eigen.ee.ualberta.ca>
