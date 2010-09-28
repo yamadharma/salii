@@ -1,7 +1,13 @@
 1.3.1
-  * ping_test prints the value of the IMAGESERVER
+  * Fixed that udhcp overrides the value IMAGESERVER even when the value
+    is empty. Udhcp only sets the IMAGSERVER value when not given as a
+    kernel arg.
+      Reported by : Chris Pepper
+
   * Removed a lot of SystemImager specific files that SALI does not use
-  * Changed Makefile, make help shows the available options
+     now you must use ./configure first
+  * Changed Makefile, 'make help' shows the available options
+  * ping_test prints the value of the IMAGESERVER
 
   * added curl 7.21.1 for fetching the headers when using http/ftp protocol
 

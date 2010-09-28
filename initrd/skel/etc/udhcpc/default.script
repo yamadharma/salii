@@ -9,9 +9,5 @@ DHCPVARFILE=/tmp/udhcpc
 echo "SALIIMAGESRV=$saliimgsrv" > $DHCPVARFILE
 echo "IPADDR=$ip" >> $DHCPVARFILE
 echo "HOSTNAME=$hostname" >> $DHCPVARFILE
-SHOST=$(echo $hostname | awk -F . '{ print $1 }')
-echo $HOST > /etc/hostname
-hostname $SHOST
-echo "NETMASK=$subnet" >> $DHCPVARFILE
 
 exec /etc/udhcpc/default.$1

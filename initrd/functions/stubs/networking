@@ -76,6 +76,7 @@ start_udhcpc_for(){
 			if [ -z "$IMAGESERVER" ]
 			then
 				if [ -z "$SALIIMAGESRV" ]
+				then
 					logmsg "Unable to find a IMAGESERVER"
 					shellout
 				else

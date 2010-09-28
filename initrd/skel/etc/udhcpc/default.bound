@@ -3,7 +3,7 @@
 
 # Uncomment this to allow dhcpcd to set hostname of the host to the
 # hostname option supplied by DHCP server.
-#SET_HOSTNAME='yes'
+SET_HOSTNAME='yes'
 
 RESOLV_CONF="/etc/resolv.conf"
 
