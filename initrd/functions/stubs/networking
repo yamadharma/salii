@@ -73,6 +73,16 @@ start_udhcpc_for(){
 
 		if [ $IPADDR ]
 		then
+			if [ -z "$IMAGESERVER" ]
+			then
+				if [ -z "$SALIIMAGESRV" ]
+					logmsg "Unable to find a IMAGESERVER"
+					shellout
+				else
+					IMAGESERVER=$SALIIMAGESRV
+				fi
+			fi
+
 	                ping_test $IMAGESERVER
 
 			case $PING_EXIT_STATUS in
