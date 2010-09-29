@@ -210,6 +210,32 @@ partition(){
 
 	logmsg
 	logmsg "Partition disk: $DISK $DISKSIZE"
+	logmsg
+
+	## We only support 16 partitions 
+	#
+	EXTENDED=0
+
+	if [ "$DISKLABEL" == "msdos" ]
+	then
+		if [ $# -gt 15 ]
+		then
+			logmsg
+			logmsg "Sorry we do not support more the 15 partitions for disks with msdos label"
+			logmsg
+			shellout
+		fi
+
+		if [ $# -gt 4 ]
+		then
+			EXTENDED=1
+		fi
+
+	fi
+
+	## Default partition type is: primary
+	#
+	PARTITION_TYPE="primary"
 
 	while [ $# -gt 0 ]; do
 
@@ -226,6 +252,28 @@ partition(){
 		fi
 
 		NUMPARTITIONS=$(( $NUMPARTITIONS + 1 ))
+
+		if [ $NUMPARTITIONS -eq 4 ]
+		then
+			if [ $EXTENDED -eq 1 ]
+			then
+				START_MB=$END_OF_LAST
+				END_MB=$(( DISKSIZE - 0 ))
+
+				logmsg 
+				logmsg "Extended Partition"
+				logmsg "   parted -s -- $DISK mkpart extended $START_MB $END_MB"
+				logmsg
+				parted -s -- $DISK mkpart extended $START_MB $END_MB 
+
+				PARTITION_TYPE="logical"
+
+				## increase partitions
+				#
+				NUMPARTITIONS=$(( $NUMPARTITIONS + 1 ))
+			fi
+		fi
+
 		
 		logmsg
 		logmsg "Create partition $NUMPARTITIONS on disk $DISK"
@@ -234,16 +282,16 @@ partition(){
 			0)
 				START_MB=$END_OF_LAST
 				END_MB=$(( DISKSIZE - 0 ))
-				logmsg "   parted -s -- $DISK mkpart primary $START_MB $END_MB"
-				parted -s -- $DISK mkpart primary $START_MB $END_MB 
+				logmsg "   parted -s -- $DISK mkpart $PARTITION_TYPE $START_MB $END_MB"
+				parted -s -- $DISK mkpart $PARTITION_TYPE $START_MB $END_MB 
 				END_OF_LAST=$END_MB
 				sleep 1
 			;;
 			*)
 				START_MB=$END_OF_LAST
 				END_MB=$(($START_MB + $SIZE))
-				logmsg "   parted -s -- $DISK mkpart primary $START_MB $END_MB"
-				parted -s -- $DISK mkpart primary $START_MB $END_MB
+				logmsg "   parted -s -- $DISK mkpart $PARTITION_TYPE $START_MB $END_MB"
+				parted -s -- $DISK mkpart $PARTITION_TYPE $START_MB $END_MB
 				END_OF_LAST=$END_MB
 				sleep 1
 			;;
@@ -260,8 +308,8 @@ partition(){
 			PARTITION="$DISK$NUMPARTITIONS"
 		fi
 
-		##
-		# If the value of the $LABEL is none, clear it.
+		## If the value of the $LABEL is none, clear it.
+		#
 		if [ "$LABEL" == "none" ]; then
 			LABEL=""
 		fi
