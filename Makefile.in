@@ -50,9 +50,9 @@ all:	kernel $(INITRD_DIR)/initrd.img
 
 .PHONY: build
 build: 	all
-	mkdir -p $(TOPDIR)/build
-	cp $(LINUX_SRC)/arch/$(ARCH)/boot/bzImage $(TOPDIR)/build/kernel
-	cp $(INITRD_DIR)/initrd.img $(TOPDIR)/build/initrd.img
+	mkdir -p $(TOPDIR)/build/$(ARCH)
+	cp $(LINUX_SRC)/arch/$(ARCH)/boot/bzImage $(TOPDIR)/build/$(ARCH)/kernel
+	cp $(INITRD_DIR)/initrd.img $(TOPDIR)/build/$(ARCH)/initrd.img
 
 	$(foreach doc, $(RELEASE_DOCS), \
 		cp $(TOPDIR)/$(doc) $(TOPDIR)/build/$(doc);)
