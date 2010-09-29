@@ -6,8 +6,6 @@
 # SVN Info:
 #	$Id$
 
-# This master autoinstall script was created with SystemImager v3.7.6
-
 # Pull in variables left behind by the linuxrc script.
 # This information is passed from the linuxrc script on the autoinstall media 
 # via /tmp/variables.txt.  Apparently the shell we use in BOEL is not 
@@ -40,13 +38,13 @@ fi
 
 # Remove .master from script name
 #
-SARA_SCRIPT=`echo $0 | cut -d. -f1`
+SARA_IMAGE=`echo $0 | cut -d. -f1`
 
 echo $0
 echo $IMAGENAME
 
-[ -z $IMAGENAME ] && IMAGENAME=`basename $SARA_SCRIPT`
-[ -z $OVERRIDES ] && OVERRIDES=`basename $SARA_SCRIPT`
+[ -z $IMAGENAME ] && IMAGENAME=`basename $SARA_IMAGE`
+[ -z $OVERRIDES ] && OVERRIDES=`basename $SARA_IMAGE`
 
 echo $IMAGENAME
 
@@ -113,7 +111,7 @@ set_disklabel $DISK0 $DISKLABEL
 
 if [ "$DISKLABEL" == "msdos" ]; then
 	logmsg "partition $DISK0 1024:ext2.128:/boot:boot 1:none 4096:swap::swap 0:xfs:/:root"
-	partition $DISK0 1024:ext2.128:/boot:boot 1:none 4096:swap::swap 0:xfs:/:root
+	partition $DISK0 1024:ext2.128:/boot:boot 4096:swap::swap 0:xfs:/:root
 else
 	logmsg "partition $DISK0 1024:ext2:/boot:boot 1:grub2 4096:swap::swap 0:xfs:/:root"
 	partition $DISK0 1024:ext2:/boot:boot 1:grub2 4096:swap::swap 0:xfs:/:root
