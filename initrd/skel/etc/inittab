@@ -2,25 +2,14 @@
 #	$Id$
 #
 
-#
-# This is run first except when booting in single-user mode.
-#
-tty1::sysinit:/etc/init.d/rcS
+::sysinit:/etc/init.d/rcS
 
-# /bin/sh invocations on selected ttys
-#
-# Start an "askfirst" shell on the console (whatever that may be)
-::askfirst:-/bin/sh
+::respawn:/bin/login
 
-# Start an "askfirst" shell on /dev/tty2-6
-#tty2::askfirst:-/bin/sh
-#tty3::askfirst:-/bin/sh
-#tty4::askfirst:-/bin/sh
-#tty5::askfirst:-/bin/sh
-#tty6::askfirst:-/bin/sh
+tty2::respawn:/sbin/getty 38400 tty2
+tty3::respawn:/sbin/getty 38400 tty3
+tty4::respawn:/sbin/getty 38400 tty4
+tty5::respawn:/sbin/getty 38400 tty5
+tty6::respawn:/sbin/getty 38400 tty6
 
-
-# Stuff to do before rebooting
-:12345:ctrlaltdel:/usr/bin/killall rcS > /dev/null 2>&1
-:12345:ctrlaltdel:/bin/umount -a -r > /dev/null 2>&1
-:12345:ctrlaltdel:/sbin/reboot
+::ctrlaltdel:/sbin/reboot

@@ -104,6 +104,7 @@ send_monitor_msg() {
 
 send_monitor_stdout() {
     while read l; do
+
         # echo to the console -AR-
         echo "$l"
         # Send the message to the monitor daemon.
@@ -227,9 +228,15 @@ start_report_task() {
 #
 
 stop_report_task() {
+
     if [ ! -z $REPORT_PID ]; then
         kill -9 $REPORT_PID
         logmsg "Report task stopped."
+    fi
+
+    if [ "x$2" == "xkill" ]
+    then
+       killall rcS
     fi
 
     # Try to report the error to the monitor server.

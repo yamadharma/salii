@@ -37,17 +37,17 @@
 
 mount_proc
 
-monitor_save_dmesg
-
 mount_sys
+
+start_udevd
+
+monitor_save_dmesg
 
 get_arch
 
 adjust_arch
 
 ifconfig_loopback
-
-start_udevd
 
 # Need to do this prior to read_local_cfg to get last_root parameter, 
 # if specified. -BEF-

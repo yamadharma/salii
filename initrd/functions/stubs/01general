@@ -119,7 +119,7 @@ write_variables() {
 ################################################################################
 #
 #   Description:
-#   Exit with the message stored in /etc/issue.
+#   Exit with the message stored in /etc/si_error.
 #
 #   Usage: $COMMAND || shellout
 #
@@ -129,13 +129,13 @@ shellout() {
     kill -9 $TMPFS_WATCHER_PID  >/dev/null 2>/dev/null
     killall -9 udp-receiver rsync  >/dev/null 2>/dev/null
     write_variables
-    cat /etc/issue
+    cat /etc/si_error
     if [ ! -z $USELOGGER ] ;
-        then cat /etc/issue | logger
+        then cat /etc/si_error | logger
     fi
     if [ ! -z $MONITOR_SERVER ]; then
         logmsg "Installation failed!! Stopping report task."
-        stop_report_task -1
+        stop_report_task -1 kill
     fi
     exec sh > /dev/console 2>&1
 }
@@ -145,18 +145,13 @@ shellout() {
 shellopen() {
         logmsg
         logmsg "Starting console..."
-
-	## Just load the USB drivers
-	#
-	modprobe uhci_hcd
-	modprobe ehci_hcd
-
-        if [ ! -z $MONITOR_SERVER ]; then
-                logmsg "Strating console, stopping monitoring"
-                stop_report_task -1
+        
+	if [ ! -z $MONITOR_SERVER ]; then
+                logmsg "Starting console, stopping monitoring"
+                stop_report_task -1 kill
         fi
-
-        exec sh > /dev/console 2>&1
+	
+	exit 0
 }
 
 #

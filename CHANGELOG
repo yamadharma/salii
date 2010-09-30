@@ -1,4 +1,8 @@
 1.3.X
+  * Major adjustment to the /etc/inittab file. You are now able to use console redirection.
+    Reported by: Chris Pepper
+    Author: Dennis Stam
+
   * Added support for 16 partitions on disks with msdos label
     Reported by: Chris Peppper
     Author: Bas van der Vlies
