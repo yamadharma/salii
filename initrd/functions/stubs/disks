@@ -253,7 +253,7 @@ partition(){
 
 		NUMPARTITIONS=$(( $NUMPARTITIONS + 1 ))
 
-		if [ $NUMPARTITIONS -eq 4 ]
+		if [ $NUMPARTITIONS -eq 3 ]
 		then
 			if [ $EXTENDED -eq 1 ]
 			then
@@ -270,7 +270,7 @@ partition(){
 
 				## increase partitions
 				#
-				NUMPARTITIONS=$(( $NUMPARTITIONS + 1 ))
+				NUMPARTITIONS=$(( $NUMPARTITIONS + 2 ))
 			fi
 		fi
 

@@ -1,4 +1,4 @@
-1.3.X
+1.3.5
   * Major adjustment to the /etc/inittab file. You are now able to use console redirection.
     Reported by: Chris Pepper
     Author: Dennis Stam
@@ -7,6 +7,16 @@
     Reported by: Chris Peppper
     Author: Bas van der Vlies
 
+  * Minor adjustment to the rcS script. Run udev after creating the procfs and devfs
+    file systems.
+    Author: Dennis Stam
+
+  * Minor adjustment when creating extended and logical partitions. 
+    The extended partition shall now be created after creating two
+    primary partitions.
+    Reported by: Chris Pepper
+    Author: Dennis Stam
+
   * Adjusted the build method of the Makefile. The kernel and initrd.img will
     now be copied to the directory with the arch name.
     Author: Dennis Stam
@@ -14,7 +24,9 @@
   * busybos settings:
       - changed history size to 100 lines instead of 15 lines 
       - changed max chars for input to 4096 instead of 1024
-    Author: Bas van der Vlies
+      - added getty and login
+      - added mountpoint
+    Author: Bas van der Vlies & Dennis Stam
 
 1.3.2
   * Added method parse_tmpfs_opts that was removed earlier. Now you can specify the
