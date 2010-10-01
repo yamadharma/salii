@@ -1,4 +1,7 @@
 1.3.5
+  * We have changed the compression type of initrd.img from gzip to bzip2
+    Author: Dennis Stam
+
   * Major adjustment to the /etc/inittab file. You are now able to use console redirection.
     Reported by: Chris Pepper
     Author: Dennis Stam
