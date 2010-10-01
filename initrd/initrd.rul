@@ -203,12 +203,13 @@ endif
 
 	install -m 644 $(INITRD_DIR)/functions/stubs/* $(INITRD_BUILD_DIR)/etc/sali/stubs/
 
-	install -m 755 $(INITRD_DIR)/functions/sali_functions $(INITRD_BUILD_DIR)/etc/sali/sali_functions
+	install -m 755 $(INITRD_DIR)/functions/sali_functions $(INITRD_BUILD_DIR)/etc/sali/bin/sali_functions
 
 	install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
-	mkdir -p $(INITRD_BUILD_DIR)/new_root
+
+	cp -r /lib/terminfo $(INITRD_BUILD_DIR)/etc/terminfo
 
 	touch $@
 
@@ -217,7 +218,8 @@ PHONY += initrd.img
 initrd.img:	$(INITRD_DIR)/initrd.img
 
 $(INITRD_DIR)/initrd.img:       $(INITRD_DIR)/initrd
-	gzip -f -S ".img" $(INITRD_DIR)/initrd
+	bzip2 --best -f $(INITRD_DIR)/initrd
+	mv $(INITRD_DIR)/initrd.bz2 $(INITRD_DIR)/initrd.img
 
 PHONY += initrd
 initrd:	$(INITRD_DIR)/initrd

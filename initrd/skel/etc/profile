@@ -1,6 +1,6 @@
-export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:."
-export SHELL="/bin/sh"
-export TERM=linux
+export PATH="$PATH::/etc/sali/bin:/bin:/sbin:/usr/bin:/usr/sbin:."
+export MANPATH="$MANPATH:/usr/local/share/man:/usr/man:/usr/share/man"
+export SHELL="/bin/ash"
 ulimit -c 0
 umask 022
 

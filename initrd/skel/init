@@ -1,21 +1,68 @@
 #!/bin/sh
-#
-# Script to move the root to a known tmpfs initrd.
 
-. /etc/init.d/functions
+echo ""
+echo "####"
+echo "## Welcome to SALI"
+echo "####"
+echo ""
 
-parse_tmpfs_opts
+make_extra_nodes() {
+  [ -e /etc/udev/links.conf ] || return 0
+  grep '^[^#]' /etc/udev/links.conf | \
+  while read type name arg1; do
+    [ "$type" -a "$name" -a ! -e "/dev/$name" -a ! -L "/dev/$name" ] ||continue
+    case "$type" in
+      L) ln -s $arg1 /dev/$name ;;
+      D) mkdir -p /dev/$name ;;
+      M) mknod -m 600 /dev/$name $arg1 ;;
+      *) echo "links.conf: unparseable line ($type $name $arg1)" ;;
+    esac
+  done
+}
 
-logmsg "initramfs detected: init called"
+## Mounting some important filesystems
+mkdir -p /proc
+mount proc /proc -t proc
 
-mkdir -p /new_root || shellout
-mount tmpfs /new_root -t tmpfs $tmpfs_opts || shellout
-cd / || shellout
-cp -a `/bin/ls | grep -v new_root` /new_root/ || shellout
-cd /new_root || shellout
-mkdir -p old_root || shellout
+mkdir -p /sys
+mount sysfs /sys -t sysfs
+## End
 
-exec switch_root . /linuxrc
+## Starting udev
 
-logmsg "error: switch_root failed."
-shellout
+echo > /sys/kernel/uevent_helper
+
+mount -n -o mode=0755 -t tmpfs tmpfs /dev
+make_extra_nodes
+
+udevd --daemon
+
+mkdir -p /dev/.udev/db/ /dev/.udev/queue/
+udevadm trigger
+
+mkdir -p /dev/pts
+mount devpts /dev/pts -t devpts
+
+udevadm settle || true
+
+if [ -d /sys/bus/scsi ]; then
+    modprobe -q scsi_wait_scan && modprobe -r scsi_wait_scan || true
+    udevadm settle || true
+fi
+
+init="/sbin/init"
+for i in $(cat /proc/cmdline); do
+    case $i in
+        init=*)
+            init=${i#init=}
+            ;;  
+    esac
+done
+
+echo ""
+echo "####"
+echo "## Preparing installation environment"
+echo "####"
+echo ""
+
+exec $init

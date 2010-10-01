@@ -35,12 +35,6 @@
 #
 {
 
-mount_proc
-
-mount_sys
-
-start_udevd
-
 monitor_save_dmesg
 
 get_arch
