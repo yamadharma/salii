@@ -19,11 +19,7 @@ write_variables
 
 p_section "Initializing installation enviroment"
 
-monitor_save_dmesg
-
 get_arch
-
-adjust_arch
 
 for file in $(ls -1 /etc/sali/startup.d/)
 do

@@ -1,0 +1,16 @@
+p_stage "Starting syslogd server"
+
+p_service "Starting syslogd"
+
+if [ -n "${LOG_SERVER}" ]
+then
+	p_comment 0 "starting remote syslogging"
+	/sbin/syslogd -R "${LOG_SERVER}":"${LOG_SERVER_PORT}"
+else
+	p_comment 0 "starting syslogging to file"
+	/sbin/syslogd -O /tmp/si_monitor.log -S
+fi
+
+p_service "Starting klogd for kernel messages"
+/sbin/klogd -c 2
+

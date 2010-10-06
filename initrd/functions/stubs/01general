@@ -1,8 +1,3 @@
-
-fs_on_tmpfs(){
-	df 2>/dev/null | egrep 'tmpfs ' | egrep -q " $1\$"
-}
-
 ################################################################################
 #
 #  logmsg
@@ -33,28 +28,24 @@ logmsg() {
 #
 # Usage: get_arch; echo $ARCH
 get_arch() {
-    ARCH=`uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/`
+	ARCH=`uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/`
+
+	if [ "ppc64" = "$ARCH" ]
+	then
+		# This takes a little bit of futzing with due to all the PPC platforms that exist.
+		if [ -d /proc/iSeries ] ; then
+			ARCH=ppc64-iSeries
+		fi
+		if grep -qs PS3 /proc/cpuinfo; then
+			ARCH=ppc64-ps3
+		fi
+	fi
 }
 
-#
-################################################################################
-#
-#  adjust_arch
-#
-#  based on info in /proc adjust the ARCH variable.  This needs to run
-#  after proc is mounted.
-#
+## adjust_arch
 adjust_arch() {
-    if [ "ppc64" = "$ARCH" ] ; then
-        # This takes a little bit of futzing with due to all the PPC platforms that exist.
-        if [ -d /proc/iSeries ] ; then
-            ARCH=ppc64-iSeries
-            logmsg "Detected ppc64 is really an iSeries partition..."
-        fi
-        if grep -qs PS3 /proc/cpuinfo; then
-            ARCH=ppc64-ps3
-        fi
-    fi
+	# Just to be compatible
+	touch /tmp/adjust_arch
 }
 
 #
@@ -66,20 +57,17 @@ adjust_arch() {
 write_variables() {
 
 	# pass all variables set here on to the hostname.sh script
-        rm -f /tmp/variables.txt
+        cat /dev/null > /tmp/variables.txt
 
-        echo "HOSTNAME=$HOSTNAME"                       >> /tmp/variables.txt || shellout
+        echo "HOSTNAME=$HOSTNAME"                       >> /tmp/variables.txt
         echo "DOMAINNAME=$DOMAINNAME"                   >> /tmp/variables.txt
-
         echo "DEVICE=$DEVICE"                           >> /tmp/variables.txt
         echo "IPADDR=$IPADDR"                           >> /tmp/variables.txt
         echo "NETMASK=$NETMASK"                         >> /tmp/variables.txt
         echo "NETWORK=$NETWORK"                         >> /tmp/variables.txt
         echo "BROADCAST=$BROADCAST"                     >> /tmp/variables.txt
-
         echo "GATEWAY=$GATEWAY"                         >> /tmp/variables.txt
         echo "GATEWAYDEV=$GATEWAYDEV"                   >> /tmp/variables.txt
-
         echo "IMAGESERVER=$IMAGESERVER"                 >> /tmp/variables.txt
         echo "IMAGENAME=$IMAGENAME"                     >> /tmp/variables.txt
 
@@ -107,6 +95,7 @@ write_variables() {
         echo "GROUP_OVERRIDES=\"$GROUP_OVERRIDES\""     >> /tmp/variables.txt
 
 	echo "VERBOSELEVEL=\"$VERBOSELEVEL\"" 		>> /tmp/variables.txt
+	echo "ARCH=\"$ARCH\"" 				>> /tmp/variables.txt
 }
 
 #

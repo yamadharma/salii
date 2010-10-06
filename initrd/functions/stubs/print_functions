@@ -1,11 +1,14 @@
 
 p_header(){
 	printf "\n[ Welcome to SALI $(cat /etc/sali_version) ]\n"
-	printf "[     https://subtrac.sara.nl/oss/sali     ]\n\n"
+	printf "[     https://subtrac.sara.nl/oss/sali     ]\n"
 }
 
 p_separator(){
 	COLS=$(/bin/stty size | awk '{print $2}')
+
+	printf "\n"
+
 	for col in $(seq $COLS)
 	do
 		if [ $col -eq $COLS ]
