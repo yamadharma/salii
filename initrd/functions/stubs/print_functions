@@ -1,0 +1,39 @@
+
+p_header(){
+	printf "\n[ Welcome to SALI $(cat /etc/sali_version) ]\n"
+	printf "[     https://subtrac.sara.nl/oss/sali     ]\n\n"
+}
+
+p_separator(){
+	COLS=$(/bin/stty size | awk '{print $2}')
+	for col in $(seq $COLS)
+	do
+		if [ $col -eq $COLS ]
+		then
+			printf "\n"
+		else
+			printf "-"
+		fi
+	done
+}
+
+p_section(){
+	printf "\n[ ${1} ]\n"
+}
+
+p_stage(){
+	printf "\n> ${1}\n"
+}
+
+p_service(){
+	printf "  :: $1\n"
+}
+
+p_comment(){
+	LEVEL=$1
+
+	if [ $VERBOSELEVEL -ge $LEVEL ]
+	then
+		printf "     .$2\n"
+	fi
+}

@@ -5,8 +5,6 @@ monitor_save_dmesg() {
     if [ -z $MONITOR_SERVER ]; then
         return
     fi
-    logmsg
-    logmsg monitor_save_dmesg
     dmesg -s 16392 > /tmp/si_monitor.log
 }
 

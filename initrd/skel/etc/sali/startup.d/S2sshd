@@ -1,0 +1,26 @@
+
+if [ "x${SSHD}" == "xy" ]
+then
+	p_stage "Starting ssh server"
+
+	if [ ! -f "/etc/ssh/ssh_host_dsa_key" ]
+	then
+		p_service "creating a new dsa key"
+		ssh-keygen -t dsa -N "" -f /etc/ssh/ssh_host_dsa_key -q
+	fi
+
+	if [ ! -f "/etc/ssh/ssh_host_rsa_key" ]
+	then
+		p_service "creating a new rsa key"
+		ssh-keygen -t rsa -N "" -f /etc/ssh/ssh_host_rsa_key -q
+	fi
+
+	mkdir -p /var/run/sshd
+	chmod 0755 /var/run/sshd
+	/usr/sbin/sshd
+
+	if [ "$?" != 0 ]
+	then
+		p_service "failed to start sshd"
+	fi
+fi

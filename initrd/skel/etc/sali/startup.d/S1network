@@ -1,0 +1,79 @@
+
+p_stage "Configuring network"
+
+## First we configure the loopback device
+p_service "Configuring loopback device"
+p_comment 10 "ifconfig lo 127.0.0.1"
+ifconfig lo 127.0.0.1
+
+## Let's start the main network device
+p_service "Configuring main network device"
+
+if [ -n "${IPADRR}" -a -n "${DEVICE}" -a -n "${NETMASK}" -a -n "${BROADCAST}" ]
+then
+
+	ifconfig $DEVICE $IPADDR netmask $NETMASK broadcast $BROADCAST
+	
+	if [ $? != 0 ]
+	then
+		p_comment 10 "could not configure interface with the given information"
+		p_comment 10 "  device   : ${DEVICE}" 
+		p_comment 10 "  ipaddr   : ${IPADDR}" 
+		p_comment 10 "  netmask  : ${NETMASK}" 
+		p_comment 10 "  broadcast: ${BROADCAST}" 
+	fi
+
+	if [ -n "${GATEWAY}" ]
+	then
+		route add default gw $GATEWAY
+
+		if [ $? != 0 ]
+		then
+			p_comment 10 "could not set given gateway"
+		fi
+	fi
+else
+	p_comment 10 "configuring interface with DHCP"
+	RSLT=1
+
+	if [ -n "${ETHER_SLEEP}" ]
+	then
+		count_loop $ETHER_SLEEP
+	fi	
+
+	if [ -n "${DEVICE}" ]
+	then
+		p_comment 10 "variable DEVICE is specified, using ${DEVICE}"
+		dhcp $DEVICE
+
+		if [ $DHCP_RESULT -eq 0 ]
+		then
+			RSLT=0
+		else
+			p_comment 10 "could not configure ${DEVICE}, checking for other devices"
+			dhcp_guess
+		
+			if [ $DHCPG_RESULT -eq 0 ]
+			then
+				RSLT=0
+			fi
+		fi
+	else
+		p_comment 10 "variable DEVICE is not configured, guessing interface"
+		dhcp_guess
+		if [ $DHCPG_RESULT -eq 0 ]
+		then
+			RSLT=0
+		fi
+	fi
+
+	if [ $RSLT -eq 0 ]
+	then
+		p_comment 0 "network device ${DEVICE} with ip ${IPADDR} is configured"
+	else
+		p_comment 10 "DHCP configuration failed"
+		shellout
+	fi
+fi
+
+

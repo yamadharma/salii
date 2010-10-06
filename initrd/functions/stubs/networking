@@ -15,208 +15,119 @@ ifconfig_loopback() {
 #
 ## SALI ping_test has been moved up, because this function is used to determine which
 ## interface reaches the IMAGESERVER
-ping_test() {
-
-    logmsg
-    logmsg ping_test
-
-    PING_DESTINATION=$1
-
-    logmsg
-    logmsg "Pinging your IMAGESERVER: $PING_DESTINATION"
-
-
-    # Ping test code submitted by Grant Noruschat <grant@eigen.ee.ualberta.ca>
-    # modified slightly by Brian Finley.
-    PING_COUNT=1
-    PING_EXIT_STATUS=1
-    while [ "$PING_EXIT_STATUS" != "0" ]
-    do
-
-        logmsg "PING ATTEMPT $PING_COUNT: "
-        ping -c 1 $PING_DESTINATION || shellout
-        PING_EXIT_STATUS=$?
-
-        if [ "$PING_EXIT_STATUS" = "0" ]; then
-            logmsg
-            logmsg "  We have connectivity to your IMAGESERVER!"
-        fi
-
-        PING_COUNT=$(( $PING_COUNT + 1 ))
-        if [ "$PING_COUNT" = "4" ]; then
-                return
-        fi
-
-    done
-
-    unset PING_DESTINATION
-    unset HOST_TYPE
-
+ping_test() {                                                                              
+                                                                                           
+    PING_DESTINATION=$1                                                                    
+                                                                                           
+    PING_RESULT=1                                                                          
+                                                                                           
+    p_comment 10 "trying to ping your imagserver, ${PING_DESTINATION}"                     
+                                                                                           
+    # Ping test code submitted by Grant Noruschat <grant@eigen.ee.ualberta.ca>             
+    # modified slightly by Brian Finley.                                                   
+    PING_COUNT=1                                                                           
+    PING_EXIT_STATUS=1                                                                     
+    while [ $PING_EXIT_STATUS -ge 0 ]                                                      
+    do                                                                                     
+                                                                                           
+        p_comment 10 "ping attempt ${PING_COUNT}"                                          
+        ping -c 1 $PING_DESTINATION > /dev/null 2>&1                                       
+        PING_EXIT_STATUS=$?                                                                
+                                                                                           
+        if [ "$PING_EXIT_STATUS" = "0" ]                                                   
+        then                                                                               
+                p_comment 10 "we have connectivity to your IMAGESERVER!"                                       
+                PING_RESULT=0                                                              
+                break                                                                      
+        fi                                                                                 
+                                                                                           
+        PING_COUNT=$(( $PING_COUNT + 1 ))                                                  
+        if [ "$PING_COUNT" = "4" ]                                                         
+        then                                                                               
+                return                                                                     
+        fi                                                                                 
+                                                                                           
+    done                                                                                   
+                                                                                               
 }
 
 ###############################################################################
 #
-# Usage: start_udhpc_for device
+# Usage: dhpc device
 #
 ## SALI this method has been added to enable networking for a specific interface
 #
-start_udhcpc_for(){
-        logmsg "udhcpc -i $1"
-        udhcpc -i $1 -n -t 12
-
-	## Default return CODE
-	#
-        UDHCPRSLT=1
-
-        if [ -s /tmp/udhcpc ]; then
-                . /tmp/udhcpc || shellout
-
-		if [ $IPADDR ]
-		then
-			if [ -z "$IMAGESERVER" ]
-			then
-				if [ -z "$SALIIMAGESRV" ]
-				then
-					logmsg "Unable to find a IMAGESERVER"
-					shellout
-				else
-					IMAGESERVER=$SALIIMAGESRV
-				fi
-			fi
-
-	                ping_test $IMAGESERVER
-
-			case $PING_EXIT_STATUS in
-				0)
-        	                	UDHCPRSLT=0
-				;;
-			esac
-		fi
-        fi
+dhcp(){                                                                                    
+                                                                                           
+        DHCP_RESULT=1                                                                                    
+                                                                                           
+        p_comment 10 "starting udhcp on interface ${1}"                                    
+                                                                                           
+        if [ $VERBOSELEVEL -ge "256" ]                                                     
+        then                                                                               
+                udhcpc -i $1 -n -t 12                                                      
+        else                                                                               
+                udhcpc -i $1 -n -t 12 > /dev/null 2>&1                                     
+        fi                                                                                 
+                                                                                           
+        if [ -s /tmp/udhcpc ]                                                              
+        then                                                                               
+                . /tmp/udhcpc                                                              
+                                                                                           
+                if [ -n "${IPADDR}" ]                                                      
+                then                                                                       
+                        if [ -z "${IMAGESERVER}" ]                                         
+                        then                                                               
+                                if [ -n "${SALIIMAGESRV}" ]                                
+                                then                                                       
+                                        IMAGESERVER=$SALIIMAGESRV                          
+                                else                                                       
+                                        p_comment 10 "the imageserver could not be located"
+                                        echo 1                                                                 
+                                        return                                             
+                                fi                                                         
+                        fi                                                                 
+                                                                                           
+                        ping_test $IMAGESERVER                                             
+                                                                                           
+                        if [ $PING_RESULT -eq 0 ]                                          
+                        then                                                               
+                                DHCP_RESULT=0                                              
+                        fi                                                                 
+                                                                                               
+                fi                                                                             
+        fi                                                                                     
+                                                                                               
 }
 
 #################################################################################
 #
-# Usage: start_udhcp_guess
+# Usage: dhcp_guess
 #
 ## SALI This method uses the /sys/class/net to determine wich interfaces are
 ## available on the current machine. This function stops until an interface
 ## is able to connect with the imageserver.
-start_udhcpc_guess(){
-
-        UDHCPGRSLT=1
-
-        for NIC in $(ls -1 /sys/class/net/)
-        do
-                if [ "$NIC" != "lo" ]; then
-                        logmsg "start_udhcpc_for $NIC"
-                        start_udhcpc_for $NIC
-
-                        if [ "$UDHCPRSLT" != "0" ]; then
-                                logmsg
-                                logmsg "Ip could not be set for $NIC"
-                                UDHCPGRSLT=1
-                        else
-                                UDHCPGRSLT=0
-                                DEVICE=$NIC
-                                break
-                        fi
-                fi
-        done
-
-}
-
-#
-################################################################################
-#
-#   Configure network interface using local.cfg settings if possible, else
-#   use DHCP. -BEF-
-#
-## SALI Some modification to use the udhcpc setup
-start_network() {
-
-    logmsg
-    logmsg start_network
-    if [ ! -z $IPADDR ]; then
-
-        # configure interface and add default gateway
-        ifconfig $DEVICE $IPADDR  netmask $NETMASK  broadcast $BROADCAST
-        if [ $? != 0 ]; then
-            logmsg
-            logmsg "I couldn't configure the network interface using your pre-boot settings:"
-            logmsg "  DEVICE:     $DEVICE"
-            logmsg "  IPADDR:     $IPADDR"
-            logmsg "  NETMASK:    $NETMASK"
-            logmsg "  BROADCAST:  $BROADCAST"
-            logmsg
-            shellout
-        fi
-
-        if [ ! -z $GATEWAY ]; then
-            route add default gw $GATEWAY
-            if [ $? != 0 ]; then
-                logmsg
-                logmsg "The command \"route add default gw $GATEWAY\" failed."
-                logmsg "Check your pre-boot network settings."
-                logmsg
-                shellout
-            fi
-        fi
-
-    else
-
-        ### try dhcp ###
-        logmsg "IP Address not set with pre-boot settings."
-
-        ### BEGIN ether sleep ###
-        # Give the switch time to start passing packets.  Some switches won't
-        # forward packets until 30 seconds or so after an interface comes up.
-        # This means the dhcp server won't even get the request for 30 seconds.
-        # Many ethernet cards aren't considered "up" by the switch until the
-        # driver is loaded.  Because the driver is compiled directly into the
-        # kernel here, the driver is definitely loaded at this point.
-        #
-        # Default is 0.  The recommended setting of ETHER_SLEEP=35 can be set
-        # with a local.cfg file. -BEF-
-        #
-        [ -z $ETHER_SLEEP ] && ETHER_SLEEP=0
-        logmsg
-        logmsg "sleep $ETHER_SLEEP:  This is to give your switch (if you're using one) time to"
-        logmsg "           recognize your ethernet card before we try the network."
-        logmsg "           Tip: You can use <ctrl>+<c> to pass the time (pun intended)."
-        logmsg
-        count_loop $ETHER_SLEEP
-        logmsg
-        ### END ether sleep ###
-
-        if [ ! -z $DEVICE ]; then
-                logmsg
-                logmsg "Param DEVICE specified, using $DEVICE"
-                start_udhcpc_for $DEVICE
-
-                if [ "$UDHCPRSLT" != "0" ]; then
-                   logmsg
-                   logmsg "Ip could not be set, guessing interface!"
-                   start_udhcpc_guess
-                else
-                   UDHCPGRSLT=0
-                fi
-
-        else
-                logmsg
-                logmsg "Param DEVICE not set, guesing interface"
-                start_udhcpc_guess
-        fi
-
-	if [ "$UDHCPGRSLT" != "0" ]; then
-                logmsg
-                logmsg "DHCP configuration failed"
-                logmsg
-                shellout
-        fi
-
-    fi
-
+dhcp_guess(){                                                                              
+                                                                                           
+        NICS=$(ls -1 /sys/class/net | grep -v lo)                                          
+                                                                                           
+        p_comment 0 "choosing one of the following interfaces: $( echo $NICS)"                      
+                                                                                           
+        DHCPG_RESULT=1                                                                           
+                                                                                           
+        for NIC in $NICS                                                                   
+        do                                                                                 
+                p_comment 10 "starting dhcp for interface ${NIC}"                          
+                dhcp $NIC                                                                  
+                                                                                           
+                if [ $DHCP_RESULT -eq 0 ]                                                  
+                then                                                                       
+                        p_comment 10 "succesfull configuration for interface ${NIC}"                           
+                        DHCPG_RESULT=0                                                           
+                        DEVICE=$NIC                                                        
+                        break                                                              
+                fi                                                                         
+        done                                                                               
 }
 
 #

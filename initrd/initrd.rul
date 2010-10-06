@@ -207,6 +207,8 @@ endif
 
 	install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 
+	install -m 755 $(TOPDIR)/VERSION $(INITRD_BUILD_DIR)/etc/sali_version
+
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
 
 	cp -r /lib/terminfo $(INITRD_BUILD_DIR)/etc/terminfo

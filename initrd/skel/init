@@ -1,11 +1,5 @@
 #!/bin/sh
 
-echo ""
-echo "####"
-echo "## Welcome to SALI"
-echo "####"
-echo ""
-
 make_extra_nodes() {
   [ -e /etc/udev/links.conf ] || return 0
   grep '^[^#]' /etc/udev/links.conf | \
@@ -59,10 +53,8 @@ for i in $(cat /proc/cmdline); do
     esac
 done
 
-echo ""
-echo "####"
-echo "## Preparing installation environment"
-echo "####"
-echo ""
+dmesg -n 6
+
+touch /tmp/si_monitor.log
 
 exec $init

@@ -10,19 +10,20 @@ fs_on_tmpfs(){
 # Usage: log a message, redirects to console / syslog depending on usage
 logmsg() {
     # log to console
-    echo $@
+    # echo $@
     # log to temporary file (which will go away when we reboot)
     # this is good for envs that have bad consoles
-    local FILE=/tmp/si.log
-    if fs_on_tmpfs / ; then
-        echo $@ >> $FILE || shellout
-    fi
+    # local FILE=/tmp/si.log
+    # if fs_on_tmpfs / ; then
+    #    echo $@ >> $FILE || shellout
+    # fi
 
     # if syslog is running, log to it.  In order to avoid hangs we have to
     # add the "logger: " part in case $@ is ""
-    if [ ! -z $USELOGGER ] ;
-        then logger "logger: $@"
-    fi
+    #if [ ! -z $USELOGGER ] ;
+    #    then logger "logger: $@"
+    #fi
+    logger "logger: $@"
 }
 
 #
@@ -32,8 +33,6 @@ logmsg() {
 #
 # Usage: get_arch; echo $ARCH
 get_arch() {
-    logmsg
-    logmsg get_arch
     ARCH=`uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/`
 }
 
@@ -46,8 +45,6 @@ get_arch() {
 #  after proc is mounted.
 #
 adjust_arch() {
-    logmsg
-    logmsg adjust_arch
     if [ "ppc64" = "$ARCH" ] ; then
         # This takes a little bit of futzing with due to all the PPC platforms that exist.
         if [ -d /proc/iSeries ] ; then
@@ -68,11 +65,7 @@ adjust_arch() {
 # Usage: write_variables
 write_variables() {
 
-    logmsg
-    logmsg write_variables
-
-    if fs_on_tmpfs / ; then
-        # pass all variables set here on to the hostname.sh script
+	# pass all variables set here on to the hostname.sh script
         rm -f /tmp/variables.txt
 
         echo "HOSTNAME=$HOSTNAME"                       >> /tmp/variables.txt || shellout
@@ -112,7 +105,8 @@ write_variables() {
 
         echo "GROUPNAMES=\"$GROUPNAMES\""               >> /tmp/variables.txt
         echo "GROUP_OVERRIDES=\"$GROUP_OVERRIDES\""     >> /tmp/variables.txt
-    fi
+
+	echo "VERBOSELEVEL=\"$VERBOSELEVEL\"" 		>> /tmp/variables.txt
 }
 
 #
@@ -190,9 +184,6 @@ count_loop() {
 # read in varibles obtained from kernel appends
 #
 read_kernel_append_parameters() {
-    logmsg
-    logmsg read_kernel_append_parameters
-
     . /tmp/kernel_append_parameter_variables.txt
 }
 #
@@ -201,8 +192,6 @@ read_kernel_append_parameters() {
 # Variable-ize /proc/cmdline arguments
 #
 variableize_kernel_append_parameters() {
-    logmsg
-    logmsg variableize_kernel_append_parameters
     cat /proc/cmdline | tr ' ' '\n' | grep '=' > /tmp/kernel_append_parameter_variables.txt
 }
 
