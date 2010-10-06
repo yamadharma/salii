@@ -80,11 +80,11 @@ if [ -z "${HOSTNAME}" ]
 then
 	if [ -e "/scripts/hosts" ]
 	then
-		HOSTNAME=$(cat /scripts/hosts | grep "$IPADDR" | awk '{print $2}' | tail -n 1 
+		HOSTNAME=$(cat /scripts/hosts | grep "$IPADDR" | awk '{print $2}' | tail -n 1) 
 	fi
 fi
 
 if [ -z "${HOSTNAME}" ]
 then
-	    HOSTNAME=$(nslookup $IPADDR | grep "^Address 1: ${IPADDR}" | awk '{print $4}'
+	    HOSTNAME=$(nslookup $IPADDR | grep "^Address 1: ${IPADDR}" | awk '{print $4}')
 fi
