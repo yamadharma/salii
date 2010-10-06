@@ -1,0 +1,10 @@
+
+p_stage "Retrieving installation data"
+
+p_service "Retrieving scripts directory"
+rsync -a ${IMAGESERVER}::scripts/ /scripts/
+
+if [ "x${PROTOCOL}" == "xbittorrent" -o "x${PROTOCOL}" == "xmetafile" ]
+then
+	rsync -a ${IMAGESERVER}::torrents/ /torrents/
+fi

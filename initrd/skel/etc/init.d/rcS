@@ -34,19 +34,6 @@
 #   main
 #
 {
-if [ ! -z $MONITOR_SERVER ]; then
-    init_monitor_server
-fi
-
-start_syslogd
-
-tmpfs_watcher
-
-if [ "x$SSHD" = "xy" ]; then
-    logmsg
-    logmsg start_sshd
-    start_sshd
-fi
 
 if [ ! -z $SSH_DOWNLOAD_URL ]; then
     SSH=y
@@ -61,24 +48,6 @@ logmsg "$PROTOCOL"
 if [ "x$PROTOCOL" = "x" ]
 then
 	old_getimage
-fi
-
-logmsg "$PROTOCOL"
-get_torrents_directory
-get_scripts_directory
-
-# HOSTNAME may already be set via local.cfg -BEF-
-if [ -z $HOSTNAME ]; then
-    get_hostname_by_hosts_file
-fi
-
-if [ -z $HOSTNAME ]; then
-    get_hostname_by_dns
-fi
-
-if [ ! -z $HOSTNAME ]; then
-    logmsg
-    logmsg "This hosts name is: $HOSTNAME"
 fi
 
 run_pre_install_scripts

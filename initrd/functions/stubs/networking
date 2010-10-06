@@ -1,14 +1,4 @@
 
-#
-################################################################################
-#
-# Configure loopback interface (may as well)
-ifconfig_loopback() {
-    logmsg
-    logmsg ifconfig_loopback
-    ifconfig lo 127.0.0.1
-}
-
 ################################################################################
 #
 # Usage: ping_test destination
@@ -130,69 +120,10 @@ dhcp_guess(){
         done                                                                               
 }
 
-#
-################################################################################
-#
-get_hostname_by_hosts_file() {
-
-    logmsg
-    logmsg get_hostname_by_hosts_file
-
-    #
-    # Look in $FILE for that magic joy.
-    #
-    FILE=${SCRIPTS_DIR}/hosts
-    if [ -e $FILE ]; then
-
-        logmsg "Hosts file exists..."
-
-        # add escape characters to IPADDR so that it can be used to find HOSTNAME below
-        IPADDR_ESCAPED=`echo "$IPADDR" | sed -e 's/\./\\\./g'`
-
-        # get HOSTNAME by parsing hosts file
-        logmsg "Searching for this machine's hostname in $FILE by IP: $IPADDR"
-
-        # Command summary by line:
-        # 1: convert tabs to spaces -- contains a literal tab: <ctrl>+<v> then <tab>
-        # 2: remove comments
-        # 3: add a space at the beginning of every line
-        # 4: get line with IP address (no more no less)
-        # 5: strip out ip address
-        # 6: strip out space(s) before first hostname on line
-        # 7: remove any aliases on line
-        # 8: remove domain name, leaving naught but the hostname, naked as the day it were born
-
-        HOSTNAME=`
-            sed 's/[[:space:]]/ /g' $FILE | \
-            grep -v '^ *#' | \
-            sed 's/^/ /' | \
-            grep " $IPADDR_ESCAPED " | \
-            sed 's/ [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*//' | \
-            sed 's/ *//' | \
-            sed 's/ .*//' | \
-            sed 's/\..*$//g'
-        `
-    else
-        logmsg "No hosts file."
-    fi
-}
-
-#
-################################################################################
-#
-get_hostname_by_dns() {
-
-    logmsg
-    logmsg get_hostname_by_dns
-
-    # Get base hostname.  For example, www7.domain.com will become www7. -BEF-
-    HOSTNAME=`nslookup $IPADDR | sed -ne "s/^Address 1:[[:space:]]\+$IPADDR[[:space:]]\+\([^\.]\+\).*$/\1/p"`
-}
-#
 ################################################################################
 #
 get_base_hostname() {
-    BASE_HOSTNAME=$(echo $HOSTNAME | sed "s/[.0-9].*$//")
+	BASE_HOSTNAME=$(echo $HOSTNAME | sed "s/[.0-9].*$//")
 } #
 
 ################################################################################
