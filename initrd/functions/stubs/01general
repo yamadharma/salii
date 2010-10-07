@@ -4,21 +4,8 @@
 #
 # Usage: log a message, redirects to console / syslog depending on usage
 logmsg() {
-    # log to console
-    # echo $@
-    # log to temporary file (which will go away when we reboot)
-    # this is good for envs that have bad consoles
-    # local FILE=/tmp/si.log
-    # if fs_on_tmpfs / ; then
-    #    echo $@ >> $FILE || shellout
-    # fi
-
-    # if syslog is running, log to it.  In order to avoid hangs we have to
-    # add the "logger: " part in case $@ is ""
-    #if [ ! -z $USELOGGER ] ;
-    #    then logger "logger: $@"
-    #fi
-    logger "logger: $@"
+	echo "$@"
+	echo "$@" >> /log/monitor.log
 }
 
 #
@@ -64,7 +51,6 @@ write_variables() {
         echo "DEVICE=$DEVICE"                           >> /tmp/variables.txt
         echo "IPADDR=$IPADDR"                           >> /tmp/variables.txt
         echo "NETMASK=$NETMASK"                         >> /tmp/variables.txt
-        echo "NETWORK=$NETWORK"                         >> /tmp/variables.txt
         echo "BROADCAST=$BROADCAST"                     >> /tmp/variables.txt
         echo "GATEWAY=$GATEWAY"                         >> /tmp/variables.txt
         echo "GATEWAYDEV=$GATEWAYDEV"                   >> /tmp/variables.txt
@@ -107,34 +93,19 @@ write_variables() {
 #   Usage: $COMMAND || shellout
 #
 shellout() {
-    COUNT="$RETRY"
-    logmsg "Killing off running processes."
-    kill -9 $TMPFS_WATCHER_PID  >/dev/null 2>/dev/null
-    killall -9 udp-receiver rsync  >/dev/null 2>/dev/null
-    write_variables
-    cat /etc/si_error
-    if [ ! -z $USELOGGER ] ;
-        then cat /etc/si_error | logger
-    fi
-    if [ ! -z $MONITOR_SERVER ]; then
-        logmsg "Installation failed!! Stopping report task."
-        stop_report_task -1 kill
-    fi
-    exec sh > /dev/console 2>&1
-}
+	p_service "An error has occured, killing off running processes."
 
-##
-# This function has been added to open a console without any errors
-shellopen() {
-        logmsg
-        logmsg "Starting console..."
-        
+	killall -9 udp-receiver rsync  >/dev/null 2>/dev/null
+	write_variables
+
+	cat /etc/si_error
+
 	if [ ! -z $MONITOR_SERVER ]; then
-                logmsg "Starting console, stopping monitoring"
-                stop_report_task -1 kill
-        fi
-	
-	exit 0
+		p_comment 0 "installation failed!! stopping report task."
+		stop_report_task -1
+	fi
+
+	exec cttyhack /bin/login -f root
 }
 
 #

@@ -1,0 +1,13 @@
+
+p_stage "Final preparations"
+
+p_service "Loaded modules"
+for module in $(cat /proc/modules | awk '{print $1}')
+do
+	p_comment 0 "${module}"
+done
+
+p_service "Checking for SystsemImager specific things"
+p_comment 0 "\$PROTOCOL variable"
+p_comment 0 "Check for master script"
+p_comment 0 "Check for SCRIPTNAME, OVERRIDE, IMAGENAME"

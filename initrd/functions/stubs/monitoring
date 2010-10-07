@@ -65,27 +65,6 @@ send_monitor_msg() {
 #
 ################################################################################
 #
-#   Initialize the monitor server
-#
-
-init_monitor_server() {
-    # Send initialization status.
-    send_monitor_msg "status=0:first_timestamp=on:speed=0"
-    logmsg "Monitoring initialized."
-    # Start client log gathering server: for each connection
-    # to the local client on port 8181 the full log is sent
-    # to the requestor. -AR-
-    if [ "x$MONITOR_CONSOLE" = "xy" ]; then
-        MONITOR_CONSOLE=yes
-    fi
-    if [ "x$MONITOR_CONSOLE" = "xyes" ]; then
-        while :; do nc -p 8181 -l < /tmp/si_monitor.log; done &
-    fi
-}
-
-#
-################################################################################
-#
 #   Report installation status to the monitor server
 #
 

@@ -1,8 +1,4 @@
 #!/bin/sh
-# Currently, we only dispatch according to command.  However, a more
-# elaborate system might dispatch by command and interface or do some
-# common initialization first, especially if more dhcp event notifications
-# are added.
 
 DHCPVARFILE=/tmp/udhcpc
 
@@ -12,5 +8,3 @@ echo "HOSTNAME=$hostname" >> $DHCPVARFILE
 echo "NETMASK=$subnet" >> $DHCPVARFILE
 echo "BROADCAST=$broadcast" >> $DHCPVARFILE
 echo "DOMAINNAME=$domain" >> $DHCPVARFILE
-
-exec /etc/udhcpc/default.$1

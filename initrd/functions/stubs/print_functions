@@ -1,35 +1,82 @@
 
+p_log(){
+	printf "$1" >> /log/monitor.log
+}
+
+p_whitespace(){
+	AMOUNT=$1
+
+	LINE=""
+
+	for i in $( seq $AMOUNT )
+	do
+		LINE="${LINE} "
+	done
+
+	echo "${LINE}"
+}
+
+p_section(){
+	COLS=$(stty size | awk '{print $2}')
+	COLS=$(( $COLS - 2 ))
+
+	if [ -n "${1}" ]
+	then
+		LENGTH=$(echo "${1}" | wc -L)
+		COLS=$(( $COLS - $LENGTH ))
+
+		if [ $COLS -ge $LENGTH ]
+		then
+			LEFT=$(( $COLS / 2 ))
+			RIGHT=$(( $COLS - $LEFT ))
+
+			LINE="[$(p_whitespace $LEFT)${1}$(p_whitespace $RIGHT)]\n"
+		else
+			LINE="[ ${1} ]\n"
+		fi
+	fi
+
+	p_log "${LINE}"
+	printf "${LINE}"
+}
+
 p_header(){
-	printf "\n[ Welcome to SALI $(cat /etc/sali_version) ]\n"
-	printf "[     https://subtrac.sara.nl/oss/sali     ]\n"
+	printf "\n"
+	p_section "Welcome to SALI $(cat /etc/sali_version)"
+	p_section "https://subtrac.sara.nl/oss/sali"
 }
 
 p_separator(){
 	COLS=$(/bin/stty size | awk '{print $2}')
 
-	printf "\n"
+	LINE="\n"
 
-	for col in $(seq $COLS)
+	for col in $(seq 0 $COLS)
 	do
 		if [ $col -eq $COLS ]
 		then
-			printf "\n"
+			LINE="${LINE}\n\n"
 		else
-			printf "-"
+			LINE="${LINE}-"
 		fi
 	done
-}
 
-p_section(){
-	printf "\n[ ${1} ]\n"
+	p_log "${LINE}"
+	printf "${LINE}"
 }
 
 p_stage(){
-	printf "\n> ${1}\n"
+	LINE="\n> ${1}\n"
+
+	p_log "${LINE}"
+	printf "${LINE}"
 }
 
 p_service(){
-	printf "  :: $1\n"
+	LINE="  :: $1\n"
+
+	p_log "${LINE}"
+	printf "${LINE}"
 }
 
 p_comment(){
@@ -37,6 +84,9 @@ p_comment(){
 
 	if [ $VERBOSELEVEL -ge $LEVEL ]
 	then
-		printf "     .$2\n"
+		LINE="     .$2\n"
+
+		p_log "${LINE}"
+		printf "${LINE}"
 	fi
 }

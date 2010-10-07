@@ -1,0 +1,31 @@
+p_stage "Starting logging/monitor facilities"
+
+p_service "Starting syslogd"
+
+if [ -n "${LOG_SERVER}" ]
+then
+	p_comment 0 "starting remote syslogging"
+	/sbin/syslogd -R "${LOG_SERVER}":"${LOG_SERVER_PORT}" -O /log/monitor.log -L -S
+else
+	p_comment 0 "starting syslogging to file"
+	/sbin/syslogd -O /log/monitor.log -S
+fi
+
+p_service "Starting klogd for kernel messages"
+/sbin/klogd -c 2
+
+if [ -n "${MONITOR_SERVER}" ]
+then
+	p_service "Starting monitoring to your monitorserver ( ${MONITOR_SERVER} )"
+	send_monitor_msg "status=0:first_timestamp=on:speed=0"
+
+	# Start client log gathering server: for each connection
+	# to the local client on port 8181 the full log is sent
+	# to the requestor. -AR-
+	if [ "x$MONITOR_CONSOLE" = "xyes" -o "x$MONITOR_CONSOLE" = "xy" ]; then
+		MONITOR_CONSOLE=yes
+		while :; do nc -p 8181 -l < /log/monitor.log; done &
+	fi
+
+	p_comment 0 "monitoring initialized"
+fi

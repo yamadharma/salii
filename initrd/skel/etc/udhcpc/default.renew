@@ -50,3 +50,4 @@ else
 	echo -n "$R" > "$RESOLV_CONF"
 fi
 
+exec /etc/udhcpc/savevars
