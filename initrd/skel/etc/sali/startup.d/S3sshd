@@ -22,5 +22,8 @@ then
 	if [ "$?" != 0 ]
 	then
 		p_service "failed to start sshd"
+		return 1
 	fi
 fi
+
+return 0

@@ -29,3 +29,5 @@ then
 
 	p_comment 0 "monitoring initialized"
 fi
+
+return 0

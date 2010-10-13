@@ -24,5 +24,12 @@ get_arch
 for file in $(ls -1 /etc/sali/startup.d/)
 do
 	. "/etc/sali/startup.d/${file}"
+
+	if [ $? != 0 ]
+	then
+		p_stage "An error has occurred in stage ${file}"
+		open_console
+	fi
+
 	write_variables
 done

@@ -21,6 +21,7 @@ then
 		p_comment 10 "  ipaddr   : ${IPADDR}" 
 		p_comment 10 "  netmask  : ${NETMASK}" 
 		p_comment 10 "  broadcast: ${BROADCAST}" 
+		return 1
 	fi
 
 	if [ -n "${GATEWAY}" ]
@@ -30,6 +31,7 @@ then
 		if [ $? != 0 ]
 		then
 			p_comment 10 "could not set given gateway"
+			return 1
 		fi
 	fi
 else
@@ -72,7 +74,7 @@ else
 		p_comment 0 "network device ${DEVICE} with ip ${IPADDR} is configured"
 	else
 		p_comment 10 "DHCP configuration failed"
-		shellout
+		return 1
 	fi
 fi
 
@@ -88,3 +90,5 @@ if [ -z "${HOSTNAME}" ]
 then
 	    HOSTNAME=$(nslookup $IPADDR | grep "^Address 1: ${IPADDR}" | awk '{print $4}')
 fi
+
+return 0

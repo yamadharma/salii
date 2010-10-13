@@ -114,3 +114,8 @@ shutdown() {
 
 }
 
+open_console(){
+	printf "\nOpening console...\n"
+	printf "\n"
+	exec cttyhack /bin/login -f root 
+}
