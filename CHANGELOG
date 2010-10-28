@@ -3,6 +3,9 @@
 
   * Fixed the disk_enumerate function to sort the disk the correct way. See tickets #13 and #14
 
+  * Updated kernel to 2.6.36
+    * Fixes a uevent between lvm and udev to load module dm_mod
+
 1.3.5
   * The init script has been modernised and does not include the /etc/init.d/functions
     file anymore. Also udev has been adjusted to run from the init. Also the startup of
