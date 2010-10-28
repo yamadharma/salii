@@ -50,28 +50,74 @@ find_all_disks(){
 
 }
 
+sort_disks(){
+    DISKORDER=$1
+    DISKS=$2
+
+    # This variables is used to store the founded disks
+        FDISKS=""
+        # Determine what kind of a grep must be done
+        CONTROLLER=false
+
+    for disk in $DISKORDER
+    do   
+        ## Here we make sure we only have the disk name
+        DISKNAME=$(basename $disk)
+     
+        ## If the length of the diskname is 2 then it is a controller
+        ##  ie. sd or c0
+        if [ $(length $DISKNAME) -eq 2 ]
+        then 
+            CONTROLLER=true
+        fi   
+    
+        ## Walk through the given diskorder 
+        for odisk in $(echo $2 | tr " " "\n" | awk '{ print length(), $1 | "sort" }' | awk '{print $2}')
+        do   
+            ## Check if we already found the current disk
+            DONE=$(echo $FDISKS | grep -w "${odisk}")
+     
+            ## If variable DONE is empty go futher, else continue the loop
+            if [ -z "${DONE}" ]
+            then 
+                ## If it is a controller the grep not on the whole word
+                if [ "x${CONTROLLER}" == "xtrue" ]
+                then 
+                    found=$(echo $odisk | grep $disk)
+                    if [ -n "${found}" ]
+                    then 
+                        FDISKS="${odisk} ${FDISKS}"
+                        echo "${odisk}"
+                    fi   
+                else 
+                    found=$(echo $odisk | grep -w $disk)
+                    if [ -n "${found}" ]
+                    then 
+                        FDISKS="${odisk} ${FDISKS}"
+                        echo "${odisk}"
+                    fi   
+                fi   
+            fi   
+        done 
+    done 
+    
+}
+
 disk_enumerate(){
-	##  To support the following syntax's
-	#    - A=",a,b,,c" --> A="a b c"
-	#
-	ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
+    ##  To support the following syntax's
+    #    - A=",a,b,,c" --> A="a b c"
+    #
+    ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
 
-	ALLDISKS=$(find_all_disks)
-	NUMDISKS=-1
+    ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks)")
+    NUMDISKS=-1
 
-	for order in $ORDER
-	do
-		for disk in $ALLDISKS
-		do
-			found=$(echo $disk | grep $order)
-			if [ $found ]
-			then
-				echo "A disk found: $disk"
-				NUMDISKS=$(( $NUMDISKS + 1 ))
-				eval "DISK$NUMDISKS=/dev/$disk"
-			fi
-		done
-	done
+    for disk in $ALLDISKS
+    do
+        echo "A disk found: $disk"
+        NUMDISKS=$(( $NUMDISKS + 1 ))
+        eval "DISK$NUMDISKS=/dev/$disk"
+    done
 }
 
 ## Sets the disklabel for a specified disk
