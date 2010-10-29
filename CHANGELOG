@@ -2,15 +2,21 @@
   * A complete rewrite of the rcS script
      * The rcS script has been replaced by /etc/sali/bin/startup and
        /etc/sali/bin/install
+    Author: Dennis Stam
 
   * The init script has been changed so it will not include /etc/init.d/functions file. So when
     you have a syntax error in the /etc/init.d/functions the kernel will not panic.
-
-  * Enabled option shells/cttyhack in busybox
+    Author: Dennis Stam
 
   * Fixed the disk_enumerate function to sort the disk the correct way. See tickets #13 and #14
+    Author: Dennis Stam and Bas van der Vlies
 
-  * Updated kernel to 2.6.36
+  * busybox settings:
+    * added cttyhack
+
+  * update aria 1.10.5
+  * update busybox 1.17.3
+  * update kernel 2.6.36
     * Fixes a uevent between lvm and udev to load module dm_mod
 
 1.3.5
@@ -47,7 +53,7 @@
     now be copied to the directory with the arch name.
     Author: Dennis Stam
 
-  * busybos settings:
+  * busybox settings:
       - changed history size to 100 lines instead of 15 lines 
       - changed max chars for input to 4096 instead of 1024
       - added getty and login
