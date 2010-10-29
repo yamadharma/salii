@@ -11,6 +11,6 @@ echo "IPADDR=$ip" >> $DHCPVARFILE
 echo "HOSTNAME=$hostname" >> $DHCPVARFILE
 echo "NETMASK=$subnet" >> $DHCPVARFILE
 echo "BROADCAST=$broadcast" >> $DHCPVARFILE
-echo "DOMAINNAME=$domain" >> $DHCPVARFILE
+echo "DOMAINNAME=$(hostname -d)" >> $DHCPVARFILE
 
 exec /etc/udhcpc/default.$1

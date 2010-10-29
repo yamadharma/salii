@@ -28,8 +28,11 @@ then
 	return 1
 fi
 
-p_comment 0 "\$PROTOCOL variable"
-p_comment 0 "Check for master script"
-p_comment 0 "Check for SCRIPTNAME, OVERRIDE, IMAGENAME"
+
+if [ -z "${PROTOCOL}" ]
+then
+	p_comment 0 "\$PROTOCOL variable is not set, using deprecated installation method!"
+	old_getimage
+fi
 
 return 0

@@ -1,0 +1,8 @@
+
+p_stage "Installing image ( using the old method )"
+
+choose_autoinstall_script
+
+write_variables
+
+run_autoinstall_script

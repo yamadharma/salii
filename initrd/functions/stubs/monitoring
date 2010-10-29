@@ -69,77 +69,80 @@ send_monitor_msg() {
 #
 
 start_report_task() {
+
+    logmsg "Start report task, currently disabled!"
+
     # Reporting interval (in sec).
-    REPORT_INTERVAL=10
+    #REPORT_INTERVAL=10
 
     # Evaluate image size.
-    logmsg "Evaluating image size..."
+    #logmsg "Evaluating image size..."
     
-    case "$PROTOCOL" in
-        "bittorrent")
-            if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent" ]; then
-                bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent"
-            elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent" ]; then
-                bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent"
-            else
-                logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
-                shellout
-            fi
-            IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
-        ;;
-        "metalink")
-            if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.metafile" ]; then
-                bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.metafile"
-            elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.metafile" ]; then
-                bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.metafile"
-            else
-                logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
-                shellout
-            fi
-            IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
-        ;;
-        "rsync")
-            IMAGESIZE=$(rsync -av --numeric-ids $IMAGESERVER::$IMAGENAME | grep "total size" | sed -e "s/total size is \([0-9]*\).*/\1/")
-        ;;
-    esac
+    #case "$PROTOCOL" in
+    #    "bittorrent")
+    #        if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent" ]; then
+    #            bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent"
+    #        elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent" ]; then
+    #            bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent"
+    #        else
+    #            logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
+    #            shellout
+    #        fi
+    #        IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
+    #    ;;
+    #    "metalink")
+    #        if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.metafile" ]; then
+    #            bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.metafile"
+    #        elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.metafile" ]; then
+    #            bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.metafile"
+    #        else
+    #            logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
+    #            shellout
+    #        fi
+    #        IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
+    #    ;;
+    #    "rsync")
+    #        IMAGESIZE=$(rsync -av --numeric-ids $IMAGESERVER::$IMAGENAME | grep "total size" | sed -e "s/total size is \([0-9]*\).*/\1/")
+    #    ;;
+    #esac
 
-    IMAGESIZE=$(( $IMAGESIZE / 1024 ))
-    logmsg "  --> Image size = $(( $IMAGESIZE / 1024 ))MiB"
+    #IMAGESIZE=$(( $IMAGESIZE / 1024 ))
+    #logmsg "  --> Image size = $(( $IMAGESIZE / 1024 ))MiB"
 
     # Evaluate disks size.
-    LIST=$(df 2>/dev/null | grep "/" | awk '{ print $4}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
-    AVAILDISKSIZE=$(( $LIST ))
+    #LIST=$(df 2>/dev/null | grep "/" | awk '{ print $4}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
+    #AVAILDISKSIZE=$(( $LIST ))
 
     # Spawn the report task -AR-
-    {
-    TOT=0; CURR_SIZE=0
-    while :; do
-    	LIST=$(df 2>/dev/null | grep "/" | awk '{ print $4}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
-        AVAILTOT=$(( $LIST ))
-
+    #{
+    #TOT=0; CURR_SIZE=0
+    #while :; do
+   # 	LIST=$(df 2>/dev/null | grep "/" | awk '{ print $4}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
+   #     AVAILTOT=$(( $LIST ))
+#
         # Evaluate bandwidth.
-        speed=`echo "scale=2; (($AVAILDISKSIZE - $AVAILTOT) - $CURR_SIZE) / $REPORT_INTERVAL" | bc`
-        speed=`echo "scale=2; if ($speed >= 0) { print $speed; } else { print 0; }" | bc`
+#        speed=`echo "scale=2; (($AVAILDISKSIZE - $AVAILTOT) - $CURR_SIZE) / $REPORT_INTERVAL" | bc`
+#        speed=`echo "scale=2; if ($speed >= 0) { print $speed; } else { print 0; }" | bc`
 
         # Evaluate status.
-        CURR_SIZE=$(($AVAILDISKSIZE - $AVAILTOT))
-        status=`echo "scale=2; $CURR_SIZE * 100 / $IMAGESIZE" | bc`
-        if [ `echo "scale=2; $status <= 0" | bc` -eq 1 ]; then
-            status=1
-        elif [ `echo "scale=2; $status >= 100" | bc` -eq 1 ]; then
-            status=99
-        fi
+#        CURR_SIZE=$(($AVAILDISKSIZE - $AVAILTOT))
+#        status=`echo "scale=2; $CURR_SIZE * 100 / $IMAGESIZE" | bc`
+#        if [ `echo "scale=2; $status <= 0" | bc` -eq 1 ]; then
+#            status=1
+#        elif [ `echo "scale=2; $status >= 100" | bc` -eq 1 ]; then
+#            status=99
+#        fi
 
         # Send status and bandwidth to the monitor server.
-        send_monitor_msg "status=$status:speed=$speed"
+#        send_monitor_msg "status=$status:speed=$speed"
 
         # Wait $REPORT_INTERVAL sec between each report -AR-
-        sleep $REPORT_INTERVAL
-    done
-    }&
+#        sleep $REPORT_INTERVAL
+#    done
+#    }&
 
-    logmsg "Report task started."
-    REPORT_PID=$!
+ #   logmsg "Report task started."
+ #   REPORT_PID=$!
 }
 
 #
