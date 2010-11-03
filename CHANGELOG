@@ -9,10 +9,17 @@
     Author: Dennis Stam
 
   * Fixed the disk_enumerate function to sort the disk the correct way. See tickets #13 and #14
+    Reported by: Juriaan Saathof
     Author: Dennis Stam and Bas van der Vlies
+
+  * All disk environmant variables are now exported so they can be used in the post install
+    scripts.
+    Reported by: Juriaan Saathof
+    Fixed by: Bas van der Vlies
 
   * busybox settings:
     * added cttyhack
+    Author: Dennis Stam
 
   * update aria 1.10.5
   * update busybox 1.17.3

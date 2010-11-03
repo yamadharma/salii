@@ -116,7 +116,7 @@ disk_enumerate(){
     do
         echo "A disk found: $disk"
         NUMDISKS=$(( $NUMDISKS + 1 ))
-        eval "DISK$NUMDISKS=/dev/$disk"
+        eval "export DISK$NUMDISKS=/dev/$disk"
     done
 }
 
