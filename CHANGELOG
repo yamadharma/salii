@@ -21,8 +21,8 @@
     * added cttyhack
     Author: Dennis Stam
 
-  * update aria 1.10.5
-  * update busybox 1.17.3
+  * update aria 1.10.6
+  * update busybox 1.17.4
   * update kernel 2.6.36
     * Fixes a uevent between lvm and udev to load module dm_mod
 
