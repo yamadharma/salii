@@ -27,6 +27,7 @@
   * update aria 1.10.6
   * update busybox 1.17.4
   * update udev 164
+  * update curl 7,21.2 (security update)
   * update kernel 2.6.36.1
     * Fixes a uevent between lvm and udev to load module dm_mod
 

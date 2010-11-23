@@ -3,10 +3,11 @@
 #   vi: set filetype=make:
 #
 
-CURL_VERSION	= 7.21.1
-CURL_TARBALL	= curl-$(CURL_VERSION).tar.gz
+CURL_VERSION	= 7.21.2
+CURL_TARBALL	= curl-$(CURL_VERSION).tar.bz2
 
-CURL_URL 	= ftp://ftp.sara.nl/pub/sali/sources/curl-$(CURL_VERSION).tar.gz
+### download = http://curl.haxx.se/download.html 
+CURL_URL 	= ftp://ftp.sara.nl/pub/sali/sources/curl-$(CURL_VERSION).tar.bz2
 
 CURL_DIR	= $(INITRD_SRC_DIR)/curl-$(CURL_VERSION)
 
@@ -28,7 +29,7 @@ $(CURL_DIR).install:	$(CURL_DIR).build
 $(CURL_DIR).unpack:   	$(INITRD_DIR)/make.d/curl.rul	\
 			$(INITRD_SRC_DIR)/$(CURL_TARBALL)
 	rm -rf $(CURL_DIR)
-	cd $(INITRD_SRC_DIR) && tar -xvzf $(INITRD_SRC_DIR)/$(CURL_TARBALL)
+	cd $(INITRD_SRC_DIR) && tar -xjvf $(INITRD_SRC_DIR)/$(CURL_TARBALL)
 	touch $@
 
 $(INITRD_SRC_DIR)/$(CURL_TARBALL):

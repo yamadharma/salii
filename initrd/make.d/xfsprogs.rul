@@ -28,6 +28,7 @@ $(XFSPROGS_DIR).build:	$(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL)
 	chmod +x $(XFSPROGS_DIR)/configure
 	cd $(XFSPROGS_DIR) && ./configure --libdir=$(INITRD_BUILD_DIR)/lib/
 	$(MAKE) -j $(NCPUS) -C $(XFSPROGS_DIR)
+	touch $@
 
 $(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
@@ -36,6 +37,7 @@ $(INITRD_SRC_DIR)/$(XFSPROGS_TARBALL):
 PHONY += xfsprogs_clean
 xfsprogs_clean:
 	rm -rf $(XFSPROGS_DIR)
+	rm $(XFSPROGS_DIR).build $(XFSPROGS_DIR).unpack $(XFSPROGS_DIR).install
 
 else
 
