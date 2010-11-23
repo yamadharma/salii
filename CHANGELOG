@@ -22,10 +22,11 @@
     Author: Dennis Stam
 
   * update oppenssh 5.6p1
+  * update lvm 2.02.77
   * update xfsprogs 3.1.4
   * update aria 1.10.6
   * update busybox 1.17.4
-  * update kernel 2.6.36
+  * update kernel 2.6.36.1
     * Fixes a uevent between lvm and udev to load module dm_mod
 
 1.3.5
