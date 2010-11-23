@@ -3,7 +3,7 @@
 #    vi: set filetype=make:
 #   
 
-OPENSSH_VERSION         := 5.5p1
+OPENSSH_VERSION         := 5.6p1
 OPENSSH_DIR             := $(INITRD_SRC_DIR)/openssh-$(OPENSSH_VERSION)
 OPENSSH_TARBALL         := openssh-$(OPENSSH_VERSION).tar.gz
 OPENSSH_MD5SUM          := 88633408f4cb1eb11ec7e2ec58b519eb
