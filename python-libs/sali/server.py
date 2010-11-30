@@ -1,3 +1,8 @@
+# "SALI"
+#
+# Copyright (c) 2010 SARA Computing and Networking Services
+#
+#   $Id$
 
 # Must be imported first
 from __future__ import print_function
