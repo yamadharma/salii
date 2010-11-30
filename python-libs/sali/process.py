@@ -34,7 +34,7 @@ class Process( object ):
             self.amount += 1
             self.queue.put( task )
         else:
-            self.log.critical( 'given task is not a instance of Task' )
+            print( 'given task is not an instance of Task' )
             sys.exit( 1 )
 
     def _run( self, thread, task ):
