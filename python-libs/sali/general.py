@@ -75,16 +75,16 @@ class Config( SafeConfigParser ):
         except NoOptionError:
             return False
 
-        return True
+        return False
 
     def do_updateimages( self ):
         try:
-            if self.getboolean( 'update', 'enable_update' ):
+            if self.getboolean( 'update', 'enabled' ):
                 return True
         except NoOptionError:
             return False
 
-        return True
+        return False
 
     def do_monitor( self ):
         try:
@@ -93,7 +93,7 @@ class Config( SafeConfigParser ):
         except NoOptionError:
             return False
 
-        return True
+        return False
 
     def get_params( self, section, append='' ):
 

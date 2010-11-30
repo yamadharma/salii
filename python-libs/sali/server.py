@@ -425,7 +425,7 @@ class sali_server( general.Daemon ):
                 sys.exit( 1 )
 
         self.process = process.Process()
-    
+
         if self.cfg.do_tracker():
             ## Parsing the configuration to arguments.
             targs = self.cfg.get_params( 'tracker', append='--' )
