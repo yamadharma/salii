@@ -9,6 +9,7 @@ import Queue
 import threading
 import types
 import time
+import sys
 
 class Task( object ):
 

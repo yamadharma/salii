@@ -125,12 +125,12 @@ class Logging( object ):
 
         self.level = self.LEVELS[ level ]
 
-    def getLogger( self, name ):
+    def getLogger( self, name, cli=False ):
 
         logger = logging.getLogger( name )
         logger.setLevel( logging.DEBUG )
     
-        if not self.daemon:
+        if not self.daemon or cli:
             ch = logging.StreamHandler()
 
             if self.level == logging.DEBUG:
@@ -138,13 +138,17 @@ class Logging( object ):
             else:
                 ch.setLevel( logging.INFO )
 
-            ch.setFormatter( logging.Formatter( '%(name)-12s: %(levelname)-7s -- %(message)s' ) )
+            if cli:
+                ch.setFormatter( logging.Formatter( '%(message)s' ) )
+            else:
+                ch.setFormatter( logging.Formatter( '%(name)-12s: %(levelname)-7s -- %(message)s' ) )
             logger.addHandler( ch ) 
 
-        fh = logging.FileHandler( self.logfile )
-        fh.setLevel( self.level )
-        fh.setFormatter( logging.Formatter( '%(asctime)s - %(name)-12s - %(levelname)-7s - %(message)s' ) )
-        logger.addHandler( fh )
+        if not cli:
+            fh = logging.FileHandler( self.logfile )
+            fh.setLevel( self.level )
+            fh.setFormatter( logging.Formatter( '%(asctime)s - %(name)-12s - %(levelname)-7s - %(message)s' ) )
+            logger.addHandler( fh )
 
         return logger
 

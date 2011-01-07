@@ -1,0 +1,339 @@
+#!/usr/bin/env python
+#
+# "SALI"
+#
+# Copyright (c) 2010 SARA Computing and Networking Services
+#
+#   $Id$
+
+from __future__ import print_function
+import sys
+import argparse
+import os
+import re
+import subprocess
+import tempfile
+import atexit
+import datetime
+
+try:
+    from sali import general
+except ImportError:
+    sys.path.append( '../python-libs' )
+
+    from sali import general
+
+class ExitException( Exception ):
+    pass
+
+def ask( question, choices=list(), default=None, showlist=False ):
+
+    choices.sort()
+
+    if showlist or len( choices ) > 3:
+        for item in choices:
+            print( '%2d %s' % ( choices.index( item ) + 1, item ) )
+        str_question = '%s: ' % question
+    else:
+        str_question = '%s: %s' % ( question, ' '.join( choices ) )
+
+    if len( choices ) > 3 and not showlist:
+        e_default = '? for options'
+        str_question = '%s: ' % question
+    else:
+        e_default = ''
+
+    if default:
+        str_default = default
+    else:
+        str_default = ''
+
+    answer = raw_input( '%s [%s] ' % ( str_question, str_default ) )
+
+    if answer == '?':
+        if len( choices ) > 3:
+            return ask( question, choices, default, showlist=True )
+        else:
+            return ask( question, choices, default, showlist=False )
+    elif not answer and default:
+        return default
+    elif showlist and answer.isdigit() or len( choices ) > 3 and answer.isdigit():
+        return choices[ int( answer ) - 1 ]
+    elif not answer:
+        return choices( question, choices, default, showlist )
+        
+    return answer
+
+class ServerClient( object ):
+
+    def __init__( self, args ): 
+        self.cfg = general.Config( args.config ) 
+
+    def run( self ):
+        pass
+
+class GetImage( ServerClient ):
+
+    exclude_tmp = None
+
+    def __init__( self, args ):
+        ServerClient.__init__( self, args )
+
+        p = subprocess.Popen( [ 'which', 'rsync' ], stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+        std, ste = p.communicate()
+
+        if p.returncode > 0:
+            raise ExitException( 'Could not located rsync' )
+
+        self.rsync = std.strip()
+
+        if not args.host:
+            self.hostname = ask( 'Golden image hostname' )
+        else:
+            self.hostname = args.host
+
+        if not args.image:
+            self.imagename = ask( 'Imagename', choices=os.listdir( self.cfg.get( 'update', 'imagedir' ) ) )
+        else:
+            self.imagename = args.image
+
+        if args.exclude:
+            self.excludefile = args.exclude
+        else:
+            self.excludefile = None
+
+        atexit.register( self.exit )
+
+    def get_image( self, excludefile ):
+
+        if self.cfg.getboolean( 'rsync', 'quiet' ):
+            opts = '-aHS'
+            quiet = True
+        else:
+            opts = '-aHSv'
+            quiet = False
+
+        command = [ 
+            self.rsync, 
+            opts,
+            '--numeric-ids',
+            '--delete',
+            '--delete-excluded',
+            '--exclude-from=%s' % excludefile,
+            'rsync://%s:%d/root/' % ( 
+                self.hostname,
+                self.cfg.getint( 'rsync', 'port' ) ) ,
+            os.path.join( 
+                self.cfg.get( 'update', 'imagedir' ), 
+                self.imagename
+            ),
+        ]
+
+        p = subprocess.Popen( command , stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+
+        if not quiet:
+            print( '\n### Fetching image from host %s\n' % self.hostname )
+            for line in p.stdout:
+                print( line.strip() )
+
+        std, ste = p.communicate()
+
+        if p.returncode > 0:
+            print( ste )
+            raise ExitException( 'An error has occured during rsync transfer' )
+
+        if not quiet:
+            print( '\n### Done with imaging' )
+
+        ccommand = [
+            self.rsync,
+            'rsync://%s:%d/__cloning_completed__' % ( 
+                self.hostname,
+                self.cfg.getint( 'rsync', 'port' ) ) ,
+            '/',
+        ]
+        
+        p = subprocess.Popen( ccommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+        std, ste = p.communicate()
+
+        if p.returncode <> 5 and p.returncode > 0:
+            print( ste )
+            raise ExitException( 'Could not send terminate signal to golden client' )
+
+    def exclude_file( self ):
+       
+        fto = tempfile.NamedTemporaryFile( delete=False )
+
+        mfs_file = os.path.join( self.cfg.get( 'update', 'imagedir' ), '%s/etc/systemimager/mounted_filesystems' % self.imagename )
+
+        with open( mfs_file ) as mfo:
+            fto.write( '## Rules from the mounted_filesystems file\n' )
+            for line in mfo:
+                splitted = line.strip().split( ' ' )
+                if splitted[ 4 ] not in [ 'ext2','ext3','ext4','reiserfs','jfs','xfs','vfat','fat' ]:
+                    fto.write( '%s/*\n' % splitted[2] )
+
+
+        fto.write( '## Rules from the getimage.exclude\n' )
+        with open( '/etc/sali/getimage.exclude' ) as gex:
+            fto.write( gex.read() )
+
+        if self.excludefile:
+            fto.write( '## External rules\n' )
+            with open( self.excludefile ) as exf:
+                fto.write( exf.read() )
+
+        return fto.name
+
+    def get_mountedfilesystem( self ):
+
+        if self.cfg.getboolean( 'rsync', 'quiet' ):
+            opts = '-a'
+            quiet = True
+        else:
+            opts = '-av'
+            quiet = False
+
+        command = [ 
+            self.rsync, 
+            opts, 
+            'rsync://%s:%d/root/etc/systemimager/mounted_filesystems' % ( 
+                self.hostname,
+                self.cfg.getint( 'rsync', 'port' ) ) ,
+            os.path.join( 
+                self.cfg.get( 'update', 'imagedir' ), 
+                '%s/etc/systemimager/mounted_filesystems' % self.imagename
+            ),
+        ]
+
+        p = subprocess.Popen( command , stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+
+        if not quiet:
+            print( '\n### Fetching mounted_filesystems from host %s\n' % self.hostname )
+            for line in p.stdout:
+                print( line.strip() )
+
+        std, ste = p.communicate()
+
+        if p.returncode > 0:
+            print( ste )
+            raise ExitException( 'An error has occured during rsync transfer' )
+
+        if not quiet:
+            print( '\n### Done' )
+        
+    def run( self ):
+
+        imagepath = os.path.join( self.cfg.get( 'update', 'imagedir' ), self.imagename )
+
+        if not os.path.exists( imagepath ):
+            os.makedirs( imagepath, 0777 )
+            print( 'A new imagedirectory \'%s\' has been created in \'%s\'' % (
+                self.imagename,
+                self.cfg.get( 'update', 'imagedir' ) )
+            )
+
+        if not os.path.exists( os.path.join( imagepath, 'etc/systemimager' ) ):
+            os.makedirs( os.path.join( imagepath, 'etc/systemimager' ), 0777 )
+            print( 'A new directory for systemimager has been created \'%s\'' % (
+                os.path.join( imagepath, 'etc/systemimager' ) )
+            )
+
+        self.get_mountedfilesystem()
+        self.exclude_tmp = self.exclude_file()
+        self.get_image( self.exclude_tmp )
+        os.utime( imagepath, None )
+
+        # Delete the exludefile when we are done!
+        os.remove( self.exclude_tmp )
+
+    def exit( self ):
+
+        if self.exclude_tmp and os.path.exists( self.exclude_tmp ):
+            os.remove( self.exclude_tmp )
+
+class Rsync( ServerClient ):
+
+    def run( self ):
+        ## if we can't find the location, STOP
+        if not os.path.isdir( self.cfg.get( 'rsync', 'stubdir' ) ):
+            raise ExitException( 'Cannot find rsync stubdir' )
+
+        if '00header.conf' not in os.listdir( self.cfg.get( 'rsync', 'stubdir' ) ):
+            raise ExitException( '00header.conf must be available!' )
+
+        with open( self.cfg.get( 'rsync', 'configfile' ), 'w' ) as fo:
+            fo.write( '### Do not edit this file, check the documentation of SALI ###\n' )
+            str_date = datetime.datetime.strftime( datetime.datetime.now(), '%m/%d/%Y %H:%M' )
+            fo.write( '###                    %s                    ###\n\n' % str_date )
+            for file in os.listdir( self.cfg.get( 'rsync', 'stubdir' ) ):
+                with open( os.path.join( self.cfg.get( 'rsync', 'stubdir' ), file ) ) as fi:
+                    fo.write( '### Begin %s\n' % file )
+                    fo.write( fi.read() )
+                    fo.write( '### End %s\n\n' % file )
+
+            fo.write( '### Images from %s\n' % self.cfg.get( 'update', 'imagedir' ) )
+            for image in os.listdir( self.cfg.get( 'update', 'imagedir' ) ):
+                fo.write( '[%s]\n' % image )
+                fo.write( '   path=%s\n\n' % os.path.join( self.cfg.get( 'update', 'imagedir' ), image ) )
+
+OPTIONS = {
+    'rsync': Rsync,
+    'getimage' : GetImage,
+}
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser( 
+        description='The server client tool for fetching images and creating the rsynd file',
+        conflict_handler='resolve',
+    )
+
+    parser.add_argument( 
+        'option', 
+        metavar='OPTION', 
+        type=str, 
+        choices=OPTIONS.keys(),
+        help='specify which operation must be done' 
+    )
+
+    parser.add_argument(
+        '-c', '--config',
+        metavar='CONFIG',
+        type=str,
+        default='/etc/sali/sali.cfg',
+        help='configuration of sali'
+    )
+
+    parser.add_argument(
+        '-h', '--host',
+        metavar='HOSTNAME',
+        type=str,
+        help='is used for getimage option',
+    )
+
+    parser.add_argument(
+        '-i', '--image',
+        metavar='IMAGENAME',
+        type=str,
+        help='is ised for getimage option',
+    )
+
+    parser.add_argument(
+        '-e', '--exclude',
+        metavar='EXCLUDE',
+        type=str,
+        help='is ised for getimage option',
+    )
+
+    args = parser.parse_args()
+
+    try:
+        tr = OPTIONS[ args.option ]( args )
+        tr.run()
+    except ExitException, err:
+        print( err )
+        sys.exit( 1 )
+    except KeyboardInterrupt:
+        print( '\n\nCaught a keyboardinterrupt' )
+        sys.exit( 0 )
+

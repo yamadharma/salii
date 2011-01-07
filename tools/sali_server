@@ -8,16 +8,16 @@
 
 from __future__ import print_function
 
-## BitTornado uses the old sha module which is deprecated. So
-## added a filter to ignore these DeprecationWarning.
-import warnings
-warnings.filterwarnings( 'ignore', category=DeprecationWarning )
-
 import sys
-sys.path.append( '../python-libs' )
 
-from sali import server
-from sali import general
+try:
+    from sali import general
+    from sali import server
+except ImportError:
+    sys.path.append( '../python-libs' )
+
+    from sali import general
+    from sali import server
 
 if __name__ == '__main__':
 
