@@ -221,7 +221,7 @@ class UpdateImages( process.Task ):
                             if os.path.getmtime( os.path.join( self.ci.imagedir, image ) ) > os.path.getmtime( self.ci.tarball_location( image ) ):
                                 self.log.info( '%s%s: tarball of image is out of date, creating a new one' % ( self.ci.space( 2 ), image ) )
                                 os.remove( self.ci.tarball_location( image ) )
-                                self.ci.check_metafiles( image, self.tarball_location( image ), remove=True )
+                                self.ci.check_metafiles( image, self.ci.tarball_location( image ), remove=True )
                                 self.ci.create_tarball( image )
                             else:
                                 self.log.info( '%s%s: tarball of image is up to date' % ( self.ci.space( 2 ), image ) )
