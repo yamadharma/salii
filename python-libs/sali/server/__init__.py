@@ -23,6 +23,8 @@ import sys
 import time
 import os
 import subprocess
+import socket
+import signal
 
 ## Import some BitTornado modules
 from BitTornado.BT1.track import track
@@ -146,6 +148,9 @@ class SaliMonitor( process.Task ):
         except ValueError:
             self.log.critical( 'Port must be a integer' )
             sys.exit( 1 )
+        except socket.error, err:
+            self.log.critical( 'Socket error: %s' % err )
+            sys.exit( 1 )
 
     def run( self ):
         self.log.info( 'started' )
@@ -236,42 +241,17 @@ class UpdateImages( process.Task ):
 
 class sali_server( general.Daemon ):
 
-    def __init__( self, cfg, fg=False ):
+    def __init__( self, cfg, logging, pidfile, workpath='/' ):
+        general.Daemon.__init__( self, cfg, logging, pidfile, workpath )
+        signal.signal( signal.SIGTERM, self.handler )
 
-        if not fg:
-            self.daemon = True
-
-        if not cfg.has_option( 'DEFAULT', 'pidfile' ):
-            print( 'You must have a pidfile variable in DEFAULT section' )
-            sys.exit( 1 )
-
-        if not cfg.has_option( 'DEFAULT', 'logfile' ):
-            print( 'Variable logifile must be set in section DEFAULT' )
-            sys.exit( 1 )
-
-        if not cfg.has_option( 'DEFAULT', 'loglevel' ):
-            print( 'Variable loglevel must be set in section DEFAULT' )
-            sys.exit( 1 )
-
-        try:
-            self.logging =  general.Logging( 
-                                cfg.get_default( 'logfile' ),
-                                cfg.getint( 'DEFAULT', 'loglevel' )
-                            )
-            self.logging.daemon = self.daemon
-        except ValueError:
-            print( 'Value of loglevel must be a integer' )
-            sys.exit( 1 )
-
-        self.cfg = cfg
         self.log = self.logging.getLogger( 'SaliServer' )
 
-        if fg:
-            self.log.info( 'starting in forground' )
-        else:
-            self.log.info( 'starting as daemon' )
-
-        general.Daemon.__init__( self, cfg.get_default( 'pidfile' ) )
+    def handler( self, signal, frame ):
+        if os.path.exists( self.pidfile ):
+            print( 'Removing pidfile, caugth a signal' )
+            os.remove( self.pidfile )
+        sys.exit()
 
     def run( self ):
         self.log.info( 'starting threads' )

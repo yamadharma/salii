@@ -153,143 +153,142 @@ class Logging( object ):
         return logger
 
 class Daemon:
-    """A generic daemon class. Usage: subclass the daemon class and override the run() method.
 
-        http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/"""
-
-    daemon = False
-
-    def __init__(self, pidfile):
+    def __init__( self, cfg, logging, pidfile, workpath='/' ):
         self.pidfile = pidfile
-    
-    def daemonize(self):
-        """Deamonize class. UNIX double fork mechanism."""
+        self.workpath = workpath
+        self.cfg = cfg
+        self.logging = logging
 
-        try: 
-            self.log.debug( 'forking main process' )
-            pid = os.fork() 
-            if pid > 0:
-                # exit first parent
-                self.log.debug( 'exiting first parent' )
-                sys.exit(0) 
-        except OSError as err: 
-            self.log.critical( 'first fork failed: %s' % str( err ) )
-            sys.stderr.write('fork #1 failed: {0}\n'.format(err))
-            sys.exit(1)
-    
-        # decouple from parent environment
-        self.log.debug( 'decouple from parent environment' )
-        os.chdir('/') 
-        os.setsid() 
-        os.umask(0) 
-    
-        # do second fork
-        try: 
-            self.log.debug( 'forking again' )
-            pid = os.fork() 
-            if pid > 0:
+    def perror( self, msg, err ):
+        print( msg.format( err ), file=sys.stderr )
+        sys.exit( 1 )
 
-                # exit from second parent
-                self.log.debug( 'exiting from second parent' )
-                sys.exit(0) 
-        except OSError as err: 
-            self.log.critical( 'second fork failed: %s' % str( err ) )
-            sys.stderr.write('fork #2 failed: {0}\n'.format(err))
-            sys.exit(1) 
-    
+    def daemonize( self ):
+        if not os.path.isdir( self.workpath ):
+            self.perror( 'Workpath does not exist!', '' )
+
+        try:
+            pid = os.fork()
+
+            if pid > 0:
+                sys.exit( 0 )
+        except OSError as err:
+            self.perror( 'Fork #1 failed: {0}', err )
+
+        try:
+            pid = os.fork()
+
+            if pid > 0:
+                sys.exit( 0 )
+        except OSError as err:
+            self.perror( 'Fork #2 failed: {0}', err )
+
         # redirect standard file descriptors
-        self.log.debug( 'redirecting standard file descriptors' )
         sys.stdout.flush()
         sys.stderr.flush()
-        si = open(os.devnull, 'r')
-        so = open(os.devnull, 'a+')
-        se = open(os.devnull, 'a+')
+        si = open( os.devnull, 'r' )
+        so = open( os.devnull, 'a+' )
+        se = open( os.devnull, 'a+' )
+        os.dup2( si.fileno(), sys.stdin.fileno() )
+        os.dup2( so.fileno(), sys.stdout.fileno() )
+        os.dup2( se.fileno(), sys.stderr.fileno() )
 
-        os.dup2(si.fileno(), sys.stdin.fileno())
-        os.dup2(so.fileno(), sys.stdout.fileno())
-        os.dup2(se.fileno(), sys.stderr.fileno())
-    
-        # write pidfile
-        self.log.debug( 'write pidfile' )
-        atexit.register(self.delpid)
+        atexit.register( os.remove, self.pidfile )
+        pid = str( os.getpid() )
 
-        pid = str(os.getpid())
-        with open(self.pidfile,'w+') as f:
-            f.write(pid + '\n')
-
-        self.log.info( 'process has been daemonized' )
-   
-    def delpid(self):
-        self.log.debug( 'removing pidfile' )
-        os.remove(self.pidfile)
-
-    def start( self ):
-        """Start the daemon."""
-
-        self.log.info( 'starting SaliServer' )
-
-        # Check for a pidfile to see if the daemon already runs
-        try:
-            with open(self.pidfile,'r') as pf:
-
-                pid = int(pf.read().strip())
-        except IOError:
-            pid = None
-    
-        if pid:
-            message = "pidfile {0} already exist. " + \
-                    "Daemon already running?\n"
-            sys.stderr.write(message.format(self.pidfile))
-            sys.exit(1)
-        
-        # Start the daemon
-        if self.daemon:
-            self.daemonize()
+        with open( self.pidfile, 'w+' ) as fo:
+            fo.write( pid )
 
         self.run()
 
-    def stop(self):
-        """Stop the daemon."""
+    def run( self ):
 
-        self.log.info( 'stopping daemon' )
-        # Get the pid from the pidfile
+        while true:
+            time.sleep( 1 )
+
+class DaemonCtl( object ):
+
+    def __init__( self, daemon, cfg, workpath='/', foreground=False ):
+
+        if not cfg.has_option( 'DEFAULT', 'pidfile' ):
+            print( 'You must have a pidfile variable in DEFAULT section' )
+            sys.exit( 1 )
+
+        if not cfg.has_option( 'DEFAULT', 'logfile' ):
+            print( 'Variable logifile must be set in section DEFAULT' )
+            sys.exit( 1 )
+
+        if not cfg.has_option( 'DEFAULT', 'loglevel' ):
+            print( 'Variable loglevel must be set in section DEFAULT' )
+            sys.exit( 1 )
+
         try:
-            with open(self.pidfile,'r') as pf:
-                pid = int(pf.read().strip())
+            self.logging =  Logging( 
+                                cfg.get_default( 'logfile' ),
+                                cfg.getint( 'DEFAULT', 'loglevel' )
+                            )
+            self.logging.daemon = not foreground
+        except ValueError:
+            print( 'Value of loglevel must be a integer' )
+            sys.exit( 1 )
+
+        self.cfg = cfg
+        self.log = self.logging.getLogger( 'DaemonCtl' )
+        self.workpath = workpath
+        self.foreground = foreground
+        self.daemon = daemon
+        self.pidfile = cfg.get_default( 'pidfile' )
+
+        if foreground:
+            self.log.info( 'starting in forground' )
+        else:
+            self.log.info( 'starting as daemon' )
+
+    def start( self ):
+
+        try:
+            with open( self.pidfile, 'r' ) as pf:
+                pid = int( pf.read().strip() )
         except IOError:
             pid = None
-    
-        if not pid:
-            self.log.critical( 'pidfile "%s" does not exist. Daemon not running?' % self.pidfile )
-            message = "pidfile {0} does not exist. " + \
-                    "Daemon not running?\n"
-            sys.stderr.write(message.format(self.pidfile))
-            return # not an error in a restart
 
-        # Try killing the daemon process    
-        self.log.debug( 'killing daemon' )
+        if pid:
+            print( 'Pidfile {0} already exist. Daemon already running?'.format( self.pidfile ) )
+            sys.exit( 1 )
+
+        d = self.daemon( self.cfg, self.logging, self.pidfile, self.workpath )
+
+        if self.foreground:
+            d.run()
+        else:
+            d.daemonize()
+
+    def stop( self ):
+
         try:
-            while 1:
-                os.kill(pid, signal.SIGTERM)
-                time.sleep(0.1)
-        except OSError as err:
-            e = str(err.args)
-            if e.find("No such process") > 0:
-                self.log.error( 'could not locate process' )
-                if os.path.exists(self.pidfile):
-                    os.remove(self.pidfile)
-            else:
-                print( (str(err.args)) )
-                sys.exit(1)
+            with open( self.pidfile, 'r' ) as pf:
+                pid = int( pf.read().strip() )
+        except IOerror:
+            pid = None
 
-    def restart(self):
-        """Restart the daemon."""
-        self.log.info( 'restarting daemon' )
+        if not pid:
+            print( 'Pidfile {0} could not be found. Daemon not running?'.format( self.pidfile ) )
+            return
+
+        try:
+            while True:
+                os.kill( pid, signal.SIGTERM )
+                time.sleep( 0.1 )
+        except OSError as err:
+            e = str( err.args )
+            if e.find( "No such process" ) > 0:
+                if os.path.exists( self.pidfile ):
+                    os.remove( self.pidfile )
+            else:
+                print( str( err.args ) )
+                sys.exit( 1 )
+
+    def restart( self ):
         self.stop()
         self.start()
-
-    def run(self):
-        """You should override this method when you subclass Daemon.
-        
-        It will be called after the process has been daemonized by 
-        start() or restart()."""

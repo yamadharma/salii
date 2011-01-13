@@ -31,16 +31,16 @@ if __name__ == '__main__':
     cfg = general.Config( CFGFILE )
 
     if ACTION in [ 'start', 'stop', 'restart' ]:
-        daemon = server.sali_server( cfg )
+        dc = general.DaemonCtl( server.sali_server, cfg )
 
         if ACTION == 'start':
-            daemon.start()
+            dc.start()
         elif ACTION == 'stop':
-            daemon.stop()
+            dc.stop()
         elif ACTION == 'restart':
-            daemon.restart()
+            dc.restart()
     elif ACTION == 'fg':
-        daemon = server.sali_server( cfg, fg=True )
-        daemon.start()
+        dc = general.DaemonCtl( server.sali_server, cfg, foreground=True )
+        dc.start()
     elif ACTION == 'help':
         print( 'Show some nice help' )

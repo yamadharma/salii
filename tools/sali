@@ -175,7 +175,7 @@ class GetImage( ServerClient ):
 
 
         fto.write( '## Rules from the getimage.exclude\n' )
-        with open( '/etc/sali/getimage.exclude' ) as gex:
+        with open( '/data/sali/getimage.exclude' ) as gex:
             fto.write( gex.read() )
 
         if self.excludefile:
