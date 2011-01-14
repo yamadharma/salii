@@ -4,9 +4,6 @@
 #
 #   $Id$
 
-## Must be imported first
-from __future__ import print_function
-
 ## Python modules
 import os
 import signal
@@ -25,7 +22,7 @@ class Config( SafeConfigParser ):
         self.readfp( open( cfgfile ) )
 
         if not self.has_section( 'bittorrent' ):
-            print( 'Missing the bittorrent configuration in the given file, check the documentation!' )
+            print 'Missing the bittorrent configuration in the given file, check the documentation!'
             sys.exit( 1 )
 
     def options_default( self, section ):
@@ -121,7 +118,7 @@ class Logging( object ):
         self.logfile = logfile
 
         if level not in self.LEVELS.keys():
-            print( 'Configured level is incorrect choose 0 - 5' )
+            print 'Configured level is incorrect choose 0 - 5'
 
         self.level = self.LEVELS[ level ]
 
@@ -161,7 +158,7 @@ class Daemon:
         self.logging = logging
 
     def perror( self, msg, err ):
-        print( msg.format( err ), file=sys.stderr )
+        sys.stderr.write( msg.format( err ) + "\n" )
         sys.exit( 1 )
 
     def daemonize( self ):
@@ -173,7 +170,7 @@ class Daemon:
 
             if pid > 0:
                 sys.exit( 0 )
-        except OSError as err:
+        except OSError, err:
             self.perror( 'Fork #1 failed: {0}', err )
 
         try:
@@ -181,7 +178,7 @@ class Daemon:
 
             if pid > 0:
                 sys.exit( 0 )
-        except OSError as err:
+        except OSError, err:
             self.perror( 'Fork #2 failed: {0}', err )
 
         # redirect standard file descriptors
@@ -197,8 +194,9 @@ class Daemon:
         atexit.register( os.remove, self.pidfile )
         pid = str( os.getpid() )
 
-        with open( self.pidfile, 'w+' ) as fo:
-            fo.write( pid )
+        fo = open( self.pidfile, 'w+' )
+        fo.write( pid )
+        fo.close()
 
         self.run()
 
@@ -212,15 +210,15 @@ class DaemonCtl( object ):
     def __init__( self, daemon, cfg, workpath='/', foreground=False ):
 
         if not cfg.has_option( 'DEFAULT', 'pidfile' ):
-            print( 'You must have a pidfile variable in DEFAULT section' )
+            print 'You must have a pidfile variable in DEFAULT section'
             sys.exit( 1 )
 
         if not cfg.has_option( 'DEFAULT', 'logfile' ):
-            print( 'Variable logifile must be set in section DEFAULT' )
+            print 'Variable logifile must be set in section DEFAULT'
             sys.exit( 1 )
 
         if not cfg.has_option( 'DEFAULT', 'loglevel' ):
-            print( 'Variable loglevel must be set in section DEFAULT' )
+            print 'Variable loglevel must be set in section DEFAULT'
             sys.exit( 1 )
 
         try:
@@ -230,7 +228,7 @@ class DaemonCtl( object ):
                             )
             self.logging.daemon = not foreground
         except ValueError:
-            print( 'Value of loglevel must be a integer' )
+            print 'Value of loglevel must be a integer'
             sys.exit( 1 )
 
         self.cfg = cfg
@@ -248,13 +246,14 @@ class DaemonCtl( object ):
     def start( self ):
 
         try:
-            with open( self.pidfile, 'r' ) as pf:
-                pid = int( pf.read().strip() )
+            pf = open( self.pidfile, 'r' )
+            pid = int( pf.read().strip() )
+            pf.close()
         except IOError:
             pid = None
 
         if pid:
-            print( 'Pidfile {0} already exist. Daemon already running?'.format( self.pidfile ) )
+            print 'Pidfile {0} already exist. Daemon already running?'.format( self.pidfile )
             sys.exit( 1 )
 
         d = self.daemon( self.cfg, self.logging, self.pidfile, self.workpath )
@@ -267,26 +266,27 @@ class DaemonCtl( object ):
     def stop( self ):
 
         try:
-            with open( self.pidfile, 'r' ) as pf:
-                pid = int( pf.read().strip() )
+            pf = open( self.pidfile, 'r' )
+            pid = int( pf.read().strip() )
+            pf.close()
         except IOerror:
             pid = None
 
         if not pid:
-            print( 'Pidfile {0} could not be found. Daemon not running?'.format( self.pidfile ) )
+            print 'Pidfile {0} could not be found. Daemon not running?'.format( self.pidfile )
             return
 
         try:
             while True:
                 os.kill( pid, signal.SIGTERM )
                 time.sleep( 0.1 )
-        except OSError as err:
+        except OSError, err:
             e = str( err.args )
             if e.find( "No such process" ) > 0:
                 if os.path.exists( self.pidfile ):
                     os.remove( self.pidfile )
             else:
-                print( str( err.args ) )
+                print str( err.args )
                 sys.exit( 1 )
 
     def restart( self ):

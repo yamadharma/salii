@@ -4,9 +4,6 @@
 #
 #   $Id: server.py 287 2010-11-30 15:11:19Z dennis $
 
-# Must be imported first
-from __future__ import print_function
-
 ## BitTornado uses the old sha module which is deprecated. So
 ## added a filter to ignore these DeprecationWarning.
 import warnings
@@ -183,6 +180,7 @@ class UpdateImages( process.Task ):
 
         self.ci = tools.CreateImage( logging, cfg )
         self.log.info( 'started' )
+        self.cfg = cfg
 
     def check_imagedir( self ):
    
@@ -221,21 +219,28 @@ class UpdateImages( process.Task ):
 
             if images:
                 for image in images:
-                    if self.ci.is_tar( self.ci.tarball_location( image ) ):
-                        try:
-                            if os.path.getmtime( os.path.join( self.ci.imagedir, image ) ) > os.path.getmtime( self.ci.tarball_location( image ) ):
-                                self.log.info( '%s%s: tarball of image is out of date, creating a new one' % ( self.ci.space( 2 ), image ) )
-                                os.remove( self.ci.tarball_location( image ) )
-                                self.ci.check_metafiles( image, self.ci.tarball_location( image ), remove=True )
-                                self.ci.create_tarball( image )
-                            else:
-                                self.log.info( '%s%s: tarball of image is up to date' % ( self.ci.space( 2 ), image ) )
-                                self.ci.check_metafiles( image, self.ci.tarball_location( image ) )
-                        except OSError, err:
-                            self.log.critical( '%s: %s error %s' % ( image, self.ci.space( 2 ), str( err ) ) )
-                            sys.exit( 1 )
+                   
+                    no_tarball = os.path.join( self.cfg.get_default( 'maindir' ), 'notorrent' )
+                    if os.path.exists( os.path.join( no_tarball, image ) ):
+                        self.log.info( '%s%s: getimage in progress, skipping tarball creation' % ( self.ci.space( 2 ), image ) )
+                        self.log.info( 'sleeping for %s' % self.human_time( self.sleeptime ) )
+                        time.sleep( self.sleeptime )
                     else:
-                        self.ci.create_tarball( image )
+                        if self.ci.is_tar( self.ci.tarball_location( image ) ):
+                            try:
+                                if os.path.getmtime( os.path.join( self.ci.imagedir, image ) ) > os.path.getmtime( self.ci.tarball_location( image ) ):
+                                    self.log.info( '%s%s: tarball of image is out of date, creating a new one' % ( self.ci.space( 2 ), image ) )
+                                    os.remove( self.ci.tarball_location( image ) )
+                                    self.ci.check_metafiles( image, self.ci.tarball_location( image ), remove=True )
+                                    self.ci.create_tarball( image )
+                                else:
+                                    self.log.info( '%s%s: tarball of image is up to date' % ( self.ci.space( 2 ), image ) )
+                                    self.ci.check_metafiles( image, self.ci.tarball_location( image ) )
+                            except OSError, err:
+                                self.log.critical( '%s: %s error %s' % ( image, self.ci.space( 2 ), str( err ) ) )
+                                sys.exit( 1 )
+                        else:
+                            self.ci.create_tarball( image )
             self.log.info( 'sleeping for %s' % self.human_time( self.sleeptime ) )
             time.sleep( self.sleeptime )
 

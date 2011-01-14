@@ -6,8 +6,6 @@
 #
 #   $Id$
 
-from __future__ import print_function
-
 import sys
 
 try:
@@ -25,7 +23,7 @@ if __name__ == '__main__':
         CFGFILE = sys.argv[ 1 ]
         ACTION = sys.argv[ 2 ]
     else:
-        print( 'Could not execute command. Usage: %s /path/to/config start|stop|restart|fg|help' % sys.argv[ 0 ] )
+        print 'Could not execute command. Usage: %s /path/to/config start|stop|restart|fg|help' % sys.argv[ 0 ]
         sys.exit( 1 )
 
     cfg = general.Config( CFGFILE )

@@ -52,30 +52,43 @@ class SaliMonitorHandler( BaseRequestHandler ):
         name = data[ 'mac' ].lower()
         del data[ 'mac' ]
 
-        with open( self.server.cfg.get( 'monitor', 'si_clients' ), 'rt' ) as f:
-            tree = ElementTree.parse( f )
+        try:
+            fi = open( self.server.cfg.get( 'monitor', 'si_clients' ), 'rt' )
+            tree = ElementTree.parse( fi )
+            updated = False
 
-        updated = False
+            for child in tree.findall( './/client' ):
+                if child.get( 'name' ).lower() == name.lower():
+                    child.attrib[ 'name' ] = name
+                    for key,value in data.items():
+                        child.attrib[ key ] = str( value )
+                        updated = True
 
-        for child in tree.findall( './/client' ):
-            if child.get( 'name' ).lower() == name.lower():
-                child.attrib[ 'name' ] = name
-                for key,value in data.items():
-                    child.attrib[ key ] = str( value )
-                    updated = True
+            if not updated:
+                father = tree.getroot()
 
-        if not updated:
-            father = tree.getroot()
+                attribs = dict()          
+                attribs[ 'name' ] = name 
 
-            attribs = dict()          
-            attribs[ 'name' ] = name 
+                for key, value in data.items(): 
+                    attribs[ key ] = str( value )
 
-            for key, value in data.items(): 
-                attribs[ key ] = str( value )
+                append = SubElement( father, 'client', attribs )
 
-            append = SubElement( father, 'client', attribs )
+            tree.write( self.server.cfg.get( 'monitor', 'si_clients' ) )
+            fi.close()
+        except Exception:
+            tree = ElementTree.Element('opt')
 
-        tree.write( self.server.cfg.get( 'monitor', 'si_clients' ) )
+            child = ElementTree.SubElement( tree, 'client' )
+
+            child.attrib[ 'name' ] = str( name )
+            for key,value in data.items():
+                child.attrib[ key ]  = str( value )
+
+            fo = open( self.server.cfg.get( 'monitor', 'si_clients' ), 'w' )
+            fo.write( ElementTree.tostring( tree ) )
+            fo.close()
 
     def save_data( self, data ):
 
@@ -114,8 +127,7 @@ class SaliMonitorHandler( BaseRequestHandler ):
         data = self.request.recv( 1024 ).strip()
         self.server.log.debug( 'data recieved from "%s"' % self.client_address[ 0 ] )
         ddict = self.parse_data( data )
-
         if self.save_data( ddict ):
             self.server.log.debug( 'the data of client "%s" has been saved' % self.client_address[ 0 ] )
         else:
-            self.server.log( 'could not save the data of client "%s", %s' % ( self.client_address[ 0 ], data ) )
+            self.server.log.info( 'could not save the data of client "%s", %s' % ( self.client_address[ 0 ], data ) )
