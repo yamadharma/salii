@@ -14,7 +14,6 @@ import subprocess
 import tempfile
 import atexit
 import datetime
-import random
 
 try:
     from sali import general
@@ -194,6 +193,7 @@ class GetImage( ServerClient ):
             fto.write( exf.read() )
             exf.close()
 
+        fto.close()
         return fname
 
     def get_mountedfilesystem( self ):
