@@ -117,7 +117,7 @@ class Seeder( process.Task ):
             configdir.deleteOldCacheData( config[ 'expire_cache_data' ] )
             config[ 'torrent_dir' ] = args[ 0 ]
         except ValueError, e:
-            print( 'Error: %s some error' % str( e ) )
+            print 'Error: %s some error' % str( e )
             sys.exit( 1 )
 
         self.log.debug( 'start seeder with args "%s"' % " ".join( self.args ) )
@@ -254,7 +254,7 @@ class sali_server( general.Daemon ):
 
     def handler( self, signal, frame ):
         if os.path.exists( self.pidfile ):
-            print( 'Removing pidfile, caugth a signal' )
+            print 'Removing pidfile, caugth a signal'
             os.remove( self.pidfile )
         sys.exit()
 
@@ -263,7 +263,7 @@ class sali_server( general.Daemon ):
 
         if self.cfg.do_tracker() or self.cfg.do_bittorrent():
             if not self.cfg.has_option( 'bittorrent', 'torrentsdir' ):
-                print( 'Could not find variable torrentsdir in section bittorrent ( required )' )
+                print 'Could not find variable torrentsdir in section bittorrent ( required )'
                 sys.exit( 1 )
 
         self.process = process.Process()
@@ -295,5 +295,5 @@ class sali_server( general.Daemon ):
         try:
             self.process.run()
         except KeyboardInterrupt:
-            print( 'Recieved keyboardinterrupt stopping sali_server' )
+            print 'Recieved keyboardinterrupt stopping sali_server'
 
