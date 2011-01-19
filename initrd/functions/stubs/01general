@@ -84,6 +84,50 @@ write_variables() {
 	echo "ARCH=\"$ARCH\"" 				>> /tmp/variables.txt
 }
 
+################################################################################
+#
+#  Description: save_param is going to replace write_variables
+#
+# Usage: save_param KEY VALUE
+#
+# Example: save_param VERBOSE_LEVEL 2
+save_param(){
+    
+    PARAM=$1
+    VALUE=$2
+
+    if [ ! -e "/tmp/variables.txt" ]
+    then
+        echo "$PARAM=$VALUE" > /tmp/variables.txt
+        return
+    fi
+
+    ##Which line must be removed!
+    LINE=$(egrep -n "^$PARAM=" /tmp/variables.txt|awk -F : '{print $1}')
+
+    if [ -n "${LINE}" ]
+    then
+        sed ''$LINE'd' /tmp/variables.txt > /tmp/variables.txt.new
+        echo "$PARAM=\"$VALUE\"" >> /tmp/variables.txt.new
+
+        mv /tmp/variables.txt.new /tmp/variables.txt
+    else
+        echo "$PARAM=\"$VALUE\"" >> /tmp/variables.txt
+    fi
+
+}
+
+#
+############################
+#
+# Description: source the variables
+#
+# Usage: load_variables
+##
+load_variables(){
+    . /tmp/variables.txt
+}
+
 #
 ################################################################################
 #

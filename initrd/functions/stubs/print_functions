@@ -81,10 +81,16 @@ p_service(){
 
 p_comment(){
 	LEVEL=$1
+    END=$3
+
+    if [ -z "${END}" ]
+    then
+        END="\n"
+    fi
 
 	if [ $VERBOSELEVEL -ge $LEVEL ]
 	then
-		LINE="     .$2\n"
+		LINE="     .${2}${END}"
 
 		p_log "${LINE}"
 		printf "${LINE}"

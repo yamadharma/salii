@@ -70,79 +70,93 @@ send_monitor_msg() {
 
 start_report_task() {
 
-    logmsg "Start report task, currently disabled!"
+    p_stage "Starting reporting"
 
-    # Reporting interval (in sec).
-    #REPORT_INTERVAL=10
+    p_comment 0 "Reporting is disabled"
+    return
 
-    # Evaluate image size.
-    #logmsg "Evaluating image size..."
-    
-    #case "$PROTOCOL" in
-    #    "bittorrent")
-    #        if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent" ]; then
-    #            bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.torrent"
-    #        elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent" ]; then
-    #            bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.torrent"
-    #        else
-    #            logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
-    #            shellout
-    #        fi
-    #        IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
-    #    ;;
-    #    "metalink")
-    #        if [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.metafile" ]; then
-    #            bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.metafile"
-    #        elif [ -f "${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.metafile" ]; then
-    #            bm_file="${TORRENTS_DIR}/image-${IMAGENAME}.tar.gz.metafile"
-    #        else
-    #            logmsg "error: cannot find a valid torrent file for image ${IMAGENAME}"
-    #            shellout
-    #        fi
-    #        IMAGESIZE=$(aria_getsize $PROTOCOL $bm_file)
-    #    ;;
-    #    "rsync")
-    #        IMAGESIZE=$(rsync -av --numeric-ids $IMAGESERVER::$IMAGENAME | grep "total size" | sed -e "s/total size is \([0-9]*\).*/\1/")
-    #    ;;
-    #esac
+    load_variables
 
-    #IMAGESIZE=$(( $IMAGESIZE / 1024 ))
-    #logmsg "  --> Image size = $(( $IMAGESIZE / 1024 ))MiB"
+    case "${PROTOCOL}" in
+        bittorrent|metafile)
+            p_service "Enabling reporting for bittorrent/metafile"
+            p_comment 0 " note: when progress is 90% and speed 0 or -, image is unpacking"
 
-    # Evaluate disks size.
-    #LIST=$(df 2>/dev/null | grep "/" | awk '{ print $4}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
-    #AVAILDISKSIZE=$(( $LIST ))
+            # Does the torrents directory exist!
+            if [ ! -d "${TORRENTS_DIR}" ]
+            then
+                p_comment 0 "Could not locate torrents directory"
+                return
+            fi
 
-    # Spawn the report task -AR-
-    #{
-    #TOT=0; CURR_SIZE=0
-    #while :; do
-   # 	LIST=$(df 2>/dev/null | grep "/" | awk '{ print $4}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
-   #     AVAILTOT=$(( $LIST ))
-#
-        # Evaluate bandwidth.
-#        speed=`echo "scale=2; (($AVAILDISKSIZE - $AVAILTOT) - $CURR_SIZE) / $REPORT_INTERVAL" | bc`
-#        speed=`echo "scale=2; if ($speed >= 0) { print $speed; } else { print 0; }" | bc`
+            PATTERN="^image-$IMAGENAME.(tar|tar.gz).(torrent|metafile)$"
+            NCHECK=$(ls -1 ${TORRENTS_DIR} | egrep "${PATTERN}" | wc -l)
 
-        # Evaluate status.
-#        CURR_SIZE=$(($AVAILDISKSIZE - $AVAILTOT))
-#        status=`echo "scale=2; $CURR_SIZE * 100 / $IMAGESIZE" | bc`
-#        if [ `echo "scale=2; $status <= 0" | bc` -eq 1 ]; then
-#            status=1
-#        elif [ `echo "scale=2; $status >= 100" | bc` -eq 1 ]; then
-#            status=99
-#        fi
+            #Ncheck must have one result!
+            if [ $NCHECK != 1 ]
+            then
+                p_comment 0 "Could not locate source file"
+            fi
 
-        # Send status and bandwidth to the monitor server.
-#        send_monitor_msg "status=$status:speed=$speed"
+            IMAGESOURCE=$(ls -1 ${TORRENTS_DIR} | egrep "${PATTERN}")
+            p_comment 0 "Checking imagesize of image ${IMAGESOURCE}: ..." "\r"
 
-        # Wait $REPORT_INTERVAL sec between each report -AR-
-#        sleep $REPORT_INTERVAL
-#    done
-#    }&
+            IMAGESIZE=$(aria_getsize "${PROTOCOL}" "${TORRENTS_DIR}/${IMAGESOURCE}")
+            p_comment 0 "Checking imagesize of image ${IMAGESOURCE}: ${IMAGESIZE}" "\r"
 
- #   logmsg "Report task started."
- #   REPORT_PID=$!
+            RETRY=0
+            #Starting actual reporting daemon
+            while true
+            do
+
+                if [ $RETRY -ge 5 ]
+                then
+                    # send status 90 percent and ridicilus speed to indicate that the reporting has failed!
+                    #  in the future report status number that indicates this error
+                    send_monitor_msg "status=90:speed=99999"
+                    return
+                fi
+
+                if [ -e "${ARIA_LOG} ]
+                then
+                    LINE=$(tail -n1 $ARIA_LOG)
+                    
+                    case "${LINE} in
+                        # When the download is completed ( SEEDING == completed )
+                        # Set some default values, in the future this will change!
+                        *"download completed"*|SEEDING)
+                            SPEED=0
+                            PROGRESS=90
+                            DONE=true
+                        ;;
+                        *)
+                            PROGRESS=$(echo $LINE | awk 'match($0,/\(([0-9]+)\%\)/) { print substr($0,RSTART+1,RLENGTH-3)}')
+                            SPEED=$(echo $LINE | awk 'match($0,/SPD:(.+)Bs/) { print substr($0,RSTART+4,RLENGTH-6)}' )
+                        ;;
+                    esac
+
+                    # Convert bytes to kilo bytes, when amount of bytes is
+                    # lower then 1024, report 0
+                    if [ $SPEED -lt 1024 ]
+                    then
+                        SPEED=0
+                    else
+                        SPEED=$(echo "scale=2; ( ${SPEED} / 1024 )" | bc)
+                    fi
+
+                    if [ $PROGRESS -ge 90 ]
+                    then
+                        send_monitor_msg "status=90:speed=${SPEED}"
+                    else
+                        send_monitor_MSG "status=${PROGRESS}:speed=${SPEED}"
+                    fi
+
+                    sleep 10
+                else
+                    RETRY=$(( $RETRY + 1 ))
+                    sleep 5
+                fi
+            done
 }
 
 #
