@@ -72,9 +72,6 @@ start_report_task() {
 
     p_stage "Starting reporting"
 
-    p_comment 0 "Reporting is disabled"
-    return
-
     load_variables
 
     case "${PROTOCOL}" in
@@ -99,11 +96,12 @@ start_report_task() {
             fi
 
             IMAGESOURCE=$(ls -1 ${TORRENTS_DIR} | egrep "${PATTERN}")
-            p_comment 0 "Checking imagesize of image ${IMAGESOURCE}: ..." "\r"
+            p_comment 0 "Checking imagesize of image: ${IMAGESOURCE}"
 
             IMAGESIZE=$(aria_getsize "${PROTOCOL}" "${TORRENTS_DIR}/${IMAGESOURCE}")
-            p_comment 0 "Checking imagesize of image ${IMAGESOURCE}: ${IMAGESIZE}" "\r"
+            p_comment 0 " size is ${IMAGESOURCE}"
 
+            {
             RETRY=0
             #Starting actual reporting daemon
             while true
@@ -117,21 +115,27 @@ start_report_task() {
                     return
                 fi
 
-                if [ -e "${ARIA_LOG} ]
+                if [ -e "${ARIA_LOG}" ]
                 then
                     LINE=$(tail -n1 $ARIA_LOG)
+
+                    SEED=0
+                    PROGRESS=0
                     
-                    case "${LINE} in
+                    case "${LINE}" in
                         # When the download is completed ( SEEDING == completed )
                         # Set some default values, in the future this will change!
-                        *"download completed"*|SEEDING)
+                        *"download completed"*|*SEEDING*)
                             SPEED=0
                             PROGRESS=90
                             DONE=true
                         ;;
-                        *)
+                        *SIZE*)
                             PROGRESS=$(echo $LINE | awk 'match($0,/\(([0-9]+)\%\)/) { print substr($0,RSTART+1,RLENGTH-3)}')
                             SPEED=$(echo $LINE | awk 'match($0,/SPD:(.+)Bs/) { print substr($0,RSTART+4,RLENGTH-6)}' )
+                        ;;
+                        *)
+                            continue
                         ;;
                     esac
 
@@ -151,12 +155,27 @@ start_report_task() {
                         send_monitor_MSG "status=${PROGRESS}:speed=${SPEED}"
                     fi
 
+                    if [ "x$DONE" = "xtrue" ]
+                    then
+                        break
+                    fi
+
                     sleep 10
                 else
                     RETRY=$(( $RETRY + 1 ))
                     sleep 5
                 fi
             done
+            } &
+
+            REPORT_PID=$!
+            save_param REPORT_PID $REPORT_PID
+            p_comment 0 "Report process started, with pid ${REPORT_PID}"
+        ;;
+        *)
+            p_comment 0 "Given protocol is not supported"
+        ;;
+    esac
 }
 
 #
