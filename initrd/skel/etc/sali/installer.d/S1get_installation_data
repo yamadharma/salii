@@ -6,5 +6,6 @@ rsync -a ${IMAGESERVER}::scripts/ /scripts/
 
 if [ "x${PROTOCOL}" == "xbittorrent" -o "x${PROTOCOL}" == "xmetafile" ]
 then
+    p_service "Retrieving torrents directory"
 	rsync -a ${IMAGESERVER}::torrents/ /torrents/
 fi

@@ -1,0 +1,42 @@
+#
+#       $Id: scrub.rul 276 2010-11-23 09:08:23Z bas $
+#   vi: set filetype=make:
+#
+
+SCRUB_VERSION	= 2.4
+SCRUB_TARBALL	= scrub-$(SCRUB_VERSION).tar.bz2
+
+#### http://scrub.sourceforge.net ####
+SCRUB_URL 	= ftp://ftp.sara.nl/pub/sali/sources/scrub-$(SCRUB_VERSION).tar.bz2
+
+SCRUB_DIR	= $(INITRD_SRC_DIR)/scrub-$(SCRUB_VERSION)
+
+ALL_SOURCE += $(INITRD_SRC_DIR)/$(SCRUB_TARBALL)
+
+PHONY += scrub
+scrub:	$(SCRUB_DIR).build
+
+$(SCRUB_DIR).build:  $(SCRUB_DIR).unpack
+	cd $(SCRUB_DIR) && ./configure --prefix=/usr  && make
+	touch $@
+
+PHONY += scrub_install
+scrub_install:	$(SCRUB_DIR).install
+
+$(SCRUB_DIR).install:	$(SCRUB_DIR).build
+	cd $(SCRUB_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
+
+$(SCRUB_DIR).unpack:   	$(INITRD_DIR)/make.d/scrub.rul	\
+			$(INITRD_SRC_DIR)/$(SCRUB_TARBALL)
+	rm -rf $(SCRUB_DIR)
+	cd $(INITRD_SRC_DIR) && tar -xvjf $(INITRD_SRC_DIR)/$(SCRUB_TARBALL)
+	touch $@
+
+$(INITRD_SRC_DIR)/$(SCRUB_TARBALL):
+	mkdir -p $(INITRD_SRC_DIR)
+	$(GETSOURCE) $(SCRUB_URL) $(INITRD_SRC_DIR)
+
+PHONY += scrub_clean
+scrub_clean:
+	rm -rf $(SCRUB_DIR)
+	rm -f  $(SCRUB_DIR).build $(SCRUB_DIR).unpack $(SCRUB_DIR).install

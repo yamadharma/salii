@@ -78,6 +78,7 @@ include $(INITRD_MAKE_DIR)/rsync.rul
 include $(INITRD_MAKE_DIR)/udev.rul
 include $(INITRD_MAKE_DIR)/kexec.rul
 include $(INITRD_MAKE_DIR)/aria2.rul
+include $(INITRD_MAKE_DIR)/scrub.rul
 include $(INITRD_MAKE_DIR)/curl.rul
 
 # HvB 7 Jul 2010
@@ -106,6 +107,7 @@ $(INITRD_BUILD_DIR).prep:	$(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/sbin
 	mkdir -p -m 1777 $(INITRD_BUILD_DIR)/tmp
 	mkdir -p -m 1777 $(INITRD_BUILD_DIR)/log
+	mkdir -p -m 1777 $(INITRD_BUILD_DIR)/var/log
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/usr
 
 	#cd $(INITRD_BUILD_DIR)/usr && ln -s ../lib lib
@@ -154,6 +156,7 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(KEXEC_DIR).install		\
 								$(OPENSSH_DIR).install 		\
 								$(ARIA2_DIR).install 		\
+								$(SCRUB_DIR).install 		\
 								$(CURL_DIR).install
 
 #$(TAR_DIR).install 		\
