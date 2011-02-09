@@ -13,13 +13,18 @@
     Author: Dennis Stam and Bas van der Vlies
 
   * All disk environmant variables are now exported so they can be used in the post install
-    scripts.
+    scripts. Also the amount of disks is exported in var NUMDISKS.
     Reported by: Juriaan Saathof
     Fixed by: Bas van der Vlies
 
   * added scrub
     * scrub is a disk wipe utility
     * more information at: http://code.google.com/p/diskscrub/
+    * added a startup script called S98scrub, wich will run if SCRUB=y is specified.
+    * other options are:
+      * SCRUB_DISKS=sda,sdb,/dev/cciss/d0c0 , specify which disks must me scrubbed, separate with ,
+      * SCRUB_OPTIONS="-pdod", specify which options must be passed on to the scrub ( see manpage )
+      * SCRUB_REBOOT=y or SCRUB_HALT=y, reboot or halt the machine
     Author: Dennis Stam
 
   * busybox settings:

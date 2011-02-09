@@ -118,6 +118,9 @@ disk_enumerate(){
         NUMDISKS=$(( $NUMDISKS + 1 ))
         eval "export DISK$NUMDISKS=/dev/$disk"
     done
+
+    #Let's export the amount of disks!
+    export NUMDISKS=$(( $NUMDISKS + 1 ))
 }
 
 ## Sets the disklabel for a specified disk
