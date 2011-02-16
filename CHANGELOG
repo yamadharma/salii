@@ -1,4 +1,8 @@
 1.4.0
+  * Added kernel virtualization support for X86_64 kernel
+    Requested by: Ernst Pijper (SARA)
+    Author: Bas van der Vlies
+
   * A complete rewrite of the rcS script
      * The rcS script has been replaced by /etc/sali/bin/startup and
        /etc/sali/bin/install
