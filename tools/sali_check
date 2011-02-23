@@ -1,0 +1,244 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import re
+import ftplib
+import datetime
+import xmlrpclib
+import getpass
+
+WIKI_URL = 'https://%s:%s@subtrac.sara.nl/oss/sali/login/xmlrpc'
+WIKI_PAGE = 'SaliUsedPrograms'
+
+### TAKEN FROM http://code.activestate.com/recipes/135435-sort-a-string-using-numeric-order
+def sorted_copy(alist):
+    # inspired by Alex Martelli
+    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52234
+    indices = map(_generate_index, alist)
+    decorated = zip(indices, alist)
+    decorated.sort()
+    return [ item for index, item in decorated ]
+    
+def _generate_index(str):
+    """
+    Splits a string into alpha and numeric elements, which
+    is used as an index for sorting"
+    """
+    #
+    # the index is built progressively
+    # using the _append function
+    #
+    index = []
+    def _append(fragment, alist=index):
+        if fragment.isdigit(): fragment = int(fragment)
+        alist.append(fragment)
+
+    # initialize loop
+    prev_isdigit = str[0].isdigit()
+    current_fragment = ''
+    # group a string into digit and non-digit parts
+    for char in str:
+        curr_isdigit = char.isdigit()
+        if curr_isdigit == prev_isdigit:
+            current_fragment += char
+        else:
+            _append(current_fragment)
+            current_fragment = char
+            prev_isdigit = curr_isdigit
+    _append(current_fragment)    
+    return tuple(index)
+### END EXTERNAL
+
+def replace_version( value, program, version ):
+    return value.replace( '$(%s_VERSION)' % program.upper(), version )
+
+def read_maked(path):
+
+    for item in os.listdir(path):
+
+        program = None
+        version = None
+        tarball = None
+        info    = None
+
+        if item.endswith('.rul'):
+            program = item[:-4]
+
+            if program == 'popt':
+                continue
+
+            if program == 'kernel':
+                program = 'linux'
+                regex =  r'%s_(?P<vartype>[A-Z]+)(?P<assign>[:= \t]+)(?P<value>.+)$' % program.upper()
+            else:
+                regex =  r'^%s_(?P<vartype>[A-Z]+)(?P<assign>[:= \t]+)(?P<value>.+)$' % program.upper()
+
+            fi = open(os.path.join(path,item),'r')
+            data = fi.read()
+            fi.close()
+
+            ## match: PROGRAM_VARIABLE = VALUE
+            for result in re.finditer(regex,data,re.MULTILINE):
+                if result.group('vartype').lower() == 'version':
+                    if program == 'linux':
+                        if not version:
+                            version = list()
+                        if result.group('value') not in version:
+                            version.append( result.group('value') )
+                    else:
+                        version = result.group('value')
+                elif result.group('vartype').lower() == 'tarball':
+                    tarball = result.group('value')
+                elif result.group('vartype').lower() == 'info':
+                    info = result.group('info')
+
+            yield(program,version,tarball,info)
+
+DATA = dict()
+
+def append_to_dict(path,sversion):
+
+    ## First we check the trunk
+    path = os.path.join(os.path.join(path,sversion),'initrd/make.d')
+    for program,version,tarball,info in read_maked(path):
+        if not DATA.has_key(program):
+            DATA[program] = dict()
+
+        DATA[program]['tarball'] = tarball
+        DATA[program]['info'] = info
+        
+        if not DATA[program].has_key('versions'):
+            DATA[program]['versions'] = dict()
+
+        if not DATA[program]['versions'].has_key(version):
+            DATA[program]['versions'][version] = list()
+
+        DATA[program]['versions'][version].append(sversion)
+
+def append_main_maked(path,sversion):
+
+    path = os.path.join(os.path.join(path,sversion),'make.d')
+
+    for program,version,tarball,info in read_maked(path):
+        if not DATA.has_key(program):
+            DATA[program] = dict()
+
+        DATA[program]['tarball'] = tarball
+        DATA[program]['info'] = info
+        
+        if not DATA[program].has_key('versions'):
+            DATA[program]['versions'] = dict()
+
+        if program == 'linux':
+            for lversion in version:
+                if not DATA[program]['versions'].has_key(lversion):
+                    DATA[program]['versions'][lversion] = list()
+
+                DATA[program]['versions'][lversion].append(sversion)
+        else:
+            if not DATA[program]['versions'].has_key(version):
+                DATA[program]['versions'][version] = list()
+
+            DATA[program]['versions'][version].append(sversion)
+
+def tags_or_branches(path):
+    for version in os.listdir(path):
+        if os.path.exists(os.path.join(os.path.join(path,version),'initrd/make.d')):
+            append_to_dict(path,version)
+            append_main_maked(path,version)
+
+def column(word,length,align=''):
+    pattern = '%'+align+str(length)+'s'
+    return pattern % word
+
+if __name__ == '__main__':
+
+    action = 'trac'
+    path = None
+
+    if len(sys.argv) > 1 and len(sys.argv) < 4:
+        if os.path.exists(sys.argv[1]):
+            path = sys.argv[1]
+
+        if sys.argv[2] in ['print','trac']:
+            action = sys.argv[2]
+
+    if not path:
+        print "No path valid and/or given"
+        sys.exit(1)
+            
+    ##First we do the trunk ( initrd )
+    append_to_dict(path,'trunk')
+    append_main_maked(path,'trunk')
+
+    ##Now let's do the trunk and branches
+    tags_or_branches(os.path.join(path,'tags'))
+    tags_or_branches(os.path.join(path,'branches'))
+
+    ftp = ftplib.FTP('ftp.sara.nl')
+    ftp.login()
+    try:
+        ftp_data = ftp.nlst('pub/sali/sources')
+    except ftplib.error_perm, resp:
+        ftp_data = list()
+    ftp.close()
+
+    ftp_data = [os.path.basename(item) for item in ftp_data if not os.path.basename(item) in ['.','..']]
+
+    tarballs = list()
+    trac_data = list()
+    if action == 'trac':
+        trac_data.append( '= Packages used by SALI =' )
+
+    for key in sorted_copy(DATA.keys()):
+        if action == 'trac':
+            trac_data.append( '== %s ==' % key )
+            trac_data.append( '|| Version || Used by sali: || Tarball ||' )
+        else:
+            print key
+
+        for version in sorted_copy(DATA[key]['versions'].keys()):
+            if action == 'trac':
+                trac_data.append( '|| %s || %s || %s ||' % ( 
+                    version, 
+                    ', '.join(sorted_copy(DATA[key]['versions'][version])),
+                    ' ftp://ftp.sara.nl/pub/sali/sources/'+replace_version(DATA[key]['tarball'],key,version)
+                ) )
+            else:
+                print column(version,16),'|','Tarbal: ftp://ftp.sara.nl/pub/sali/sources/'+replace_version(DATA[key]['tarball'],key,version)
+                print column('',16),'|','Used in sali:', ', '.join(sorted_copy(DATA[key]['versions'][version]))
+                print
+            tarballs.append(replace_version(DATA[key]['tarball'],key,version))
+
+    if action == 'trac' and trac_data:
+     
+        unix_user = getpass.getuser()
+ 
+        username = raw_input('Username [%s]: ' % unix_user)
+        password = getpass.getpass('Password: ')
+
+        if not username and unix_user:
+            username = unix_user
+
+        try:
+            server = xmlrpclib.ServerProxy( WIKI_URL % ( username, password ) )
+            server.wiki.putPage( 
+                WIKI_PAGE, 
+                "\n".join( trac_data ), 
+                { 'comment': 'autoupdate %s' % str( datetime.datetime.now() ) } 
+            )
+        except xmlrpclib.ProtocolError, err:
+            print "An error has occured: %s" % err.errcode
+            print "   %s" % str( err )
+        except xmlrpclib.Fault, fault:
+            if fault.faultCode == 1:
+                print "Wikipage is already up to date"
+
+    if ftp_data and action != 'trac':
+        ftp_data = set( ftp_data )
+
+        print "Not used tarballs:"
+        for tar in sorted_copy( ftp_data.difference( set( tarballs ) ) ):
+            print ' -',tar
+        print "Note: linux and zlib excluded"
