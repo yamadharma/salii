@@ -9,6 +9,7 @@ KERNELTOOLS_TARBALL 	:= module-init-tools-$(KERNELTOOLS_VERSION).tar.gz
 
 ### http://www.kernel.org/pub/linux/utils/kernel/module-init-tools #####
 KERNELTOOLS_URL		:= ftp://ftp.sara.nl/pub/sali/sources/$(KERNELTOOLS_TARBALL)
+KERNELTOOLS_INFO	:= https://modules.wiki.kernel.org/index.php/Main_Page
 
 ALL_SOURCE += $(INITRD_SRC_DIR)/$(KERNELTOOLS_TARBALL)
 

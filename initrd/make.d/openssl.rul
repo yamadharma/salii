@@ -17,6 +17,7 @@ OPENSSL_TARBALL_TARGET  := $(SRC_DIR)/$(OPENSSL_TARBALL)
 
 #### http://www.openssl.org/source/ ####
 OPENSSL_URL             := ftp://ftp.sara.nl/pub/sali/sources/$(OPENSSL_TARBALL)
+OPENSSL_INFO		:= http://www.openssl.org/
 
 OPENSSL_BINARIES        := $(SRC_DIR)/$(OPENSSL_DIR)/apps/openssl
 OPENSSL_PATCHES 		:= $(shell ls $(PATCH_DIR)/openssl.*.patch 2>/dev/null | sort)

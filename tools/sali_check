@@ -10,6 +10,7 @@ import getpass
 
 WIKI_URL = 'https://%s:%s@subtrac.sara.nl/oss/sali/login/xmlrpc'
 WIKI_PAGE = 'SaliUsedPrograms'
+EXCLUDE_VERSIONS = ['1.1.0','1.1.1','1.2.0','1.2.1','1.2.2','1.2.3','1.2.4']
 
 ### TAKEN FROM http://code.activestate.com/recipes/135435-sort-a-string-using-numeric-order
 def sorted_copy(alist):
@@ -91,7 +92,7 @@ def read_maked(path):
                 elif result.group('vartype').lower() == 'tarball':
                     tarball = result.group('value')
                 elif result.group('vartype').lower() == 'info':
-                    info = result.group('info')
+                    info = result.group('value')
 
             yield(program,version,tarball,info)
 
@@ -144,6 +145,9 @@ def append_main_maked(path,sversion):
 
 def tags_or_branches(path):
     for version in os.listdir(path):
+        if version in EXCLUDE_VERSIONS:
+            continue
+
         if os.path.exists(os.path.join(os.path.join(path,version),'initrd/make.d')):
             append_to_dict(path,version)
             append_main_maked(path,version)
@@ -168,13 +172,11 @@ if __name__ == '__main__':
         print "No path valid and/or given"
         sys.exit(1)
             
-    ##First we do the trunk ( initrd )
-    append_to_dict(path,'trunk')
-    append_main_maked(path,'trunk')
-
-    ##Now let's do the trunk and branches
     tags_or_branches(os.path.join(path,'tags'))
     tags_or_branches(os.path.join(path,'branches'))
+
+    append_to_dict(path,'trunk')
+    append_main_maked(path,'trunk')
 
     ftp = ftplib.FTP('ftp.sara.nl')
     ftp.login()
@@ -194,6 +196,8 @@ if __name__ == '__main__':
     for key in sorted_copy(DATA.keys()):
         if action == 'trac':
             trac_data.append( '== %s ==' % key )
+            if DATA[key]['info']:
+                trac_data.append( 'Project webpage: [%s]' % DATA[key]['info'] )
             trac_data.append( '|| Version || Used by sali: || Tarball ||' )
         else:
             print key
@@ -223,11 +227,16 @@ if __name__ == '__main__':
 
         try:
             server = xmlrpclib.ServerProxy( WIKI_URL % ( username, password ) )
-            server.wiki.putPage( 
+            rslt = server.wiki.putPage( 
                 WIKI_PAGE, 
                 "\n".join( trac_data ), 
                 { 'comment': 'autoupdate %s' % str( datetime.datetime.now() ) } 
             )
+
+            if rslt:
+                print "Data has been save on wikipage %s" % WIKI_PAGE
+            else:
+                print "A unknown error has occurred, failed to save data"
         except xmlrpclib.ProtocolError, err:
             print "An error has occured: %s" % err.errcode
             print "   %s" % str( err )

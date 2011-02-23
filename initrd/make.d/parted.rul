@@ -12,6 +12,7 @@ PARTED_TARBALL := parted-$(PARTED_VERSION).tar.gz
 
 #### http://ftp.gnu.org/gnu/parted/ ####
 PARTED_URL := ftp://ftp.sara.nl/pub/sali/sources/$(PARTED_TARBALL)
+PARTED_INFO := http://www.gnu.org/software/parted/index.shtml
 
 PARTED_BINARY := $(INITRD_SRC_DIR)/$(PARTED_DIR)/parted/.libs/parted
 

@@ -7,6 +7,7 @@ UDEV_TARBALL	= udev-$(UDEV_VERSION).tar.bz2
 
 #### http://www.kernel.org/pub/linux/utils/kernel/hotplug/ ####
 UDEV_URL	= ftp://ftp.sara.nl/pub/sali/sources/
+UDEV_INFO	= http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 
 UDEV_DIR	= $(INITRD_SRC_DIR)/udev-$(UDEV_VERSION)
 

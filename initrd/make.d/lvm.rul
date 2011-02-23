@@ -22,6 +22,7 @@ LVM_TARBALL	:= LVM$(LVM_VERSION).tgz
 
 #### ftp://sources.redhat.com/pub/lvm2/ ####
 LVM_URL		:= ftp://ftp.sara.nl/pub/sali/sources/$(LVM_TARBALL)
+LVM_INFO	:= http://sources.redhat.com/lvm/
 
 LVM_BINARY	:= $(INITRD_SRC_DIR)/$(LVM_DIR)/tools/lvm
 

@@ -8,6 +8,7 @@ KEXEC_TARBALL	= kexec-tools-$(KEXEC_VERSION).tar.bz2
 
 #### http://kernel.org/pub/linux/utils/kernel/kexec/ ####
 KEXEC_URL	= ftp://ftp.sara.nl/pub/sali/sources/
+KEXEC_INFO	= http://kernel.org/pub/linux/utils/kernel/kexec/
 
 KEXEC_DIR	= $(INITRD_SRC_DIR)/kexec-tools-$(KEXEC_VERSION)
 

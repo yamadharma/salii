@@ -8,6 +8,7 @@ SCRUB_TARBALL	= scrub-$(SCRUB_VERSION).tar.bz2
 
 #### http://scrub.sourceforge.net ####
 SCRUB_URL 	= ftp://ftp.sara.nl/pub/sali/sources/scrub-$(SCRUB_VERSION).tar.bz2
+SCRUB_INFO	= http://code.google.com/p/diskscrub/
 
 SCRUB_DIR	= $(INITRD_SRC_DIR)/scrub-$(SCRUB_VERSION)
 

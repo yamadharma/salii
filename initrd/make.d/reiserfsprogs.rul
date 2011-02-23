@@ -7,6 +7,7 @@ REISERFSPROGS_VERSION := 3.6.21
 REISERFSPROGS_DIR := $(INITRD_SRC_DIR)/reiserfsprogs-$(REISERFSPROGS_VERSION)
 REISERFSPROGS_TARBALL := reiserfsprogs-$(REISERFSPROGS_VERSION).tar.gz
 REISERFSPROGS_URL := ftp://ftp.sara.nl/pub/sali/sources/$(REISERFSPROGS_TARBALL)
+REISERFSPROGS_INFO := https://ftp.kernel.org/pub/linux/utils/fs/reiserfs/
 
 MKREISERFS_BINARY := $(REISERFSPROGS_DIR)/mkreiserfs/mkreiserfs
 REISERFSTUNE_BINARY := $(REISERFSPROGS_DIR)/tune/reiserfstune

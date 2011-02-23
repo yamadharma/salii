@@ -13,6 +13,7 @@ BUSYBOX_TARBALL = busybox-$(BUSYBOX_VERSION).tar.bz2
 
 #### http://www.busybox.net/ ####
 BUSYBOX_URL 	= ftp://ftp.sara.nl/pub/sali/sources/$(BUSYBOX_TARBALL)
+BUSYBOX_INFO	= http://www.busybox.net/
 
 BUSYBOX_PATCHES = $(shell ls $(INITRD_PATCH_DIR)/busybox.*.patch 2>/dev/null | sort)
 BUSYBOX_CONFIG 	= $(INITRD_PATCH_DIR)/busybox.standard.config
