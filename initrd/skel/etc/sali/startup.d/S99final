@@ -36,7 +36,7 @@ p_comment 0 "Scriptname: ${SCRIPTNAME}, imagename: ${IMAGENAME}, hostname: ${HOS
 
 if [ -z "${PROTOCOL}" ]
 then
-	p_comment 0 "\$PROTOCOL variable is not set, using deprecated installation method!"
+	p_comment 0 "\$PROTOCOL variable is not set, using deprecated installation method\!"
 	old_getimage
 fi
 

@@ -3,7 +3,7 @@
 #   vi: set filetype=make:
 #
 
-ARIA2_VERSION	= 1.10.6
+ARIA2_VERSION	= 1.10.9
 ARIA2_TARBALL	= aria2-$(ARIA2_VERSION).tar.bz2
 
 #### http://aria2.sourceforge.net ####

@@ -36,14 +36,17 @@
     * added login
     Author: Dennis Stam
 
-  * update oppenssh 5.6p1
-  * update lvm 2.02.77
+  * update aria 1.10.9
+  * update busybox 1.18.3
+  * update curl 7.21.4 (security update)
+  * update e2fsprogs 1.41.14
+  * update kernel 2.6.36.4
+  * update lvm 2.2.02.84
+  * update mdadm 3.2
+  * update openssh 5.8p1
+  * update openssl 1.0.0d
+  * update udev 166
   * update xfsprogs 3.1.4
-  * update aria 1.10.6
-  * update busybox 1.18.2
-  * update udev 165
-  * update curl 7.21.2 (security update)
-  * update kernel 2.6.36.3
 
 1.3.5
   * The init script has been modernised and does not include the /etc/init.d/functions

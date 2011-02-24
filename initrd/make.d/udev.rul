@@ -2,7 +2,7 @@
 #  vi: set filetype=make:
 #
 
-UDEV_VERSION	= 165
+UDEV_VERSION	= 166
 UDEV_TARBALL	= udev-$(UDEV_VERSION).tar.bz2
 
 #### http://www.kernel.org/pub/linux/utils/kernel/hotplug/ ####
