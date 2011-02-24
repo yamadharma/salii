@@ -79,6 +79,43 @@ case "${PROTOCOL}" in
             fi
         done
     ;;
+    rsync)
+        IMAGESIZE=$(rsync -avn --numeric-ids $IMAGESERVER::$IMAGENAME|grep "total size"|awk '{print $4}')
+        IMAGESIZE=$(( $IMAGESIZE / 1024 ))
+        PREVSIZE=0
+
+        while true
+        do
+            if [ -e "/a" ]
+            then
+                CURSIZE=$(df 2>/dev/null | grep "/a" | awk '{ print $3}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
+                CURSIZE=$(echo $CURSIZE|bc)
+                PERCENT=$(echo "scale=2; ($CURSIZE / $IMAGESIZE) * 100"| bc)
+                SPEED=$(echo "scale=2; ($CURSIZE - $PREVSIZE) / 10" | bc)
+
+                if [ $(echo "scale=2; $PERCENT <= 0" | bc) -eq 1 ]
+                then
+                    PERCENT=1
+                elif [ $(echo "scale=2; $PERCENT >= 100" | bc) -eq 1 ]
+                then
+                    PERCENT=99
+                fi
+
+                send_monitor_msg "status=${PERCENT}:speed=${SPEED}"
+
+                if [ $CURSIZE -gt $IMAGESIZE ]
+                then
+                    break
+                fi
+
+                PREVSIZE=$CURSIZE
+
+                sleep 10
+            else
+                sleep 5
+            fi
+        done
+    ;;
     *)
         p_comment 0 "Given protocol is not supported"
     ;;
