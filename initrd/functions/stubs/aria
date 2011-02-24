@@ -73,8 +73,8 @@ aria_get_file() {
     save_param ARIA_LOG /tmp/aria.log
 
     ##Starting aria2c and sending the stdout to a file
-    logmsg "/usr/bin/aria2c --dir $destination $metafile > $metafile_log &"
-    /usr/bin/aria2c --human-readable=false--dir $destination $metafile > $metafile_log &
+    logmsg "/usr/bin/aria2c --human-readable=false --dir $destination $metafile > $metafile_log &"
+    /usr/bin/aria2c --human-readable=false --dir $destination $metafile > $metafile_log &
 
     pid=$!
     if [ ! -d /proc/$pid ]; then

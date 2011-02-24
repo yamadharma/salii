@@ -72,110 +72,25 @@ start_report_task() {
 
     p_stage "Starting reporting"
 
-    load_variables
+    . /tmp/variables.txt
 
     case "${PROTOCOL}" in
         bittorrent|metafile)
             p_service "Enabling reporting for bittorrent/metafile"
-            p_comment 0 " note: when progress is 90% and speed 0 or -, image is unpacking"
-
-            # Does the torrents directory exist!
-            if [ ! -d "${TORRENTS_DIR}" ]
-            then
-                p_comment 0 "Could not locate torrents directory"
-                return
-            fi
-
-            PATTERN="^image-$IMAGENAME.(tar|tar.gz).(torrent|metafile)$"
-            NCHECK=$(ls -1 ${TORRENTS_DIR} | egrep "${PATTERN}" | wc -l)
-
-            #Ncheck must have one result!
-            if [ $NCHECK != 1 ]
-            then
-                p_comment 0 "Could not locate source file"
-            fi
-
-            IMAGESOURCE=$(ls -1 ${TORRENTS_DIR} | egrep "${PATTERN}")
-            p_comment 0 "Checking imagesize of image: ${IMAGESOURCE}"
-
-            IMAGESIZE=$(aria_getsize "${PROTOCOL}" "${TORRENTS_DIR}/${IMAGESOURCE}")
-            p_comment 0 " size is ${IMAGESOURCE}"
-
-            {
-            RETRY=0
-            #Starting actual reporting daemon
-            while true
-            do
-
-                if [ $RETRY -ge 5 ]
-                then
-                    # send status 90 percent and ridicilus speed to indicate that the reporting has failed!
-                    #  in the future report status number that indicates this error
-                    send_monitor_msg "status=90:speed=99999"
-                    return
-                fi
-
-                if [ -e "${ARIA_LOG}" ]
-                then
-                    LINE=$(tail -n1 $ARIA_LOG)
-
-                    SEED=0
-                    PROGRESS=0
-                    
-                    case "${LINE}" in
-                        # When the download is completed ( SEEDING == completed )
-                        # Set some default values, in the future this will change!
-                        *"download completed"*|*SEEDING*)
-                            SPEED=0
-                            PROGRESS=90
-                            DONE=true
-                        ;;
-                        *SIZE*)
-                            PROGRESS=$(echo $LINE | awk 'match($0,/\(([0-9]+)\%\)/) { print substr($0,RSTART+1,RLENGTH-3)}')
-                            SPEED=$(echo $LINE | awk 'match($0,/SPD:(.+)Bs/) { print substr($0,RSTART+4,RLENGTH-6)}' )
-                        ;;
-                        *)
-                            continue
-                        ;;
-                    esac
-
-                    # Convert bytes to kilo bytes, when amount of bytes is
-                    # lower then 1024, report 0
-                    if [ $SPEED -lt 1024 ]
-                    then
-                        SPEED=0
-                    else
-                        SPEED=$(echo "scale=2; ( ${SPEED} / 1024 )" | bc)
-                    fi
-
-                    if [ $PROGRESS -ge 90 ]
-                    then
-                        send_monitor_msg "status=90:speed=${SPEED}"
-                    else
-                        send_monitor_MSG "status=${PROGRESS}:speed=${SPEED}"
-                    fi
-
-                    if [ "x$DONE" = "xtrue" ]
-                    then
-                        break
-                    fi
-
-                    sleep 10
-                else
-                    RETRY=$(( $RETRY + 1 ))
-                    sleep 5
-                fi
-            done
-            } &
-
-            REPORT_PID=$!
-            save_param REPORT_PID $REPORT_PID
-            p_comment 0 "Report process started, with pid ${REPORT_PID}"
+            p_comment 0 " note: when progress is 90%% and speed 0 or -, image is unpacking"
         ;;
         *)
             p_comment 0 "Given protocol is not supported"
+            return
         ;;
     esac
+
+    /bin/sh /etc/sali/bin/report_task &
+
+    REPORT_PID=$!
+    export REPORT_PID
+    save_param REPORT_PID $REPORT_PID
+    p_comment 0 "Report process started, with pid ${REPORT_PID}"
 }
 
 #
@@ -187,7 +102,7 @@ start_report_task() {
 stop_report_task() {
 
     if [ ! -z $REPORT_PID ]; then
-        kill -9 $REPORT_PID
+        killall -9 report_task
         logmsg "Report task stopped."
     fi
 

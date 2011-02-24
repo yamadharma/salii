@@ -28,6 +28,11 @@ then
 	return 1
 fi
 
+p_comment 0 "Using old method: choose_autoinstall_script()"
+choose_autoinstall_script()
+
+p_comment 0 "Scriptname: ${SCRIPTNAME}, imagename: ${IMAGENAME}, hostname: ${HOSTNAME}
+
 
 if [ -z "${PROTOCOL}" ]
 then

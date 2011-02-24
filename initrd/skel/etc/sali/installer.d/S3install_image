@@ -5,4 +5,7 @@ choose_autoinstall_script
 
 write_variables
 
-run_autoinstall_script
+load_variables
+
+p_service "Starting old installer file"
+sh $SCRIPTNAME
