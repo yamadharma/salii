@@ -15,6 +15,12 @@ then
 		ssh-keygen -t rsa -N "" -f /etc/ssh/ssh_host_rsa_key -q
 	fi
 
+    if [ ! -f "/etc/ssh/ssh_host_ecdsa_key" ]
+    then
+        p_service "creating a new ecdsa key"
+        ssh-keygen -t rsa -N "" -f /etc/ssh/ssh_host_ecdsa_key -q
+    fi
+
 	mkdir -p /var/run/sshd
 	chmod 0755 /var/run/sshd
 	/usr/sbin/sshd

@@ -5,6 +5,7 @@
 
 case "${PROTOCOL}" in
     bittorrent|metafile)
+
         # Does the torrents directory exist!
         if [ ! -d "${TORRENTS_DIR}" ]
         then
@@ -32,7 +33,7 @@ case "${PROTOCOL}" in
             then
                 LINE=$(tail -n1 $ARIA_LOG)
 
-                SEED=0
+                SPEED=0
                 PROGRESS=0
                     
                 case "${LINE}" in
@@ -51,7 +52,7 @@ case "${PROTOCOL}" in
                         continue
                     ;;
                 esac
-
+                
                 # Convert bytes to kilo bytes, when amount of bytes is
                 # lower then 1024, report 0
                 if [ $SPEED -lt 1024 ]
@@ -75,6 +76,7 @@ case "${PROTOCOL}" in
 
                 sleep 10
             else
+                . /tmp/variables.txt
                 sleep 5
             fi
         done
