@@ -2,9 +2,9 @@
 #	$Id$
 #
 
-::sysinit:/etc/sali/bin/startup
+::sysinit:/bin/startup
 
-::once:/etc/sali/bin/installer
+::once:/bin/installer
 
 tty2::askfirst:/bin/login -f root
 tty3::askfirst:/bin/login -f root
