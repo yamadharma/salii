@@ -98,6 +98,8 @@ $(INITRD_BUILD_DIR).prep:	$(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/ssh
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/sali
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/sali/stubs
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/installer.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/startup.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/default
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/init.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib
@@ -212,6 +214,12 @@ endif
 	install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 
 	install -m 755 $(TOPDIR)/VERSION $(INITRD_BUILD_DIR)/etc/sali_version
+
+	install -m 644 $(INITRD_DIR)/sali/startup.d/* $(INITRD_BUILD_DIR)/etc/startup.d/
+
+	install -m 644 $(INITRD_DIR)/sali/installer.d/* $(INITRD_BUILD_DIR)/etc/installer.d/
+
+	install -m 755 $(INITRD_DIR)/sali/bin/* $(INITRD_BUILD_DIR)/bin
 
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
 

@@ -89,7 +89,7 @@ start_report_task() {
         ;;
     esac
 
-    /bin/sh /etc/sali/bin/report_task &
+    /bin/sh /bin/report_task &
 
     REPORT_PID=$!
     export REPORT_PID
