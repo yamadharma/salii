@@ -4,8 +4,7 @@
     Author: Bas van der Vlies
 
   * A complete rewrite of the rcS script
-     * The rcS script has been replaced by /etc/sali/bin/startup and
-       /etc/sali/bin/install
+     * The rcS script has been replaced by /bin/startup and /bin/install
     Author: Dennis Stam
 
   * The init script has been changed so it will not include /etc/init.d/functions file. So when
