@@ -1,4 +1,0 @@
-
-p_stage "Running pre-install scripts"
-
-run_pre_install_scripts

@@ -1,6 +1,0 @@
-
-p_stage "Opening console"
-
-printf "\n"
-
-exec cttyhack /bin/login -f root 
