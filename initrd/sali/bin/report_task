@@ -1,0 +1,124 @@
+#!/bin/sh
+
+. /etc/init.d/functions
+. /tmp/variables.txt
+
+case "${PROTOCOL}" in
+    bittorrent|metafile)
+
+        # Does the torrents directory exist!
+        if [ ! -d "${TORRENTS_DIR}" ]
+        then
+            p_comment 0 "Could not locate torrents directory"
+            return
+        fi
+
+        PATTERN="^image-$IMAGENAME.(tar|tar.gz).(torrent|metafile)$"
+        NCHECK=$(ls -1 ${TORRENTS_DIR} | egrep "${PATTERN}" | wc -l)
+
+        #Ncheck must have one result!
+        if [ $NCHECK != 1 ]
+        then
+            p_comment 0 "Could not locate source file"
+        fi
+
+        IMAGESOURCE=$(ls -1 ${TORRENTS_DIR} | egrep "${PATTERN}")
+        IMAGESIZE=$(aria_getsize "${PROTOCOL}" "${TORRENTS_DIR}/${IMAGESOURCE}")
+
+        #Starting actual reporting daemon
+        while true
+        do
+
+            if [ -e "${ARIA_LOG}" ]
+            then
+                LINE=$(tail -n1 $ARIA_LOG)
+
+                SPEED=0
+                PROGRESS=0
+                    
+                case "${LINE}" in
+                    # When the download is completed ( SEEDING == completed )
+                    # Set some default values, in the future this will change!
+                    *SIZE*)
+                        PROGRESS=$(echo $LINE | awk 'match($0,/\(([0-9]+)\%\)/) { print substr($0,RSTART+1,RLENGTH-3)}')
+                        SPEED=$(echo $LINE | awk 'match($0,/SPD:(.+)Bs/) { print substr($0,RSTART+4,RLENGTH-6)}' )
+                    ;;
+                    *"download completed"*|*SEEDING*)
+                        SPEED=0
+                        PROGRESS=90
+                        DONE=true
+                    ;;
+                    *)
+                        continue
+                    ;;
+                esac
+                
+                # Convert bytes to kilo bytes, when amount of bytes is
+                # lower then 1024, report 0
+                if [ $SPEED -lt 1024 ]
+                then
+                    SPEED=0
+                else
+                    SPEED=$(echo "scale=2; ( ${SPEED} / 1024 )" | bc)
+                fi
+
+                if [ $PROGRESS -ge 90 ]
+                then
+                    send_monitor_msg "status=90:speed=${SPEED}"
+                else
+                    send_monitor_msg "status=${PROGRESS}:speed=${SPEED}"
+                fi
+
+                if [ "x$DONE" = "xtrue" ]
+                then
+                    break
+                fi
+
+                sleep 10
+            else
+                . /tmp/variables.txt
+                sleep 5
+            fi
+        done
+    ;;
+    rsync)
+        IMAGESIZE=$(rsync -avn --numeric-ids $IMAGESERVER::$IMAGENAME|grep "total size"|awk '{print $4}')
+        IMAGESIZE=$(( $IMAGESIZE / 1024 ))
+        PREVSIZE=0
+
+        while true
+        do
+            if [ -e "/a" ]
+            then
+                CURSIZE=$(df 2>/dev/null | grep "/a" | awk '{ print $3}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
+                CURSIZE=$(echo $CURSIZE|bc)
+                PERCENT=$(echo "scale=2; ($CURSIZE / $IMAGESIZE) * 100"| bc)
+                SPEED=$(echo "scale=2; ($CURSIZE - $PREVSIZE) / 10" | bc)
+
+                if [ $(echo "scale=2; $PERCENT <= 0" | bc) -eq 1 ]
+                then
+                    PERCENT=1
+                elif [ $(echo "scale=2; $PERCENT >= 100" | bc) -eq 1 ]
+                then
+                    PERCENT=99
+                fi
+
+                send_monitor_msg "status=${PERCENT}:speed=${SPEED}"
+
+                if [ $CURSIZE -gt $IMAGESIZE ]
+                then
+                    break
+                fi
+
+                PREVSIZE=$CURSIZE
+
+                sleep 10
+            else
+                sleep 5
+            fi
+        done
+    ;;
+    *)
+        p_comment 0 "Given protocol is not supported"
+    ;;
+esac

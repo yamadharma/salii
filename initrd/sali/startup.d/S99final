@@ -1,0 +1,43 @@
+
+p_stage "Final preparations"
+
+p_service "Loaded modules"
+for module in $(cat /proc/modules | awk '{print $1}')
+do
+	p_comment 0 "${module}"
+done
+
+if [ "x${RESCUE}" == "xyes" ]
+then
+	p_service "RESCUE var has been set opening console"
+	open_console
+	return 0
+fi
+
+p_service "Checking for SystsemImager specific things"
+
+if [ -z "${SCRIPTNAME}" -a -z "${IMAGENAME}" -a -z "${HOSTNAME}" ]
+then
+	p_comment 0 "Could not found any of the following variables:"
+	p_comment 0 "  - SCRIPNAME"
+	p_comment 0 "  - IMAGENAME"
+	p_comment 0 "  - HOSTNAME"
+	p_comment 0 "We need these variables for determing which image must be installed"
+	p_comment 0 ""
+	p_comment 0 "This message can be ignored when you wan't a rescue shell"
+	return 1
+fi
+
+p_comment 0 "Using old method: choose_autoinstall_script()"
+choose_autoinstall_script()
+
+p_comment 0 "Scriptname: ${SCRIPTNAME}, imagename: ${IMAGENAME}, hostname: ${HOSTNAME}
+
+
+if [ -z "${PROTOCOL}" ]
+then
+	p_comment 0 "\$PROTOCOL variable is not set, using deprecated installation method\!"
+	old_getimage
+fi
+
+return 0

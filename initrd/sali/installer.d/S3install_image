@@ -1,0 +1,11 @@
+
+p_stage "Installing image ( using the old method )"
+
+choose_autoinstall_script
+
+write_variables
+
+load_variables
+
+p_service "Starting old installer file"
+sh $SCRIPTNAME
