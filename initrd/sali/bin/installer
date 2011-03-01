@@ -3,6 +3,13 @@
 . /etc/init.d/functions
 . /tmp/variables.txt
 
+if [ "x${RESCUE}" == "xyes" ]
+then
+	p_service "RESCUE var has been set opening console"
+	open_console
+	return 0
+fi
+
 ## Let's gather the given kernel arguments
 p_separator
 p_section "Starting installation process"

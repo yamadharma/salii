@@ -2,10 +2,10 @@ old_getimage(){
 
     if [ "x$BITTORRENT" = "xy" ]
     then
-	PROTOCOL="bittorrent"
-	STAGING=$BITTORRENT_STAGING
+	    PROTOCOL="bittorrent"
+    	STAGING="$BITTORRENT_STAGING"
     else
-	PROTOCOL="rsync"
+	    PROTOCOL="rsync"
     fi
 
 }

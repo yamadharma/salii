@@ -204,12 +204,10 @@ endif
 	install -m 755 $(INITRD_DIR)/skel/etc/init.d/rcS \
 	  $(INITRD_BUILD_DIR)/etc/init.d/rcS
 
-	$(INITRD_DIR)/functions/sali_functions --makefile --stubsdir $(INITRD_DIR)/functions/stubs \
+	$(INITRD_DIR)/sali/bin/sali_functions --makefile --stubsdir $(INITRD_DIR)/functions/stubs \
 	  --tmpfile $(INITRD_DIR)/functions/functions.mbm
 
 	install -m 644 $(INITRD_DIR)/functions/stubs/* $(INITRD_BUILD_DIR)/etc/sali/stubs/
-
-	install -m 755 $(INITRD_DIR)/functions/sali_functions $(INITRD_BUILD_DIR)/etc/sali/bin/sali_functions
 
 	install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 

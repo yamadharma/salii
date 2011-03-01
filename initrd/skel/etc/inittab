@@ -8,5 +8,6 @@
 
 tty2::askfirst:/bin/login -f root
 tty3::askfirst:/bin/login -f root
+tty4::once:/usr/bin/tail -f /log/monitor.log
 
 ::ctrlaltdel:/sbin/reboot
