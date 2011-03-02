@@ -28,6 +28,9 @@ then
     choose_autoinstall_script()
 
     p_comment 0 "Scriptname: ${SCRIPTNAME}, imagename: ${IMAGENAME}, hostname: ${HOSTNAME}"
+
+    save_param SCRIPTNAME $SCRIPTNAME
+    save_param IMAGENAME $IMAGENAME
     
     if [ -z "${PROTOCOL}" ]
     then
