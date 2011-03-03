@@ -1,0 +1,14 @@
+Source: sali
+Section: admin
+Priority: optional
+Maintainer: Dennis Stam <dennis.stam@sara.nl>
+Build-Depends: debhelper (>= 7.0.15), cdbs (>= 0.4.52), python, python-support (>= 0.8.4)
+Build-Depends-Indep: python (>= 2.5)
+Standards-Version: 3.8.0
+
+Package: sali
+Architecture: all
+Depends: ${python:Depends}
+Conflicts: bittornado (<= 0.3.18)
+Description: The sali server tools
+
