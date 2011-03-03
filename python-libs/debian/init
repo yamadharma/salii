@@ -1,0 +1,44 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides: sali
+# Required-Start: $network rsyncd
+# Required-Stop:
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Short-Description: Sali server daemons
+# Description: This daemon is used for serving bittorrent files
+#              also this daemon recieves the monitor data from the clients
+### END INIT INFO
+
+## sali_server has a build in start/stop/restart function
+
+. /etc/default/sali
+
+CFG="${SALI_CONFIG:=/etc/sali/sali.cfg}"
+PYTHON="${PYTHON_CMD:=$(which python)}"
+
+case "$1" in
+    start)
+        echo "Starting sali_server daemon..."
+        $PYTHON $SALI_CMD $CFG start
+    ;;
+    stop)
+        echo "Stopping sali_server daemon..."
+        $PYTHON $SALI_CMD $CFG stop
+    ;;
+    restart)
+        echo "Restarting sali daemon..."
+        $PYTHON $SALI_CMD $CFG restart
+    ;;
+    *)
+        if [ "$(cat /etc/debian_version | awk -F . '{print $1}')" -ge "6" ]
+        then 
+            echo "Usage: service sali start|stop|restart"
+        else
+            echo "Usage: /etc/init.d/sali start|stop|restart"
+        fi
+    ;;
+esac
+
+exit 0  
