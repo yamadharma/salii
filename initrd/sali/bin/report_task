@@ -41,7 +41,7 @@ case "${PROTOCOL}" in
                     # Set some default values, in the future this will change!
                     *SIZE*)
                         PROGRESS=$(echo $LINE | awk 'match($0,/\(([0-9]+)\%\)/) { print substr($0,RSTART+1,RLENGTH-3)}')
-                        SPEED=$(echo $LINE | awk 'match($0,/SPD:(.+)Bs /) { print substr($0,RSTART+4,RLENGTH-6)}' )
+                        SPEED=$(echo $LINE | awk 'match($0,/SPD:(.+)Bs /) { print substr($0,RSTART+4,RLENGTH-7)}' )
                     ;;
                     *"download completed"*|*SEEDING*)
                         SPEED=0
@@ -52,6 +52,11 @@ case "${PROTOCOL}" in
                         continue
                     ;;
                 esac
+
+                if [ -z "${SPEED}" ]
+                then
+                    SPEED=0
+                fi
                 
                 # Convert bytes to kilo bytes, when amount of bytes is
                 # lower then 1024, report 0
