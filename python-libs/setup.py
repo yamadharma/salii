@@ -36,7 +36,7 @@ setup(
                 'config/sali.cfg', 
                 'config/getimage.exclude',
             ] ),
-        (   '/etc/sali/rsync_stub', [
+        (   '/etc/sali/rsync_stubs', [
                 'config/rsync_stubs/00header.conf',
             ] )
         ],
