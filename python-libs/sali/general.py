@@ -269,7 +269,7 @@ class DaemonCtl( object ):
             pf = open( self.pidfile, 'r' )
             pid = int( pf.read().strip() )
             pf.close()
-        except IOerror:
+        except IOError:
             pid = None
 
         if not pid:

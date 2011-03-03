@@ -183,7 +183,7 @@ class GetImage( ServerClient ):
         mfo.close()
 
         fto.write( '## Rules from the getimage.exclude\n' )
-        gex = open( '/data/sali/getimage.exclude' )
+        gex = open( '/etc/sali/getimage.exclude' )
         fto.write( gex.read() )
         gex.close()
 
