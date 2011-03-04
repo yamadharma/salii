@@ -198,7 +198,7 @@ if __name__ == '__main__':
             trac_data.append( '== %s ==' % key )
             if DATA[key]['info']:
                 trac_data.append( 'Project webpage: [%s]' % DATA[key]['info'] )
-            trac_data.append( '|| Version || Used by sali: || Tarball ||' )
+            trac_data.append( '||= Version =||= Used by sali: =||= Tarball =||' )
         else:
             print key
 
