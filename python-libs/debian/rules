@@ -8,3 +8,7 @@ include /usr/share/cdbs/1/class/python-distutils.mk
 DEB_PYTHON_SETUP_CMD := setup.py
 DEB_PYTHON_COMPRESS_EXCLUDE := .pyc
 DEB_STRIP_EXCLUDE := .pyc
+
+binary-predeb/sali::
+	mkdir -p debian/sali/usr/sbin
+	mv debian/sali/usr/bin/sali_server debian/sali/usr/sbin/sali_server

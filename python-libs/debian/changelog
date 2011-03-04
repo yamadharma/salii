@@ -1,4 +1,10 @@
-sali (1.4.0) unstable; urgency=low
+sali (1.4.0-2) unstable; urgency=low
+
+  * Debian package change.
+
+ -- Dennis Stam <dennis.stam@sara.nl>  Fri, 04 Mar 2011 11:57:33 +0100
+
+sali (1.4.0-1) unstable; urgency=low
 
   * Initial release.
 
