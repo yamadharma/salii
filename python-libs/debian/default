@@ -1,5 +1,5 @@
 
 SALI_ENABLED=y
-SALI_CMD=/usr/bin/sali_server
+SALI_CMD=/usr/sbin/sali_server
 SALI_CONFIG=/etc/sali/sali.cfg
 
