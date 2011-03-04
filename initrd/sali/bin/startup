@@ -12,7 +12,7 @@ read_kernel_append_parameters
 
 if [ -z "${VERBOSELEVEL}" ]
 then
-        VERBOSELEVEL=256
+        VERBOSELEVEL=2
 fi
 
 write_variables
