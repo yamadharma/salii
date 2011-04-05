@@ -1,3 +1,10 @@
+1.4.1
+  * Added experimental support for ppc64 architecture. Tested under SLES 11.1 with Power 6.
+    Author: Dennis Stam & Michel Scheerman
+
+  * Change the find_all_disks order from by-id to by-path first, see ticket #16
+    Author: Dennis Stam
+
 1.4.0
   * Added kernel virtualization support for X86_64 kernel
     Requested by: Ernst Pijper (SARA)

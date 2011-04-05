@@ -21,9 +21,7 @@ PARTED_BINARY := $(INITRD_SRC_DIR)/$(PARTED_DIR)/parted/.libs/parted
 
 ALL_SOURCE += $(INITRD_SRC_DIR)/$(PARTED_TARBALL)
 
-ifdef IS_PPC64
-	PARTED_CONFIGURE = --build=powerpc-unknown-linux
-endif
+PARTED_CONFIGURE = --build=powerpc-unknown-linux
 
 PHONY += parted
 parted:	$(PARTED_DIR).build
@@ -33,14 +31,9 @@ $(PARTED_DIR).build:	$(INITRD_SRC_DIR)/$(PARTED_TARBALL) $(PARTED_PATCHES) $(E2F
 	cd $(INITRD_SRC_DIR) && tar -xvzf $(PARTED_TARBALL)
 	cd $(PARTED_DIR) && \
 	  cat $(PARTED_PATCHES) < /dev/null | patch -p1
-
-#  BvdV: This not work yet! 25 June 2010
-#	( cd $(PARTED_DIR) && \
-#	  CPPFLAGS=-I$(INITRD_BUILD_DIR)/usr/include CFLAGS=-I$(INITRD_BUILD_DIR)/usr/include LDFLAGS=-L$(INITRD_BUILD_DIR)/usr/lib \
-#	  ./configure --disable-Werror --prefix=/usr $(PARTED_CONFIGURE))
-
-	( cd $(PARTED_DIR) && \
-	  ./configure --disable-Werror --prefix=/usr $(PARTED_CONFIGURE))
+	cd $(PARTED_DIR) && \
+         CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/lib" \
+	  ./configure --disable-Werror --prefix=/usr $(PARTED_CONFIGURE)
 	$(MAKE) -j $(NCPUS) -C $(PARTED_DIR)
 
 PHONY += parted_install

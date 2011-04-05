@@ -40,7 +40,7 @@ $(LVM_DIR).build:	$(INITRD_SRC_DIR)/$(LVM_TARBALL)
 	rm -rf $(LVM_DIR)
 	cd $(INITRD_SRC_DIR) && tar -xvzf $(LVM_TARBALL)
 	cd $(LVM_DIR) && \
-		./configure --enable-udev_sync --enable-udev_rules
+		./configure --enable-udev_sync --enable-udev_rules --prefix=/
 	cd $(LVM_DIR) && $(MAKE) -j $(NCPUS)
 
 PHONY += lvm_install
@@ -48,6 +48,7 @@ lvm_install: $(LVM_DIR).install
 
 $(LVM_DIR).install: $(LVM_DIR).build
 	cd $(LVM_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
+	cd $(LVM_DIR) && ln -s `ls -1|grep libdevmapper.so.*` libdevmapper.so
 
 $(INITRD_SRC_DIR)/$(LVM_TARBALL):
 	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)

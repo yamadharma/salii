@@ -11,12 +11,12 @@ find_all_disks(){
 	#  lrwxrwxrwx 1 root root 10 2010-04-05 12:40 pci-0000:02:0e.0-scsi-0:2:0:0-part1 -> ../../sda1
 	#
 
-	if [ -e /dev/disk/by-id ]
-	then
-		disks=$(ls -l /dev/disk/by-id | grep -v part | awk '{ print $NF }' | sort -u)
-	elif [ -e /dev/disk/by-path ]
+	if [ -e /dev/disk/by-path ]
 	then
 		disks=$(ls -l /dev/disk/by-path | grep -v part | awk '{ print $NF }' | sort -u)
+	elif [ -e /dev/disk/by-id ]
+	then
+		disks=$(ls -l /dev/disk/by-id | grep -v part | awk '{ print $NF }' | sort -u)
 	elif [ -e /dev/disk/by-label ]
 	then
 		disks=$(ls -l /dev/disk/by-label | grep -v part | awk '{ print $NF }' | sort -u)
