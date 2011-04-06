@@ -1,0 +1,7 @@
+/var/log/sali/sali.log {
+    create 0640 root root
+    missingok
+    weekly
+    rotate 7
+    compress
+}
