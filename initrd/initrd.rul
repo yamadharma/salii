@@ -179,30 +179,30 @@ ifeq ($(ARCH),ppc64)
 
 	( \
 		cd $(INITRD_BUILD_DIR) && \
-		cp `$(COPYLIBS) sbin/modprobe usr/bin/ssh \
+		cp `$(COPYLIBS) $(INITRD_BUILD_DIR)/lib sbin/modprobe usr/bin/ssh \
 			sbin/udevd sbin/mkfs.ext4 sbin/xfs_db usr/sbin/parted \
 			usr/bin/aria2c usr/sbin/sshd usr/bin/rsync usr/bin/curl` lib \
 	)
 else
-		cp -a /lib/libse*   $(INITRD_BUILD_DIR)/lib
+	cp -a /lib/libse*   $(INITRD_BUILD_DIR)/lib
 
 	( \
 		cd $(INITRD_BUILD_DIR) && \
-		cp `$(COPYLIBS) sbin/modprobe usr/bin/ssh sbin/lvdisplay \
+		cp `$(COPYLIBS) $(INITRD_BUILD_DIR)/lib sbin/modprobe usr/bin/ssh sbin/lvdisplay \
 			sbin/udevd sbin/mkfs.ext4 sbin/xfs_db usr/sbin/parted \
 			usr/bin/aria2c usr/sbin/sshd usr/bin/rsync usr/bin/curl` lib \
 	)
 
 	# copy libnss files and the loader file.  As they are not automatically included
 	#
-	ifeq ($(ARCH),x86_64)
+ifeq ($(ARCH),x86_64)
 		cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib
 		cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib
-	else
+else
 		cp -a /lib/libnss* $(INITRD_BUILD_DIR)/lib
 		cp -a /lib/ld* $(INITRD_BUILD_DIR)/lib
 		cp -a /lib/libdev* $(INITRD_BUILD_DIR)/lib
-	endif
+endif
 endif
 
 	# Strip 'em. -BEF- HvB

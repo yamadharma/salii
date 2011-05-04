@@ -21,7 +21,7 @@ then
             do
                 p_service "SCRUB starting on disk $disk"
                 eval d_name="\${DISK${disk}}"
-                scrub "${d_name}" &
+                scrub "${d_name} ${SCRUB_OPTIONS}" &
                 p_comment 2 "PID of process is ${!}"
             done
         ;;
@@ -32,7 +32,7 @@ then
                 p_service "SCRUB starting on disk $disk"
                 if [ -e "$disk" ]
                 then
-                    scrub "${disk}${SCRUB_OPTIONS}" &
+                    scrub "${disk} ${SCRUB_OPTIONS}" &
                     p_comment 2 "PID of process is ${!}"
                 elif [ -e "/dev/$disk" ]
                 then

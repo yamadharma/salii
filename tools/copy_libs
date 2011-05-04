@@ -28,9 +28,20 @@ then
 	exit 0
 fi
 
+SALILPATH=$1
+shift 1
 FILES=$@
 
 for f in  $FILES
 do
-	ldd $f  | awk '{ print $3 }' | grep ^/
-done | sort | uniq 
+	for libpath in $(ldd $f  | awk '{ print $3 }' | grep ^/)
+    do
+        LIBNAME=$(basename $libpath)
+        if [ ! -e "${SALILPATH}/${LIBNAME}" ]
+        then
+            echo "${libpath}"
+        else
+            echo ""
+        fi
+    done
+done | sort | uniq
