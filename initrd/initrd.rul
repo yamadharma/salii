@@ -115,7 +115,7 @@ $(INITRD_BUILD_DIR).prep:	$(INITRD_DIR)/initrd.rul
 	mkdir -p -m 1777 $(INITRD_BUILD_DIR)/var/log
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/usr
 
-	cd $(INITRD_BUILD_DIR)/usr && ln -s ../lib lib
+	#cd $(INITRD_BUILD_DIR)/usr && ln -s ../lib lib
 
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/usr/bin
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/usr/sbin

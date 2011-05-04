@@ -8,6 +8,10 @@ XFSPROGS_TARBALL := xfsprogs-$(XFSPROGS_VERSION).tar.gz
 XFSPROGS_URL := ftp://ftp.sara.nl/pub/sali/sources/$(XFSPROGS_TARBALL)
 XFSPROGS_INFO := http://xfs.org/index.php/Main_Page
 
+export OPTIMIZER="-fPIC"
+export DEBUG=-DNDEBUG
+export LIBUUID=/usr/%{_lib}/libuuid.a
+
 ## Disabled
 #XFSPROGS_PATCHES := $(shell ls $(PATCH_DIR)/xfsprogs.*.patch 2>/dev/null | sort)
 
