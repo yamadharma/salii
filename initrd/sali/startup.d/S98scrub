@@ -8,7 +8,7 @@ then
     then
         SCRUB_DISKS=all
     fi
-
+    
     case "${SCRUB_DISKS}" in
         all)
             p_stage "Starting SCRUB for all disks"
@@ -21,28 +21,28 @@ then
             do
                 p_service "SCRUB starting on disk $disk"
                 eval d_name="\${DISK${disk}}"
-                scrub "${d_name} ${SCRUB_OPTIONS}" &
+                p_comment 2 "  scrub $SCRUB_OPTIONS $d_name"
+                scrub $SCRUB_OPTIONS $d_name &
                 p_comment 2 "PID of process is ${!}"
             done
         ;;
         *)
-            p_stage "Starting SCRUB for specified disks"
-            for disk in $(echo $SCRUB_DISKS|tr "," "\n")
-            do
-                p_service "SCRUB starting on disk $disk"
-                if [ -e "$disk" ]
-                then
-                    scrub "${disk} ${SCRUB_OPTIONS}" &
-                    p_comment 2 "PID of process is ${!}"
-                elif [ -e "/dev/$disk" ]
-                then
-                    scrub "/dev/${disk}${SCRUB_OPTIONS}" &
-                    p_comment 2 "PID of process is ${!}"
-                else
-                    p_comment 2 "Could not locate disk '$disk'"
-                fi
-            done
-        ;;
+        	p_stage "Starting SCRUB for specified disks"
+        	for disk in $(echo $SCRUB_DISKS|tr "," "\n")
+        	do
+        		p_service "SCRUB starting on disk ${disk}"
+        		if [ -e "$disk" ]
+        		then
+        			scrub_disk=$disk
+        		elif [ -e "/dev/${disk}" ]
+        		then
+        			scrub_disk="/dev/${disk}"
+        		fi
+        		
+	                p_comment 2 "  scrub $SCRUB_OPTIONS $scrub_disk"
+	                scrub $SCRUB_OPTIONS $scrub_disk &
+	                p_comment 2 "PID of process is ${!}"
+        	done
     esac
 
     while true

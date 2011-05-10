@@ -82,6 +82,11 @@ write_variables() {
 
 	echo "VERBOSELEVEL=\"$VERBOSELEVEL\"" 		>> /tmp/variables.txt
 	echo "ARCH=\"$ARCH\"" 				>> /tmp/variables.txt
+    echo "SCRUB=\$SCRUB\""  >> /tmp/variables.txt
+    echo "SCRUB_DISKS=\$SCRUB_DISKS\""  >> /tmp/variables.txt
+    echo "SCRUB_REBOOT=\$SCRUB_REBOOT\""  >> /tmp/variables.txt
+    echo "SCRUB_HALT=\$SCRUB_HALT\""  >> /tmp/variables.txt
+    echo "SCRUB_OPTIONS=\$SCRUB_OPTIONS\""  >> /tmp/variables.txt
 }
 
 ################################################################################
