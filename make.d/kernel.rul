@@ -15,30 +15,28 @@
 
 ifeq ($(ARCH),i386)
 	LINUX_VERSION = 2.6.36.4
-	LINUX_IMAGE = $(LINUX_SRC)/arch/i386/boot/bzImage
+	LINUX_IMAGE = $(LINUX_DIR)/arch/i386/boot/bzImage
 	LINUX_TARGET = bzImage
-	LINUX_DIR = linux-$(LINUX_VERSION)
 endif
 
 ifeq ($(ARCH),x86_64)
 	LINUX_VERSION = 2.6.36.4
-	LINUX_IMAGE = $(LINUX_SRC)/arch/x86_64/boot/bzImage
+	LINUX_IMAGE = $(LINUX_DIR)/arch/x86_64/boot/bzImage
 	LINUX_TARGET = bzImage
-	LINUX_DIR = linux-$(LINUX_VERSION)
 endif
 
 ifeq ($(ARCH),ppc64)
 	LINUX_VERSION = 2.6.36.4
-	LINUX_IMAGE = $(LINUX_SRC)/arch/powerpc/boot/zImage
+	LINUX_IMAGE = $(LINUX_DIR)/arch/powerpc/boot/zImage
 	LINUX_TARGET = zImage
-	LINUX_DIR = linux-$(LINUX_VERSION)
 endif
 
-LINUX_SRC := $(SRC_DIR)/$(LINUX_DIR)
-LINUX_TARBALL := linux-$(LINUX_VERSION).tar.bz2
-LINUX_URL = ftp://ftp.sara.nl/pub/sali/sources/$(LINUX_TARBALL)
-LINUX_INFO = http://kernel.org
-LINUX_CONFIG := $(PATCH_DIR)/linux.$(ARCH).config
+LINUX_DIR 		:= $(SRC_DIR)/linux-$(LINUX_VERSION)
+LINUX_TARBALL 	:= linux-$(LINUX_VERSION).tar.bz2
+LINUX_URL 		:= ftp://ftp.sara.nl/pub/sali/sources/$(LINUX_TARBALL)
+LINUX_INFO 		:= http://kernel.org
+
+LINUX_CONFIG 	:= $(PATCH_DIR)/linux.$(ARCH).config
 
 ## names for kernel patch files can be of 2 forms:
 ##  1) patches that apply to all architectures
@@ -73,23 +71,23 @@ PHONY += kernel
 kernel:	$(LINUX_IMAGE)
 
 $(LINUX_IMAGE): $(SRC_DIR)/patched_kernel-stamp
-	$(MAKE) -C $(LINUX_SRC) -j $(NCPUS) $(LINUX_TARGET)
+	$(MAKE) -j$(NCUPS) -C $(LINUX_DIR) $(LINUX_TARGET)
 
 PHONY += patched_kernel-stamp
 patched_kernel-stamp:	$(SRC_DIR)/patched_kernel-stamp
 
 $(SRC_DIR)/patched_kernel-stamp:	$(SRC_DIR)/$(LINUX_TARBALL) \
 					$(LINUX_CONFIG) $(LINUX_PATCHES)
-	rm -rf $(LINUX_SRC)
+	rm -rf $(LINUX_DIR)
 	@echo -n Extracting kernel source...
 	@cd $(SRC_DIR) && tar xjf $(LINUX_TARBALL)
 	@echo done
-	@cd $(LINUX_SRC) && \
+	@cd $(LINUX_DIR) && \
    	  $(foreach patch, $(LINUX_PATCHES), \
   	    echo -n Applying `basename $(patch)`... && cat $(patch) | patch -s -p1 && echo done. &&) /bin/true
-	cp -a $(LINUX_CONFIG) $(LINUX_SRC)/.config
-	perl -pi -e "s/^EXTRAVERSION =\s*(\S*)\s*\n/EXTRAVERSION = \1-sali_v$(VERSION)\n/" $(LINUX_SRC)/Makefile
-	$(MAKE) -C $(LINUX_SRC) oldconfig
+	cp -a $(LINUX_CONFIG) $(LINUX_DIR)/.config
+	perl -pi -e "s/^EXTRAVERSION =\s*(\S*)\s*\n/EXTRAVERSION = \1-sali_v$(VERSION)\n/" $(LINUX_DIR)/Makefile
+	$(MAKE) -C $(LINUX_DIR) oldconfig
 	touch $(SRC_DIR)/patched_kernel-stamp
 
 PHONY += get_kernel_source
@@ -103,11 +101,11 @@ PHONY += modules
 modules:	$(SRC_DIR)/modules_build-stamp
 
 $(SRC_DIR)/modules_build-stamp: $(LINUX_IMAGE)
-	$(MAKE) -C $(LINUX_SRC) -j $(NCPUS) modules
+	$(MAKE) -j$(NCUPS) -C $(LINUX_DIR) modules
 	touch $(SRC_DIR)/modules_build-stamp
 
 PHONY += kernel_clean
 kernel_clean:
-	rm -rf $(LINUX_SRC)
+	rm -rf $(LINUX_DIR)
 	rm -f $(SRC_DIR)/patched_kernel-stamp
 	rm -f $(SRC_DIR)/modules_build-stamp

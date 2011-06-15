@@ -8,7 +8,7 @@
 #
 
 BUSYBOX_VERSION	= 1.18.3
-BUSYBOX_DIR 	= $(INITRD_SRC_DIR)/busybox-$(BUSYBOX_VERSION)
+BUSYBOX_DIR 	= $(SRC_DIR)/busybox-$(BUSYBOX_VERSION)
 BUSYBOX_TARBALL = busybox-$(BUSYBOX_VERSION).tar.bz2
 
 #### http://www.busybox.net/ ####
@@ -18,43 +18,36 @@ BUSYBOX_INFO	= http://www.busybox.net/
 BUSYBOX_PATCHES = $(shell ls $(INITRD_PATCH_DIR)/busybox.*.patch 2>/dev/null | sort)
 BUSYBOX_CONFIG 	= $(INITRD_PATCH_DIR)/busybox.standard.config
 
-ALL_SOURCE += $(INITRD_SRC_DIR)/$(BUSYBOX_TARBALL)
+# The names
+.PHONY: busybox
+busybox: $(BUSYBOX_DIR).build
 
-PHONY += busybox
-busybox:	$(BUSYBOX_DIR).build
-$(BUSYBOX_DIR).build:  $(BUSYBOX_DIR).unpack
+.PHONY: busybox_install
+busybox_install: $(BUSYBOX_DIR).install
+
+.PHONY: busybox_clean
+busybox_clean: $(BUSYBOX_DIR).clean
+
+$(BUSYBOX_DIR).build:  $(BUSYBOX_DIR).get
 	yes '' | $(MAKE) -C $(BUSYBOX_DIR) oldconfig
 	$(MAKE) -j $(NCPUS) -C $(BUSYBOX_DIR) dep
 	$(MAKE) -j $(NCPUS) -C $(BUSYBOX_DIR)
+
 	touch $@
 
-
-PHONY += busybox_install
-busybox_install:	$(BUSYBOX_DIR).install
-$(BUSYBOX_DIR).install:	$(BUSYBOX_DIR).build \
-						$(INITRD_BUILD_DIR).prep
+$(BUSYBOX_DIR).install:	$(BUSYBOX_DIR).build $(INITRD_BUILD_DIR).prep
 	$(MAKE) -j $(NCPUS) -C $(BUSYBOX_DIR) install CONFIG_PREFIX=$(INITRD_BUILD_DIR)/
+	
+	touch $@
 
-
-$(BUSYBOX_DIR).unpack:	$(INITRD_DIR)/make.d/busybox.rul \
-						$(INITRD_SRC_DIR)/$(BUSYBOX_TARBALL) \
-						$(BUSYBOX_CONFIG) \
-						$(BUSYBOX_PATCHES)
+$(BUSYBOX_DIR).get:	$(INITRD_DIR)/make.d/busybox.rul $(BUSYBOX_CONFIG) $(BUSYBOX_PATCHES)
 	rm -rf $(BUSYBOX_DIR)
-	cd $(INITRD_SRC_DIR) && tar -xvjf $(BUSYBOX_TARBALL)
+	$(GETSOURCE) $(BUSYBOX_URL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar -xvjf $(BUSYBOX_TARBALL)
 	cd $(BUSYBOX_DIR) && cat $(BUSYBOX_PATCHES) < /dev/null | patch -p1
 	cp -a $(BUSYBOX_CONFIG) $(BUSYBOX_DIR)/.config
+
 	touch $@
 
-
-$(INITRD_SRC_DIR)/$(BUSYBOX_TARBALL):
-	mkdir -p $(INITRD_SRC_DIR)
-	$(GETSOURCE) $(BUSYBOX_URL) $(INITRD_SRC_DIR)
-
-
-PHONY += busybox_clean
-busybox_clean:
-	rm -rf $(BUSYBOX_DIR)
-	rm  -f $(BUSYBOX_DIR).unpack
-	rm  -f $(BUSYBOX_DIR).build
-
+$(BUSYBOX_DIR).clean:
+	rm -rf $(BUSYBOX_DIR)*

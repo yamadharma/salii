@@ -9,22 +9,18 @@
 #   - don't always rebuild
 #
 
-OPENSSL_VERSION         := 1.0.0d
-OPENSSL_DIR             := $(INITRD_SRC_DIR)/openssl-$(OPENSSL_VERSION)
+OPENSSL_VERSION         := 0.9.8r
+OPENSSL_DIR             := $(SRC_DIR)/openssl-$(OPENSSL_VERSION)
 OPENSSL_TARBALL         := openssl-$(OPENSSL_VERSION).tar.gz
 OPENSSL_MD5SUM          := 40b6ea380cc8a5bf9734c2f8bf7e701e
 OPENSSL_TARBALL_TARGET  := $(SRC_DIR)/$(OPENSSL_TARBALL)
 
 #### http://www.openssl.org/source/ ####
 OPENSSL_URL             := ftp://ftp.sara.nl/pub/sali/sources/$(OPENSSL_TARBALL)
-OPENSSL_INFO		:= http://www.openssl.org/
+OPENSSL_INFO			:= http://www.openssl.org/
 
-OPENSSL_BINARIES        := $(SRC_DIR)/$(OPENSSL_DIR)/apps/openssl
+OPENSSL_BINARIES        := $(OPENSSL_DIR)/apps/openssl
 OPENSSL_PATCHES 		:= $(shell ls $(PATCH_DIR)/openssl.*.patch 2>/dev/null | sort)
-
-ALL_SOURCE += $(SRC_DIR)/$(OPENSSL_TARBALL)
-
-OPENSSL_SOURCE := $(SRC_DIR)/$(OPENSSL_TARBALL)
 
 ifeq ($(ARCH),i386)
 	OPENSSL_SYSTEM := linux-elf
@@ -32,43 +28,35 @@ else
 	OPENSSL_SYSTEM := linux-$(ARCH)
 endif
 
-PHONY += openssl
-openssl:	$(OPENSSL_BINARIES)
+.PHONY: openssl_clean
+openssl_clean: $(OPENSSL_DIR).clean
 
-
-$(OPENSSL_BINARIES):	$(SRC_DIR)/openssl_verify.stamp $(ZLIB_LIBRARY)
-	rm -rf $(SRC_DIR)/$(OPENSSL_DIR)
+$(OPENSSL_DIR).build: $(OPENSSL_DIR).verify_stamp $(ZLIB_LIBRARY)
+	rm -rf $(OPENSSL_DIR)
 	( cd $(SRC_DIR) && tar -xvzf $(OPENSSL_TARBALL) && \
 	    (cd $(OPENSSL_DIR) && \
 	      (cat $(OPENSSL_PATCHES) < /dev/null | patch -p1)))
-	cd $(SRC_DIR)/$(OPENSSL_DIR) && \
-	  ./Configure --prefix=/usr --openssldir=/usr/lib/ssl \
+	cd $(OPENSSL_DIR) && \
+	  ./Configure --prefix=/usr \
 	  -I$(SRC_DIR)/$(ZLIB_DIR) -L$(SRC_DIR)/$(ZLIB_DIR) \
 	  no-idea no-mdc2 no-rc5 no-krb5 zlib $(OPENSSL_SYSTEM)
-	$(MAKE) -j $(NCPUS) -C $(SRC_DIR)/$(OPENSSL_DIR) RPM_OPT_FLAGS="$(RPM_OPT_FLAGS) \
+	$(MAKE) -j $(NCPUS) -C $(OPENSSL_DIR) RPM_OPT_FLAGS="$(RPM_OPT_FLAGS) \
 	  -Wa,--noexecstack" depend
-	$(MAKE) -j $(NCPUS) -C $(SRC_DIR)/$(OPENSSL_DIR) RPM_OPT_FLAGS="$(RPM_OPT_FLAGS) \
+	$(MAKE) -j $(NCPUS) -C $(OPENSSL_DIR) RPM_OPT_FLAGS="$(RPM_OPT_FLAGS) \
 	  -Wa,--noexecstack"
 
-$(SRC_DIR)/openssl_verify.stamp:	$(OPENSSL_TARBALL_TARGET)
-	[ "$(shell md5sum $(OPENSSL_TARBALL_TARGET) | cut -d' ' -f1)" == "$(OPENSSL_MD5SUM)" ]
-	touch $(SRC_DIR)/openssl_verify.stamp
+	touch $@
 
-$(OPENSSL_TARBALL_TARGET):
+$(OPENSSL_DIR).verify_stamp: $(OPENSSL_DIR).get
+	#[ "$(shell md5sum $(OPENSSL_TARBALL_TARGET) | cut -d' ' -f1)" == "$(OPENSSL_MD5SUM)" ]
+
+	touch $@
+
+$(OPENSSL_DIR).get:
 	[ -d $(SRC_DIR) ] || mkdir -p $(SRC_DIR)
 	$(GETSOURCE) $(OPENSSL_URL) $(SRC_DIR)
 
-PHONY += ssh_clean
-ssh_clean:  openssl_clean
-	@echo ''
-	@echo 'Next time, use "make openssl_clean" as it is the proper target.'
-	@echo ''
+	touch $@
 
-PHONY += openssl_clean
-openssl_clean:
-	rm -rf $(SRC_DIR)/$(OPENSSL_DIR)
-	rm -f $(SRC_DIR)/openssl_verify.stamp
-
-
-# include build dependencies here
-# DEBIAN_BUILD_DEPS += libssl-dev zlib1g-dev
+$(OPENSSL_DIR).clean:
+	rm -rf $(OPENSSL_DIR)*

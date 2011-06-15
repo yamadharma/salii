@@ -5,39 +5,36 @@
 
 ARIA2_VERSION	= 1.10.9
 ARIA2_TARBALL	= aria2-$(ARIA2_VERSION).tar.bz2
+ARIA2_DIR		= $(SRC_DIR)/aria2-$(ARIA2_VERSION)
 
 #### http://aria2.sourceforge.net ####
 ARIA2_INFO	= http://aria2.sourceforge.net/
 ARIA2_URL 	= ftp://ftp.sara.nl/pub/sali/sources/aria2-$(ARIA2_VERSION).tar.bz2
 
-ARIA2_DIR	= $(INITRD_SRC_DIR)/aria2-$(ARIA2_VERSION)
-
-ALL_SOURCE += $(INITRD_SRC_DIR)/$(ARIA2_TARBALL)
-
 PHONY += aria2
 aria2:	$(ARIA2_DIR).build
 
-$(ARIA2_DIR).build:  $(ARIA2_DIR).unpack
-	cd $(ARIA2_DIR) && ./configure --without-sqlite3 --prefix=/usr  && make
-	touch $@
-
-PHONY += aria2_install
+.PHONY: aria2_install
 aria2_install:	$(ARIA2_DIR).install
+
+.PHONY: aria2_clean
+aria2_clean: $(ARIA2_DIR).clean
+
+$(ARIA2_DIR).build:  $(ARIA2_DIR).get
+	cd $(ARIA2_DIR) && ./configure --without-sqlite3 --with-openssl \
+		--with-openssl-prefix=$(OPENSSL_DIR) --with-libz-prefix=$(SRC_DIR)/$(ZLIB_TARBALL) --prefix=/usr  && make
+	touch $@
 
 $(ARIA2_DIR).install:	$(ARIA2_DIR).build
 	cd $(ARIA2_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
 
-$(ARIA2_DIR).unpack:   	$(INITRD_DIR)/make.d/aria2.rul	\
-			$(INITRD_SRC_DIR)/$(ARIA2_TARBALL)
-	rm -rf $(ARIA2_DIR)
-	cd $(INITRD_SRC_DIR) && tar -xvjf $(INITRD_SRC_DIR)/$(ARIA2_TARBALL)
 	touch $@
 
-$(INITRD_SRC_DIR)/$(ARIA2_TARBALL):
-	mkdir -p $(INITRD_SRC_DIR)
-	$(GETSOURCE) $(ARIA2_URL) $(INITRD_SRC_DIR)
-
-PHONY += aria2_clean
-aria2_clean:
+$(ARIA2_DIR).get: $(INITRD_DIR)/make.d/aria2.rul
 	rm -rf $(ARIA2_DIR)
-	rm -f  $(ARIA2_DIR).build $(ARIA2_DIR).unpack $(ARIA2_DIR).install
+	$(GETSOURCE) $(ARIA2_URL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar -xvjf $(ARIA2_TARBALL)
+	touch $@
+
+$(ARIA2_DIR).clean:
+	rm -rf $(ARIA2_DIR)*

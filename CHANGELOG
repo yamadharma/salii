@@ -1,3 +1,6 @@
+1.4.5
+  * An rewrite has been done of the make and configure files.
+
 1.4.1
   * Added experimental support for ppc64 architecture. Tested under SLES 11.1 with Power 6.
     Author: Dennis Stam & Michel Scheerman
