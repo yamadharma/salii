@@ -26,11 +26,11 @@ case "$(uname -s)" in
 		if [ test -e /etc/debian_version ]; then
 			OS=debian
 			OS_RELEASE=$(cat /etc/debian_version|awk -F . '{print $1}')
-			AC_MSG_RESULT(Found ${OS} release ${OS_RELEASE})
+			AC_MSG_RESULT(found ${OS} release ${OS_RELEASE})
 		elif [ test -e /etc/SuSE-release ]; then
 			OS=suse
 			OS_RELEASE=$(cat /etc/SuSE-release|awk '/VERSION =/ {print $3}')
-			AC_MSG_RESULT(Found ${OS} release ${OS_RELEASE})
+			AC_MSG_RESULT(found ${OS} release ${OS_RELEASE})
 		else
 			AC_MSG_RESULT(no)
 			AC_MSG_ERROR(Found an unsupported Linux distribution)
@@ -46,14 +46,14 @@ esac
 AC_MSG_CHECKING([uname -m for detecting host operating architecture])
 case "$(uname -m)" in
 	amd64*|x86_64)
-		AC_MSG_RESULT(found ${ARCH})
 		ARCH=x86_64
 		ARCH_BIT=64
+		AC_MSG_RESULT(found ${ARCH})
 	;;
 	ppc64*)
-		AC_MSG_RESULT(found ${ARCH})
 		ARCH=ppc64
 		ARCH_BIT=64
+		AC_MSG_RESULT(found ${ARCH})
 	;;
 	i686*|i386*)
 		AC_MSG_RESULT(found ${ARCH})

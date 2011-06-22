@@ -4,37 +4,38 @@
 #
 
 BC_VERSION	:= 1.06
-BC_DIR 		:= $(INITRD_SRC_DIR)/bc-$(BC_VERSION)
+BC_DIR 		:= $(SRC_DIR)/bc-$(BC_VERSION)
 BC_TARBALL 	:= bc-$(BC_VERSION).tar.gz
 BC_INFO		:= http://www.gnu.org/software/bc/
 BC_URL 		:= ftp://ftp.sara.nl/pub/sali/sources/$(BC_TARBALL)
 
-ALL_SOURCE += $(INITRD_SRC_DIR)/$(BC_TARBALL)
-
-PHONY += bc
+.PHONY: bc
 bc:	$(BC_DIR).build
-$(BC_DIR).build:    $(BC_DIR).unpack
+
+.PHONY: bc_install
+bc_install: $(BC_DIR).install
+
+.PHONY: bc_clean
+bc_clean: $(BC_DIR).clean
+
+$(BC_DIR).build:    $(BC_DIR).get
 	cd $(BC_DIR) && ./configure --prefix=/usr
 	$(MAKE) -j $(NCPUS) -C $(BC_DIR)
+
 	touch $@
 
-PHONY += bc_install
-bc_install: 	$(BC_DIR).install
-
-$(BC_DIR).install: $(BC_DIR).build $(INITRD_BUILD_DIR).prep
+$(BC_DIR).install: $(BC_DIR).build
 	cd $(BC_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR)  install
 
-$(BC_DIR).unpack:	$(INITRD_DIR)/make.d/bc.rul \
-                    $(INITRD_SRC_DIR)/$(BC_TARBALL)
-	cd $(INITRD_SRC_DIR) && tar -xvzf $(BC_TARBALL)
 	touch $@
 
-$(INITRD_SRC_DIR)/$(BC_TARBALL):
-	mkdir -p $(INITRD_SRC_DIR)
-	$(GETSOURCE) $(BC_URL) $(INITRD_SRC_DIR)
+$(BC_DIR).get:
+	$(GETSOURCE) $(BC_URL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar -xvzf $(BC_TARBALL)
 
-PHONY += bc_clean
-bc_clean:
+	touch $@
+
+$(BC_DIR).clean:
 	rm -rf $(BC_DIR)
 	rm -f  $(BC_DIR).unpack
 	rm -f  $(BC_DIR).build

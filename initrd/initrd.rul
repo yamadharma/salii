@@ -14,7 +14,6 @@ INITRD_BINARIES = $(shell file \
 							initrd/build_dir/usr/sbin/* \
 							| grep -v "text\|symbolic link" \
 							| perl -pi -e 's/:.*//')
-							#initrd/build_dir/libexec/* \
 
 ## BEGIN import rule files
 #
@@ -23,22 +22,23 @@ include $(INITRD_MAKED_DIR)/openssh.rul
 include $(INITRD_MAKED_DIR)/busybox.rul
 include $(INITRD_MAKED_DIR)/aria2.rul
 include $(INITRD_MAKED_DIR)/udev.rul
-#include $(INITRD_MAKED_DIR)/curl.rul
-#include $(INITRD_MAKE_DIR)/e2fsprogs.rul
+include $(INITRD_MAKED_DIR)/curl.rul
+include $(INITRD_MAKED_DIR)/rsync.rul
+include $(INITRD_MAKED_DIR)/bc.rul
+include $(INITRD_MAKED_DIR)/scrub.rul
+#include $(INITRD_MAKE_DIR)/kerneltools.rul
+#include $(INITRD_MAKE_DIR)/kexec.rul
 #include $(INITRD_MAKE_DIR)/parted.rul
+#include $(INITRD_MAKE_DIR)/e2fsprogs.rul
 #include $(INITRD_MAKE_DIR)/mdadm.rul
 #include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
 #include $(INITRD_MAKE_DIR)/xfsprogs.rul
 #include $(INITRD_MAKE_DIR)/jfsutils.rul
 #include $(INITRD_MAKE_DIR)/lvm.rul
-#include $(INITRD_MAKE_DIR)/kerneltools.rul
-#include $(INITRD_MAKE_DIR)/rsync.rul
-#include $(INITRD_MAKE_DIR)/kexec.rul
-#include $(INITRD_MAKE_DIR)/scrub.rul
-#include $(INITRD_MAKE_DIR)/bc.rul
 #
 ## END import rule files
 
+## Please note that the order herebelow is important!!!
 .PHONY: build_initrd
 build_initrd: prepare kernel \
     $(SKEL_FILES) \
@@ -46,7 +46,11 @@ build_initrd: prepare kernel \
 	openssh_install 	\
 	busybox_install 		\
 	aria2_install \
-	udev_install
+	udev_install \
+    curl_install \
+    rsync_install \
+	bc_install \
+	scrub_install
 #	$(RSYNC_DIR).install 		\
 #    $(BC_DIR).install 		\
 #	$(UDEV_DIR).install 		\

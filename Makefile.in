@@ -90,9 +90,12 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 
 	touch $@
 
+.PHONY: all
+all: show_targets
+
 # build everything, install nothing
-.PHONY:	all
-all:	kernel initrd
+.PHONY:	build
+build:	kernel initrd
 
 .PHONY:	help
 help:  show_targets
@@ -117,5 +120,5 @@ show_targets:
 	@echo "    Only build the kernel."
 	@echo " "
 	@echo "initrd.img"
-	@echo "    Only build the initrd.img"
+	@echo "    Only build the initrd.img, this will skip the kernel modules installation."
 

@@ -71,7 +71,7 @@ PHONY += kernel
 kernel:	$(LINUX_IMAGE)
 
 $(LINUX_IMAGE): $(SRC_DIR)/patched_kernel-stamp
-	$(MAKE) -j$(NCUPS) -C $(LINUX_DIR) $(LINUX_TARGET)
+	$(MAKE) -j$(NCPUS) -C $(LINUX_DIR) $(LINUX_TARGET)
 
 PHONY += patched_kernel-stamp
 patched_kernel-stamp:	$(SRC_DIR)/patched_kernel-stamp
@@ -80,9 +80,9 @@ $(SRC_DIR)/patched_kernel-stamp:	$(SRC_DIR)/$(LINUX_TARBALL) \
 					$(LINUX_CONFIG) $(LINUX_PATCHES)
 	rm -rf $(LINUX_DIR)
 	@echo -n Extracting kernel source...
-	@cd $(SRC_DIR) && tar xjf $(LINUX_TARBALL)
+	(cd $(SRC_DIR) && tar xjf $(LINUX_TARBALL))
 	@echo done
-	@cd $(LINUX_DIR) && \
+	cd $(LINUX_DIR) && \
    	  $(foreach patch, $(LINUX_PATCHES), \
   	    echo -n Applying `basename $(patch)`... && cat $(patch) | patch -s -p1 && echo done. &&) /bin/true
 	cp -a $(LINUX_CONFIG) $(LINUX_DIR)/.config
@@ -101,7 +101,7 @@ PHONY += modules
 modules:	$(SRC_DIR)/modules_build-stamp
 
 $(SRC_DIR)/modules_build-stamp: $(LINUX_IMAGE)
-	$(MAKE) -j$(NCUPS) -C $(LINUX_DIR) modules
+	$(MAKE) -j$(NCPUS) -C $(LINUX_DIR) modules
 	touch $(SRC_DIR)/modules_build-stamp
 
 PHONY += kernel_clean

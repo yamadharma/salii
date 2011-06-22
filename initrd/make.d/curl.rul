@@ -10,34 +10,33 @@ CURL_TARBALL	= curl-$(CURL_VERSION).tar.bz2
 CURL_URL 	= ftp://ftp.sara.nl/pub/sali/sources/curl-$(CURL_VERSION).tar.bz2
 CURL_INFO	= http://curl.haxx.se/
 
-CURL_DIR	= $(INITRD_SRC_DIR)/curl-$(CURL_VERSION)
+CURL_DIR	= $(SRC_DIR)/curl-$(CURL_VERSION)
 
-ALL_SOURCE += $(INITRD_SRC_DIR)/$(CURL_TARBALL)
+.PHONY: curl
+curl: $(CURL_DIR).build
 
-PHONY += curl
-curl:	$(CURL_DIR).build
+.PHONY: curl_install
+curl_install: $(CURL_DIR).install
 
-$(CURL_DIR).build:  $(CURL_DIR).unpack
-	cd $(CURL_DIR) && ./configure --prefix=/usr && make
+.PHONY: curl_clean
+curl_clean: $(CURL_DIR).clean
+
+$(CURL_DIR).build: $(OPENSSL_DIR).build $(CURL_DIR).get
+	cd $(CURL_DIR) && ./configure --with-ssl=$(OPENSSL_DIR) --prefix=/usr && make
+
 	touch $@
 
-PHONY += curl_install
-curl_install:	$(CURL_DIR).install
-
-$(CURL_DIR).install:	$(CURL_DIR).build
+$(CURL_DIR).install: $(CURL_DIR).build
 	cd $(CURL_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
 
-$(CURL_DIR).unpack:   	$(INITRD_DIR)/make.d/curl.rul	\
-			$(INITRD_SRC_DIR)/$(CURL_TARBALL)
-	rm -rf $(CURL_DIR)
-	cd $(INITRD_SRC_DIR) && tar -xjvf $(INITRD_SRC_DIR)/$(CURL_TARBALL)
 	touch $@
 
-$(INITRD_SRC_DIR)/$(CURL_TARBALL):
-	mkdir -p $(INITRD_SRC_DIR)
-	$(GETSOURCE) $(CURL_URL) $(INITRD_SRC_DIR)
-
-PHONY += curl_clean
-curl_clean:
+$(CURL_DIR).get:
+	$(GETSOURCE) $(CURL_URL) $(SRC_DIR)
 	rm -rf $(CURL_DIR)
-	rm -f  $(CURL_DIR).build $(CURL_DIR).unpack $(CURL_DIR).install
+	cd $(SRC_DIR) && tar -xjvf $(SRC_DIR)/$(CURL_TARBALL)
+
+	touch $@
+
+$(CURL_DIR).clean:
+	rm -rf $(CURL_DIR)*
