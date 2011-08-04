@@ -52,19 +52,14 @@ build_initrd: prepare kernel \
 	bc_install \
 	scrub_install \
 	e2fsprogs_install
-#	$(UDEV_DIR).install 		\
-#	$(E2FSPROGS_DIR).install 	\
+#	$(KERNELTOOLS_DIR).install	\
+#	$(KEXEC_DIR).install		\
 #	$(LVM_DIR).install		\
-#	$(PARTED_DIR).install 		\
 #	$(MDADM_DIR).install 		\
+#	$(PARTED_DIR).install 		\
 #	$(REISERFSPROGS_DIR).install	\
 #	$(XFSPROGS_DIR).install		\
-#	$(KERNELTOOLS_DIR).install	\
 #	$(JFSUTILS_DIR).install		\
-#	$(KEXEC_DIR).install		\
-#	$(ARIA2_DIR).install 		\
-#	$(SCRUB_DIR).install 		\
-#	$(CURL_DIR).install
 
 .PHONY: initrd
 initrd: build_initrd

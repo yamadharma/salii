@@ -24,10 +24,10 @@ endif
 e2fsprogs:	$(E2FSPROGS_DIR).build
 
 .PHONY: e2fsprogs_install
-e2fsprogs:	$(E2FSPROGS_DIR).install
+e2fsprogs_install:	$(E2FSPROGS_DIR).install
 
 .PHONY: e2fsprogs_clean
-e2fsprogs:	$(E2FSPROGS_DIR).clean
+e2fsprogs_clean:	$(E2FSPROGS_DIR).clean
 
 $(E2FSPROGS_DIR).build:	$(E2FSPROGS_DIR).get
 	cd $(E2FSPROGS_DIR) && ./configure $(E2FSPROGS_CONFIGURE) && make -j $(NCUPS)

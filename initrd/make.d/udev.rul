@@ -4,14 +4,11 @@
 
 UDEV_VERSION	= 166
 UDEV_TARBALL	= udev-$(UDEV_VERSION).tar.bz2
+UDEV_DIR	= $(SRC_DIR)/udev-$(UDEV_VERSION)
 
 #### http://www.kernel.org/pub/linux/utils/kernel/hotplug/ ####
 UDEV_URL	= ftp://ftp.sara.nl/pub/sali/sources/
 UDEV_INFO	= http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
-
-UDEV_DIR	= $(SRC_DIR)/udev-$(UDEV_VERSION)
-
-UDEV_PATCHES = $(shell ls $(INITRD_PATCH_DIR)/udev.*.patch 2>/dev/null | sort)
 
 .PHONY: udev
 udev: $(UDEV_DIR).build
@@ -36,7 +33,6 @@ $(UDEV_DIR).get:
 	rm -rf $(UDEV_DIR)
 	$(GETSOURCE) $(UDEV_URL)/$(UDEV_TARBALL) $(SRC_DIR)
 	cd $(SRC_DIR) && tar -xvjf $(UDEV_TARBALL)
-	cd $(UDEV_DIR) && cat $(UDEV_PATCHES) < /dev/null | patch -p1
 	touch $@
 
 .PHONY: udev_clean
