@@ -26,10 +26,10 @@ include $(INITRD_MAKED_DIR)/curl.rul
 include $(INITRD_MAKED_DIR)/rsync.rul
 include $(INITRD_MAKED_DIR)/bc.rul
 include $(INITRD_MAKED_DIR)/scrub.rul
+include $(INITRD_MAKED_DIR)/e2fsprogs.rul
 #include $(INITRD_MAKE_DIR)/kerneltools.rul
 #include $(INITRD_MAKE_DIR)/kexec.rul
 #include $(INITRD_MAKE_DIR)/parted.rul
-#include $(INITRD_MAKE_DIR)/e2fsprogs.rul
 #include $(INITRD_MAKE_DIR)/mdadm.rul
 #include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
 #include $(INITRD_MAKE_DIR)/xfsprogs.rul
@@ -47,12 +47,11 @@ build_initrd: prepare kernel \
 	busybox_install 		\
 	aria2_install \
 	udev_install \
-    curl_install \
-    rsync_install \
+	curl_install \
+	rsync_install \
 	bc_install \
-	scrub_install
-#	$(RSYNC_DIR).install 		\
-#    $(BC_DIR).install 		\
+	scrub_install \
+	e2fsprogs_install
 #	$(UDEV_DIR).install 		\
 #	$(E2FSPROGS_DIR).install 	\
 #	$(LVM_DIR).install		\

@@ -1,5 +1,5 @@
 #
-#       $Id$
+#   $Id$
 #   vi: set filetype=make:
 #
 
@@ -11,7 +11,7 @@ ARIA2_DIR		= $(SRC_DIR)/aria2-$(ARIA2_VERSION)
 ARIA2_INFO	= http://aria2.sourceforge.net/
 ARIA2_URL 	= ftp://ftp.sara.nl/pub/sali/sources/aria2-$(ARIA2_VERSION).tar.bz2
 
-PHONY += aria2
+.PHONY: aria2
 aria2:	$(ARIA2_DIR).build
 
 .PHONY: aria2_install

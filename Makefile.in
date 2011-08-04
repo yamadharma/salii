@@ -10,7 +10,6 @@
 ## BEGIN General options
 #
 VERSION=$(shell cat VERSION)
-FLAVOR=$(shell cat FLAVOR)
 
 ARCH=@ARCH@
 ARCH_BIT=@ARCH_BIT@
