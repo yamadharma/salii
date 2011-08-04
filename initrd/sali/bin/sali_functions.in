@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="SYSTEMIMAGER_VERSION_STRING"
+VERSION="@SALI_VERSION@"
 STUBDIR="/etc/sali/stubs"
 FUNCTIONSFILE="/etc/init.d/functions"
 TMPFILE="/etc/sali/functions.$$"

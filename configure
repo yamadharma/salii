@@ -557,6 +557,7 @@ PACKAGE_URL=''
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+SALI_VERSION
 OS_RELEASE
 OS
 ARCH_BIT
@@ -3218,8 +3219,10 @@ OS=$OS
 
 OS_RELEASE=$OS_RELEASE
 
+SALI_VERSION="$(cat VERSION)"
 
-ac_config_files="$ac_config_files Makefile"
+
+ac_config_files="$ac_config_files Makefile initrd/sali/bin/sali_functions"
 
 
 cat >confcache <<\_ACEOF
@@ -3929,6 +3932,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "initrd/sali/bin/sali_functions") CONFIG_FILES="$CONFIG_FILES initrd/sali/bin/sali_functions" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5 ;;
   esac

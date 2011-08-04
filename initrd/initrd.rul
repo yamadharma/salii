@@ -27,7 +27,7 @@ include $(INITRD_MAKED_DIR)/rsync.rul
 include $(INITRD_MAKED_DIR)/bc.rul
 include $(INITRD_MAKED_DIR)/scrub.rul
 include $(INITRD_MAKED_DIR)/e2fsprogs.rul
-#include $(INITRD_MAKE_DIR)/kerneltools.rul
+include $(INITRD_MAKED_DIR)/kerneltools.rul
 #include $(INITRD_MAKE_DIR)/kexec.rul
 #include $(INITRD_MAKE_DIR)/parted.rul
 #include $(INITRD_MAKE_DIR)/mdadm.rul
@@ -41,7 +41,7 @@ include $(INITRD_MAKED_DIR)/e2fsprogs.rul
 ## Please note that the order herebelow is important!!!
 .PHONY: build_initrd
 build_initrd: prepare kernel \
-    $(SKEL_FILES) \
+	$(SKEL_FILES) \
 	$(SRC_DIR)/modules_build-stamp 	\
 	openssh_install 	\
 	busybox_install 		\
@@ -51,7 +51,8 @@ build_initrd: prepare kernel \
 	rsync_install \
 	bc_install \
 	scrub_install \
-	e2fsprogs_install
+	e2fsprogs_install \
+	kerneltools_install
 #	$(KERNELTOOLS_DIR).install	\
 #	$(KEXEC_DIR).install		\
 #	$(LVM_DIR).install		\
