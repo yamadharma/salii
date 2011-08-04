@@ -53,7 +53,6 @@ build_initrd: prepare kernel \
 	scrub_install \
 	e2fsprogs_install \
 	kerneltools_install
-#	$(KERNELTOOLS_DIR).install	\
 #	$(KEXEC_DIR).install		\
 #	$(LVM_DIR).install		\
 #	$(MDADM_DIR).install 		\
