@@ -5,34 +5,34 @@
 
 KEXEC_VERSION	= 2.0.2
 KEXEC_TARBALL	= kexec-tools-$(KEXEC_VERSION).tar.bz2
+KEXEC_DIR	= $(SRC_DIR)/kexec-tools-$(KEXEC_VERSION)
 
 #### http://kernel.org/pub/linux/utils/kernel/kexec/ ####
 KEXEC_URL	= ftp://ftp.sara.nl/pub/sali/sources/
 KEXEC_INFO	= http://kernel.org/pub/linux/utils/kernel/kexec/
 
-KEXEC_DIR	= $(INITRD_SRC_DIR)/kexec-tools-$(KEXEC_VERSION)
+.phony: kexec
+kexec: $(KEXEC_DIR).build
 
-ALL_SOURCE += $(INITRD_SRC_DIR)/$(KEXEC_TARBALL)
+.phony: kexec_install
+kexec_install: $(KEXEC_DIR).install
 
-PHONY += kexec
-kexec:	$(KEXEC_DIR).build
+.phony: kexec_clean
+kexec_clean: $(KEXEC_DIR).clean
 
-$(KEXEC_DIR).build:  $(INITRD_SRC_DIR)/$(KEXEC_TARBALL)
-	rm -rf $(KEXEC_DIR)
-	cd $(INITRD_SRC_DIR) && tar -xvjf $(KEXEC_TARBALL)
+$(KEXEC_DIR).build: $(KEXEC_DIR).get
 	cd $(KEXEC_DIR) && ./configure --prefix=/usr
 	$(MAKE) -j $(NCPUS) -C $(KEXEC_DIR)
-
-PHONY += kexec_install
-kexec_install: $(KEXEC_DIR).install
+	touch $@
 
 $(KEXEC_DIR).install: 	$(KEXEC_DIR).build
 	cd $(KEXEC_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
+	touch $@
 
-$(INITRD_SRC_DIR)/$(KEXEC_TARBALL):
-	mkdir -p $(SRC_DIR)
-	$(GETSOURCE) $(KEXEC_URL)/$(KEXEC_TARBALL) $(INITRD_SRC_DIR)
+$(KEXEC_DIR).get:
+	$(GETSOURCE) $(KEXEC_URL)/$(KEXEC_TARBALL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar -xvjf $(KEXEC_TARBALL)
+	touch $@
 
-PHONY += kexec_clean
-kexec_clean:
-	rm -rf $(KEXEC_DIR)
+$(KEXEC_DIR).clean:
+	rm -rf $(KEXEC_DIR)*

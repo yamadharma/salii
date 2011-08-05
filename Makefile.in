@@ -87,6 +87,8 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 	mknod -m 666 $(INITRD_BUILD_DIR)/dev/null c 1 3
 	mknod -m 666 $(INITRD_BUILD_DIR)/dev/zero c 1 5
 
+	chmod +x $(INITRD_DIR)/sali/bin/sali_functions
+
 	touch $@
 
 # build everything, install nothing
@@ -126,4 +128,4 @@ show_targets:
 	@echo " <name>_clean"
 	@echo "    Cleans the files of a .rul package in $(SRC_DIR)"
 
-*: show_targets
+all: show_targets

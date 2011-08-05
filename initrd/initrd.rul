@@ -28,7 +28,7 @@ include $(INITRD_MAKED_DIR)/bc.rul
 include $(INITRD_MAKED_DIR)/scrub.rul
 include $(INITRD_MAKED_DIR)/e2fsprogs.rul
 include $(INITRD_MAKED_DIR)/kerneltools.rul
-#include $(INITRD_MAKE_DIR)/kexec.rul
+include $(INITRD_MAKED_DIR)/kexec.rul
 #include $(INITRD_MAKE_DIR)/parted.rul
 #include $(INITRD_MAKE_DIR)/mdadm.rul
 #include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
@@ -40,7 +40,7 @@ include $(INITRD_MAKED_DIR)/kerneltools.rul
 
 ## Please note that the order herebelow is important!!!
 .PHONY: initrd_build
-initrd_build: prepare kernel \
+initrd_build: prepare \
 	$(SKEL_FILES) \
 	$(SRC_DIR)/modules_build-stamp 	\
 	openssh_install 	\
@@ -52,7 +52,8 @@ initrd_build: prepare kernel \
 	bc_install \
 	scrub_install \
 	e2fsprogs_install \
-	kerneltools_install
+	kerneltools_install \
+	kexec_install 
 #	$(KEXEC_DIR).install		\
 #	$(LVM_DIR).install		\
 #	$(MDADM_DIR).install 		\
@@ -63,24 +64,22 @@ initrd_build: prepare kernel \
 
 .PHONY: initrd
 initrd: initrd_build
-    ## LVM depends on SELINUX
-    # We need to copy libse* libnss* (more specific) ld* libdev*
-    # also for copy libs
-
-    # make the binaries smaller
+    
+	# make the binaries smaller
 	strip $(INITRD_BINARIES)
 
 	# Copy over text files from the skel directory.
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
 
+	chmod +x $(INITRD_DIR)/sali/bin/sali_functions
 	$(INITRD_DIR)/sali/bin/sali_functions --makefile --stubsdir $(INITRD_DIR)/functions/stubs \
 	  --tmpfile $(INITRD_DIR)/functions/functions.mbm
 
+	install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 	#install -m 644 $(INITRD_DIR)/functions/stubs/* $(INITRD_BUILD_DIR)/etc/sali/stubs/
-	#install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 	install -m 755 $(ROOT_DIR)/VERSION $(INITRD_BUILD_DIR)/etc/sali_version
 
-    # Cleanup the .svn stuff
+	# Cleanup the .svn stuff
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
 
 .PHONY: initrd_clean
