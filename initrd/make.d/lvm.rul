@@ -25,7 +25,7 @@ LVM_URL			= ftp://ftp.sara.nl/pub/sali/sources/$(LVM_TARBALL)
 LVM_INFO		= http://sources.redhat.com/lvm2/
 
 .PHONY: lvm
-lvm:	$(LVM_DIR).build
+lvm: $(LVM_DIR).build
 
 .PHONY: lvm_install
 lvm_install: $(LVM_DIR).install
@@ -37,15 +37,17 @@ lvm_clean: $(LVM_DIR).clean
 # `/usr/bin', `/usr/lib' etc.  You can specify
 # an installation prefix other than `/usr' using `--prefix',
 # for instance `--prefix=$HOME'.
-$(LVM_DIR).build:	$(LVM_DIR).get udev_install
+$(LVM_DIR).build:	$(LVM_DIR).get $(UDEV_DIR).build
 	cd $(LVM_DIR) && \
      CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/lib" \
-		./configure --enable-udev_sync --enable-udev_rules --prefix=/
+		./configure --enable-udev_sync --enable-udev_rules
 	cd $(LVM_DIR) && $(MAKE) -j $(NCPUS)
+
+	touch $@
 
 $(LVM_DIR).install: $(LVM_DIR).build
 	cd $(LVM_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
-#	cd $(LVM_DIR) && ln -s `ls -1|grep libdevmapper.so.*` libdevmapper.so
+	touch $@
 
 $(LVM_DIR).get:
 	$(GETSOURCE) $(LVM_URL) $(SRC_DIR)

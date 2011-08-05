@@ -17,7 +17,7 @@ E2FSPROGS_CONFIGURE = --disable-fsck --disable-libuuid --disable-uuidd --disable
 
 #Only ppc64 needs this flag
 ifeq ($(ARCH),ppc64)
-	E2FSPROGS_CONFIGURE = $(E2FSPROGS_CONFIGIRE) --host=ppc-unknown-linux
+	E2FSPROGS_CONFIGURE = $(E2FSPROGS_CONFIGURE) --host=ppc-unknown-linux
 endif
 
 .PHONY: e2fsprogs

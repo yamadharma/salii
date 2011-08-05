@@ -5,38 +5,33 @@
 #   2005.12.18 Erich Focht
 #
 
-MDADM_VERSION := 3.2
-MDADM_DIR := $(INITRD_SRC_DIR)/mdadm-$(MDADM_VERSION)
-MDADM_TARBALL := mdadm-$(MDADM_VERSION).tar.gz
-MDADM_URL := ftp://ftp.sara.nl/pub/sali/sources/$(MDADM_TARBALL)
-MDADM_INFO :=  http://www.kernel.org/pub/linux/utils/raid/mdadm/
-MDADM_BINARIES := $(INITRD_SRC_DIR)/$(MDADM_DIR)/mdadm
+MDADM_VERSION 	= 3.2
+MDADM_DIR 			= $(SRC_DIR)/mdadm-$(MDADM_VERSION)
+MDADM_TARBALL 	= mdadm-$(MDADM_VERSION).tar.gz
 
-## Disabled
-#MDADM_PATCHES := $(shell ls $(PATCH_DIR)/mdadm.*.patch 2>/dev/null | sort)
+MDADM_URL 	= ftp://ftp.sara.nl/pub/sali/sources/$(MDADM_TARBALL)
+MDADM_INFO 	=  http://www.kernel.org/pub/linux/utils/raid/mdadm/
 
-ALL_SOURCE += $(INITRD_SRC_DIR)/$(MDADM_TARBALL)
+.PHONY: mdadm
+mdadm: $(MDADM_DIR).build
 
-PHONY += mdadm
-mdadm:	$(MDADM_DIR).build
+.PHONY: mdadm_install
+mdadm_install: $(MDADM_DIR).install
 
-$(MDADM_DIR).build: $(INITRD_SRC_DIR)/$(MDADM_TARBALL)
-	rm -rf $(MDADM_DIR)
-	$(MAKE) $(INITRD_SRC_DIR)/$(MDADM_TARBALL)
-	[ -d $(MDADM_DIR) ] || \
-		( cd $(INITRD_SRC_DIR) && tar zxvf $(MDADM_TARBALL) )
+.PHONY: mdadm_clean
+mdadm_clean: $(MDADM_DIR).clean
+
+$(MDADM_DIR).build: $(MDAM_DIR).get
 	cd $(MDADM_DIR) && $(MAKE) -j $(NCPUS)
-
-PHONY += mdadm_install
-mdam_install: $(MDADM_DIR).install
 
 $(MDADM_DIR).install: $(MDADM_DIR).build
 	cd $(MDADM_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
+	touch $@
 
-$(INITRD_SRC_DIR)/$(MDADM_TARBALL):
-	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
-	$(GETSOURCE) $(MDADM_URL) $(INITRD_SRC_DIR)
+$(MDAM_DIR).get:
+	$(GETSOURCE) $(MDADM_URL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar zxvf $(MDADM_TARBALL)
+	touch $@
 
-PHONY += mdadm_clean
-mdadm_clean:
-	rm -rf $(MDADM_DIR)
+$(MDAM_DIR).clean:
+	rm -rf $(MDADM_DIR)*

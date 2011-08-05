@@ -90,6 +90,7 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 	chmod +x $(INITRD_DIR)/sali/bin/sali_functions
 
 	touch $@
+	touch prepare
 
 # build everything, install nothing
 .PHONY:	build

@@ -31,10 +31,10 @@ include $(INITRD_MAKED_DIR)/kerneltools.rul
 include $(INITRD_MAKED_DIR)/kexec.rul
 include $(INITRD_MAKED_DIR)/lvm.rul
 include $(INITRD_MAKED_DIR)/parted.rul
-#include $(INITRD_MAKE_DIR)/mdadm.rul
-#include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
-#include $(INITRD_MAKE_DIR)/xfsprogs.rul
+include $(INITRD_MAKED_DIR)/mdadm.rul
+include $(INITRD_MAKED_DIR)/reiserfsprogs.rul
 #include $(INITRD_MAKE_DIR)/jfsutils.rul
+#include $(INITRD_MAKE_DIR)/xfsprogs.rul
 #
 ## END import rule files
 
@@ -55,12 +55,9 @@ initrd_build: prepare \
 	kerneltools_install \
 	kexec_install \
 	lvm_install \
-	parted
-#	$(KEXEC_DIR).install		\
-#	$(LVM_DIR).install		\
-#	$(MDADM_DIR).install 		\
-#	$(PARTED_DIR).install 		\
-#	$(REISERFSPROGS_DIR).install	\
+	parted_install \
+	mdadm_install \
+	reiserfsprogs_install
 #	$(XFSPROGS_DIR).install		\
 #	$(JFSUTILS_DIR).install		\
 

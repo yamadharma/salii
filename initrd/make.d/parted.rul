@@ -6,49 +6,46 @@
 #   - go to 1.6.19
 #
 
-PARTED_VERSION := 2.3
-PARTED_DIR := $(INITRD_SRC_DIR)/parted-$(PARTED_VERSION)
-PARTED_TARBALL := parted-$(PARTED_VERSION).tar.gz
+PARTED_VERSION 	= 2.3
+PARTED_DIR 			= $(SRC_DIR)/parted-$(PARTED_VERSION)
+PARTED_TARBALL 	= parted-$(PARTED_VERSION).tar.gz
 
 #### http://ftp.gnu.org/gnu/parted/ ####
-PARTED_URL := ftp://ftp.sara.nl/pub/sali/sources/$(PARTED_TARBALL)
-PARTED_INFO := http://www.gnu.org/software/parted/index.shtml
+PARTED_URL 		= ftp://ftp.sara.nl/pub/sali/sources/$(PARTED_TARBALL)
+PARTED_INFO 	= http://www.gnu.org/software/parted/index.shtml
 
-PARTED_BINARY := $(INITRD_SRC_DIR)/$(PARTED_DIR)/parted/.libs/parted
+ifeq ($(ARCH),ppc64)
+	PARTED_CONFIGURE = $(PARTED_CONFIGURE) --build=powerpc-unknown-linux
+endif
 
-## Disabled
-#PARTED_PATCHES := $(shell ls $(PATCH_DIR)/parted.*.patch 2>/dev/null | sort)
-
-ALL_SOURCE += $(INITRD_SRC_DIR)/$(PARTED_TARBALL)
-
-PARTED_CONFIGURE = --build=powerpc-unknown-linux
-
-PHONY += parted
+.PHONY: parted
 parted:	$(PARTED_DIR).build
 
-$(PARTED_DIR).build:	$(INITRD_SRC_DIR)/$(PARTED_TARBALL) $(PARTED_PATCHES) $(E2FSPROGS_DIR).build
-	rm -rf $(INITRD_SRC_DIR)/$(PARTED_DIR)
-	cd $(INITRD_SRC_DIR) && tar -xvzf $(PARTED_TARBALL)
+.PHONY: parted_install
+parted_install:	$(PARTED_DIR).install
+
+.PHONY: parted_clean
+parted_clean:	$(PARTED_DIR).clean
+
+$(PARTED_DIR).build:	$(PARTED_DIR).get $(E2FSPROGS_DIR).build
 	cd $(PARTED_DIR) && \
 	  cat $(PARTED_PATCHES) < /dev/null | patch -p1
 	cd $(PARTED_DIR) && \
-         CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/lib" \
+         CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/usr/lib" \
 	  ./configure --disable-Werror --prefix=/usr $(PARTED_CONFIGURE)
 	$(MAKE) -j $(NCPUS) -C $(PARTED_DIR)
 
-PHONY += parted_install
-parted_install: $(PARTED_DIR).install
+	touch $@
 
 $(PARTED_DIR).install: $(PARTED_DIR).build
 	cd $(PARTED_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
+	touch $@
 
-$(INITRD_SRC_DIR)/$(PARTED_TARBALL):
-	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
-	$(GETSOURCE) $(PARTED_URL) $(INITRD_SRC_DIR)
+$(PARTED_DIR).get:
+	$(GETSOURCE) $(PARTED_URL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar -xvzf $(PARTED_TARBALL)
+	touch $@
 
-PHONY += parted_clean
-parted_clean:
-	rm -rf $(INITRD_SRC_DIR)/$(PARTED_DIR)
+$(PARTED_DIR).clean:
+	rm -rf $(SRC_DIR)/$(PARTED_DIR)
 
-DEBIAN_STABLE_BUILD_DEPS += libreadline4-dev
-UBUNTU_DAPPER_BUILD_DEPS += libreadline5-dev
