@@ -28,10 +28,10 @@ $(MDADM_DIR).install: $(MDADM_DIR).build
 	cd $(MDADM_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
 	touch $@
 
-$(MDAM_DIR).get:
+$(MDADM_DIR).get:
 	$(GETSOURCE) $(MDADM_URL) $(SRC_DIR)
 	cd $(SRC_DIR) && tar zxvf $(MDADM_TARBALL)
 	touch $@
 
-$(MDAM_DIR).clean:
+$(MDADM_DIR).clean:
 	rm -rf $(MDADM_DIR)*
