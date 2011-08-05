@@ -89,9 +89,6 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 
 	touch $@
 
-.PHONY: all
-all: show_targets
-
 # build everything, install nothing
 .PHONY:	build
 build:	kernel initrd
@@ -100,24 +97,33 @@ build:	kernel initrd
 help:  show_targets
 
 .PHONY: distclean
-distclean:
+distclean: initrd_clean
+
+	@echo "\nCLEAN:: Removing generic files"
 	rm -rf $(ROOT_DIR)/src
-	rm -rf $(INITRD_BUILD_DIR)
+	rm -r Makefile config.log config.status
 
 .PHONY:	show_targets
 show_targets:
 	@echo
-	@echo Makefile targets you are probably most interested in:
-	@echo ---------------------------------------------------------------------
-	@echo "build"
-	@echo "    Build everything."
-	@echo "	"
-	@echo "tarball"
-	@echo "    Build and create a nice tarball."
-	@echo "	"
-	@echo "kernel"
+	@echo "General commands:"
+	@echo " build"
+	@echo "    Build everything. Does not install the kernel modules"
+	@echo " kernel"
 	@echo "    Only build the kernel."
-	@echo " "
-	@echo "initrd.img"
-	@echo "    Only build the initrd.img, this will skip the kernel modules installation."
+	@echo " initrd"
+	@echo "    Only build the initrd.img, skippes kernel build!"
+	@echo " sali"
+	@echo "    Builds the kernel and initrd. Also installs the kernel modules."
+	@echo " tarball"
+	@echo "    Same as sali but creates a tar.gz with the initrd.img and kernel."
+	@echo
+	@echo "Dynamic commands (available when imported in initrd.rul):"
+	@echo " <name>"
+	@echo "    Retrieve and build the .rul package in the directory $(SRC_DIR)"
+	@echo " <name>_install"
+	@echo "    Installs the .rul package to $(INITRD_BUILD_DIR)"
+	@echo " <name>_clean"
+	@echo "    Cleans the files of a .rul package in $(SRC_DIR)"
 
+*: show_targets

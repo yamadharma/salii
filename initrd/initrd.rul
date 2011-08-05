@@ -39,8 +39,8 @@ include $(INITRD_MAKED_DIR)/kerneltools.rul
 ## END import rule files
 
 ## Please note that the order herebelow is important!!!
-.PHONY: build_initrd
-build_initrd: prepare kernel \
+.PHONY: initrd_build
+initrd_build: prepare kernel \
 	$(SKEL_FILES) \
 	$(SRC_DIR)/modules_build-stamp 	\
 	openssh_install 	\
@@ -62,7 +62,7 @@ build_initrd: prepare kernel \
 #	$(JFSUTILS_DIR).install		\
 
 .PHONY: initrd
-initrd: build_initrd
+initrd: initrd_build
     ## LVM depends on SELINUX
     # We need to copy libse* libnss* (more specific) ld* libdev*
     # also for copy libs
@@ -83,3 +83,8 @@ initrd: build_initrd
     # Cleanup the .svn stuff
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
 
+.PHONY: initrd_clean
+initrd_clean:
+	@echo "\nCLEAN:: Removing initrd specific stuff"
+	rm -rf $(INITRD_BUILD_DIR)
+	rm $(INITRD_DIR)/sali/bin/sali_functions
