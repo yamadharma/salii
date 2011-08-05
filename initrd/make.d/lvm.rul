@@ -16,46 +16,41 @@
 
 
 
-LVM_VERSION	:= 2.2.02.84
-LVM_DIR		:= $(INITRD_SRC_DIR)/LVM$(LVM_VERSION)
-LVM_TARBALL	:= LVM$(LVM_VERSION).tgz
+LVM_VERSION		= 2.2.02.84
+LVM_TARBALL		= LVM$(LVM_VERSION).tgz
+LVM_DIR				= $(SRC_DIR)/LVM$(LVM_VERSION)
 
 #### ftp://sources.redhat.com/pub/lvm2/ ####
-LVM_URL		:= ftp://ftp.sara.nl/pub/sali/sources/$(LVM_TARBALL)
-LVM_INFO	:= http://sources.redhat.com/lvm2/
+LVM_URL			= ftp://ftp.sara.nl/pub/sali/sources/$(LVM_TARBALL)
+LVM_INFO		= http://sources.redhat.com/lvm2/
 
-LVM_BINARY	:= $(INITRD_SRC_DIR)/$(LVM_DIR)/tools/lvm
-
-## Disabled
-#LVM_PATCHES	:= $(shell ls $(PATCH_DIR)/lvm.*.patch 2>/dev/null | sort)
-
-PHONY += lvm
+.PHONY: lvm
 lvm:	$(LVM_DIR).build
+
+.PHONY: lvm_install
+lvm_install: $(LVM_DIR).install
+
+.PHONY: lvm_clean
+lvm_clean: $(LVM_DIR).clean
 
 # By default, `make install' will install all the files in
 # `/usr/bin', `/usr/lib' etc.  You can specify
 # an installation prefix other than `/usr' using `--prefix',
 # for instance `--prefix=$HOME'.
-$(LVM_DIR).build:	$(INITRD_SRC_DIR)/$(LVM_TARBALL)
-	rm -rf $(LVM_DIR)
-	cd $(INITRD_SRC_DIR) && tar -xvzf $(LVM_TARBALL)
+$(LVM_DIR).build:	$(LVM_DIR).get udev_install
 	cd $(LVM_DIR) && \
+     CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/lib" \
 		./configure --enable-udev_sync --enable-udev_rules --prefix=/
 	cd $(LVM_DIR) && $(MAKE) -j $(NCPUS)
 
-PHONY += lvm_install
-lvm_install: $(LVM_DIR).install
-
 $(LVM_DIR).install: $(LVM_DIR).build
 	cd $(LVM_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
-	cd $(LVM_DIR) && ln -s `ls -1|grep libdevmapper.so.*` libdevmapper.so
+#	cd $(LVM_DIR) && ln -s `ls -1|grep libdevmapper.so.*` libdevmapper.so
 
-$(INITRD_SRC_DIR)/$(LVM_TARBALL):
-	[ -d $(INITRD_SRC_DIR) ] || mkdir -p $(INITRD_SRC_DIR)
-	$(GETSOURCE) $(LVM_URL) $(INITRD_SRC_DIR)
+$(LVM_DIR).get:
+	$(GETSOURCE) $(LVM_URL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar -xvzf $(LVM_TARBALL)
+	touch $@
 
-ALL_SOURCE += $(INITRD_SRC_DIR)/$(LVM_TARBALL)
-
-PHONY += lvm_clean
-lvm_clean:
-	rm -rf $(INITRD_SRC_DIR)/$(LVM_DIR)
+$(LVM_DIR).clean:
+	rm -rf $(LVM_DIR)*

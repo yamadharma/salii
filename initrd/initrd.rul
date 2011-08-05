@@ -29,12 +29,12 @@ include $(INITRD_MAKED_DIR)/scrub.rul
 include $(INITRD_MAKED_DIR)/e2fsprogs.rul
 include $(INITRD_MAKED_DIR)/kerneltools.rul
 include $(INITRD_MAKED_DIR)/kexec.rul
-#include $(INITRD_MAKE_DIR)/parted.rul
+include $(INITRD_MAKED_DIR)/lvm.rul
+include $(INITRD_MAKED_DIR)/parted.rul
 #include $(INITRD_MAKE_DIR)/mdadm.rul
 #include $(INITRD_MAKE_DIR)/reiserfsprogs.rul
 #include $(INITRD_MAKE_DIR)/xfsprogs.rul
 #include $(INITRD_MAKE_DIR)/jfsutils.rul
-#include $(INITRD_MAKE_DIR)/lvm.rul
 #
 ## END import rule files
 
@@ -53,7 +53,9 @@ initrd_build: prepare \
 	scrub_install \
 	e2fsprogs_install \
 	kerneltools_install \
-	kexec_install 
+	kexec_install \
+	lvm_install \
+	parted
 #	$(KEXEC_DIR).install		\
 #	$(LVM_DIR).install		\
 #	$(MDADM_DIR).install 		\
