@@ -34,7 +34,7 @@ include $(INITRD_MAKED_DIR)/parted.rul
 include $(INITRD_MAKED_DIR)/mdadm.rul
 include $(INITRD_MAKED_DIR)/reiserfsprogs.rul
 include $(INITRD_MAKED_DIR)/jfsutils.rul
-#include $(INITRD_MAKE_DIR)/xfsprogs.rul
+include $(INITRD_MAKED_DIR)/xfsprogs.rul
 #
 ## END import rule files
 
@@ -58,8 +58,8 @@ initrd_build: prepare \
 	parted_install \
 	mdadm_install \
 	reiserfsprogs_install \
-	jfsutils_install
-#	$(XFSPROGS_DIR).install		\
+	jfsutils_install \
+	xfsprogs_install
 
 .PHONY: initrd
 initrd: initrd_build

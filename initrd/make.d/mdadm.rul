@@ -21,7 +21,7 @@ mdadm_install: $(MDADM_DIR).install
 .PHONY: mdadm_clean
 mdadm_clean: $(MDADM_DIR).clean
 
-$(MDADM_DIR).build: $(MDAM_DIR).get
+$(MDADM_DIR).build: $(MDADM_DIR).get
 	cd $(MDADM_DIR) && $(MAKE) -j $(NCPUS)
 
 $(MDADM_DIR).install: $(MDADM_DIR).build
