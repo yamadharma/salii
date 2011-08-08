@@ -77,6 +77,7 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 
 	test ! -d /lib64 || ( cd $(INITRD_BUILD_DIR) && ln -s lib lib64 )
 
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty0 c 4 0
 	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty1 c 4 1
 	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty2 c 4 2
 	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty3 c 4 3
@@ -90,7 +91,6 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 	chmod +x $(INITRD_DIR)/sali/bin/sali_functions
 
 	touch $@
-	touch prepare
 
 # build everything, install nothing
 .PHONY:	build
@@ -98,6 +98,10 @@ build:	kernel initrd
 
 .PHONY:	help
 help:  show_targets
+
+.PHONY: sali
+sali: build
+	make INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_DIR) modules_install
 
 .PHONY: distclean
 distclean: initrd_clean
@@ -115,7 +119,7 @@ show_targets:
 	@echo " kernel"
 	@echo "    Only build the kernel."
 	@echo " initrd"
-	@echo "    Only build the initrd.img, skippes kernel build!"
+	@echo "    Builds the software for the initrd, skips kernel build!"
 	@echo " sali"
 	@echo "    Builds the kernel and initrd. Also installs the kernel modules."
 	@echo " tarball"
