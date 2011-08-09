@@ -1,0 +1,42 @@
+#
+#   $Id: usbutils.rul 3649 2006-06-19 18:04:56Z finley $
+#    vi: set filetype=make:
+#
+USBUTILS_VERSION 	= 0.91
+USBUTILS_DIR 			= $(SRC_DIR)/usbutils-$(USBUTILS_VERSION)
+USBUTILS_TARBALL 	= usbutils-$(USBUTILS_VERSION).tar.bz2
+
+#### http://ftp.gnu.org/gnu/usbutils/ ####
+USBUTILS_URL 		= ftp://ftp.sara.nl/pub/sali/sources/$(USBUTILS_TARBALL)
+USBUTILS_INFO 	= http://www.linux-usb.org
+
+export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib"
+
+.PHONY: usbutils
+usbutils:	$(USBUTILS_DIR).build
+
+.PHONY: usbutils_install
+usbutils_install:	$(USBUTILS_DIR).install
+
+.PHONY: usbutils_clean
+usbutils_clean:	$(USBUTILS_DIR).clean
+
+$(USBUTILS_DIR).build:	$(USBUTILS_DIR).get
+	cd $(USBUTILS_DIR) && \
+   LIBUSB_CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/usr/lib" \
+	./configure && make
+	touch $@
+
+$(USBUTILS_DIR).install: $(USBUTILS_DIR).build
+	cd $(USBUTILS_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
+	touch $@
+
+$(USBUTILS_DIR).get:
+	rm -rf $(USBUTILS_DIR)
+	$(GETSOURCE) $(USBUTILS_URL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar -xvjf $(USBUTILS_TARBALL)
+	touch $@
+
+$(USBUTILS_DIR).clean:
+	rm -rf $(SRC_DIR)/$(USBUTILS_DIR)
+

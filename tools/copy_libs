@@ -1,7 +1,7 @@
 #/bin/sh
 #
-# Author: Bas van der Vlies
-# Date  : 28 Juni 2010
+# Author: Bas van der Vlies & Dennis Stam
+# Date  : 28 Juni 2010 & 9 august 2011
 # Desc. : Copy the needed libraries in the initrd. A simple mklibs replacement
 #
 # SVn Info:
@@ -24,24 +24,48 @@
 #
 if [ $# -lt 1 ]
 then
-	echo "Usage: $(basename $0) <executable> [excutables]"
+	echo "Usage: $(basename $0) <sali_lib_path> <executable_path>"
+	echo
+	echo " Modes: byfiles or bypath"
+	echo
+	echo " Specify paths as: lib/:usr/lib/"
 	exit 0
 fi
 
-SALILPATH=$1
-shift 1
-FILES=$@
+## Some definiction given by the user
+SALIPATH=$(echo $1|tr ':' ' ')
+FILES=$(find $(echo $2|tr ':' ' '))
+TARGETDIR=$3
 
+## A function to check if we already have the lib
+check_exists() {
+	for path in $(echo $SALIPATH)
+	do
+		if [ -e "${path}/${1}" ]
+		then
+			return
+		fi
+	done
+
+	echo "${1}"
+}
+
+## Loop through the files
 for f in  $FILES
 do
-	for libpath in $(ldd $f  | awk '{ print $3 }' | grep ^/)
-    do
-        LIBNAME=$(basename $libpath)
-        if [ ! -e "${SALILPATH}/${LIBNAME}" ]
-        then
-            echo "${libpath}"
-        else
-            echo ""
-        fi
-    done
+	## Check if it's a regular file
+	if [ -f "${f}" ]
+	then
+		## Loop through the SALI lib paths
+		for libpath in $(ldd $f  | awk '{ print $3 }' | grep ^/)
+		do
+			if [ -n "$(check_exists $(basename $libpath))" ]
+			then
+				NAME=$(basename $libpath)
+				PATH=$(echo $libpath|sed 's/'${NAME}'//')
+				echo "Copying lib from ${libpath} to ${TARGETDIR}/${PATH}"
+				cp ${libpath} ${TARGETDIR}/${PATH}
+			fi
+		done
+	fi
 done | sort | uniq

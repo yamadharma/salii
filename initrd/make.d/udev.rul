@@ -10,13 +10,14 @@ UDEV_DIR	= $(SRC_DIR)/udev-$(UDEV_VERSION)
 UDEV_URL	= ftp://ftp.sara.nl/pub/sali/sources/
 UDEV_INFO	= http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 
+export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib"
+
 .PHONY: udev
 udev: $(UDEV_DIR).build
 
 $(UDEV_DIR).build:  $(UDEV_DIR).get
-	#cd $(UDEV_DIR) && make EXTRAS="`ls -c1 extras/ | sed 's:\(.*\):extras/\1:' | tr '\n' ' '`"
-	#cd $(UDEV_DIR) && ./configure --prefix=$(INITRD_BUILD_DIR)  && make
-	cd $(UDEV_DIR) && ./configure --prefix=/usr --sysconfdir=/etc \
+	cd $(UDEV_DIR) && CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/usr/lib" \
+	./configure --prefix=/usr --sysconfdir=/etc \
 		--sbindir=/sbin --libdir=/lib --with-rootlibdir=/lib --libexecdir=/lib/udev \
 		--disable-introspection && make
 	touch $@

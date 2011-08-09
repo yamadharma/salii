@@ -21,6 +21,7 @@ include $(INITRD_MAKED_DIR)/openssl.rul
 include $(INITRD_MAKED_DIR)/openssh.rul
 include $(INITRD_MAKED_DIR)/busybox.rul
 include $(INITRD_MAKED_DIR)/aria2.rul
+include $(INITRD_MAKED_DIR)/usbutils.rul
 include $(INITRD_MAKED_DIR)/udev.rul
 include $(INITRD_MAKED_DIR)/curl.rul
 include $(INITRD_MAKED_DIR)/rsync.rul
@@ -46,6 +47,7 @@ initrd_build: prepare \
 	openssh_install 	\
 	busybox_install 		\
 	aria2_install \
+	usbutils_install \
 	udev_install \
 	curl_install \
 	rsync_install \
@@ -80,6 +82,8 @@ initrd: initrd_build
 
 	# Cleanup the .svn stuff
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
+
+	$(COPYLIBS) $(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib $(INITRD_BUILD_DIR)/bin:$(INITRD_BUILD_DIR)/sbin:$(INITRD_BUILD_DIR)/usr/bin/:$(INITRD_BUILD_DIR)/usr/sbin/ $(INITRD_BUILD_DIR)
 
 .PHONY: initrd_clean
 initrd_clean:

@@ -17,9 +17,9 @@ PARTED_INFO 	= http://www.gnu.org/software/parted/index.shtml
 PARTED_CONFIGURE = --disable-Werror --prefix=/usr
 export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib"
 
-#ifeq ($(ARCH),ppc64)
-#	PARTED_CONFIGURE = --disable-Werror --prefix=/usr --build=powerpc-unknown-linux
-#endif
+ifeq ($(ARCH),ppc64)
+	PARTED_CONFIGURE = --disable-Werror --prefix=/usr --build=powerpc-unknown-linux
+endif
 
 .PHONY: parted
 parted:	$(PARTED_DIR).build
@@ -31,8 +31,6 @@ parted_install:	$(PARTED_DIR).install
 parted_clean:	$(PARTED_DIR).clean
 
 $(PARTED_DIR).build:	$(PARTED_DIR).get $(E2FSPROGS_DIR).build
-	cd $(PARTED_DIR) && \
-	  cat $(PARTED_PATCHES) < /dev/null | patch -p1
 	cd $(PARTED_DIR) && \
          CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/usr/lib" \
 	  ./configure $(PARTED_CONFIGURE)
