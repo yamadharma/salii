@@ -1,6 +1,6 @@
 
 p_log(){
-	printf "$1" >> /log/monitor.log
+	printf "$1" >> /var/log/monitor.log
 }
 
 p_whitespace(){
