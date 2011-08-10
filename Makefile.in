@@ -16,6 +16,12 @@ ARCH_BIT=@ARCH_BIT@
 OS=@OS@
 OS_RELEASE=@OS_RELEASE@
 
+ifeq ($(ARCH_BIT),64)
+	LIBDIR=lib64
+else
+	LIBDIR=lib
+endif
+
 RELEASE_DOCS = CHANGELOG LICENSE CREDITS README VERSION
 NCPUS=$(shell egrep -c '^processor' /proc/cpuinfo )
 #
@@ -65,6 +71,10 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/bin
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/sbin
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/modprobe.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/startup.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/installer.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/sali/stubs
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/dev
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/proc
@@ -96,18 +106,27 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 .PHONY:	build
 build:	kernel initrd
 
+	mkdir -p -m 0755 $(ROOT_DIR)/build/$(ARCH)
+
+	make INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_DIR) modules_install
+	cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet -o -H newc > "$(ROOT_DIR)/build/$(ARCH)/initrd"
+	cd "$(ROOT_DIR)/build/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img
+	cp "$(LINUX_IMAGE)" "$(ROOT_DIR)/build/$(ARCH)/kernel"
+
+	ifeq ($(OS),suse)
+		mkzimage --vmlinux "$(ROOT_DIR)/build/$(ARCH)/kernel" --initrd "$(ROOT_DIR)/build/$(ARCH)/initrd.img" \
+		--output "$(ROOT_DIR)/build/$(ARCH)/vmlinuz"
+	endif
+
 .PHONY:	help
 help:  show_targets
-
-.PHONY: sali
-sali: build
-	make INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_DIR) modules_install
 
 .PHONY: distclean
 distclean: initrd_clean
 
 	@echo "\nCLEAN:: Removing generic files"
 	rm -rf $(ROOT_DIR)/src
+	rm -rf $(ROOT_DIR)/build
 	rm -r Makefile config.log config.status
 
 .PHONY:	show_targets
@@ -115,15 +134,11 @@ show_targets:
 	@echo
 	@echo "General commands:"
 	@echo " build"
-	@echo "    Build everything. Does not install the kernel modules"
+	@echo "    Build everything."
 	@echo " kernel"
 	@echo "    Only build the kernel."
 	@echo " initrd"
 	@echo "    Builds the software for the initrd, skips kernel build!"
-	@echo " sali"
-	@echo "    Builds the kernel and initrd. Also installs the kernel modules."
-	@echo " tarball"
-	@echo "    Same as sali but creates a tar.gz with the initrd.img and kernel."
 	@echo
 	@echo "Dynamic commands (available when imported in initrd.rul):"
 	@echo " <name>"

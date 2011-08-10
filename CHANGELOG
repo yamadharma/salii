@@ -1,5 +1,13 @@
 1.4.5
   * An rewrite has been done of the make and configure files.
+	Author: Dennis Stam
+
+  * Improved ppc64 architecture support
+	Author: Dennis Stam & Michel Scheerman
+
+  * Added module blacklisting via kernel parameters, use BLACKLIST=module_a;module_b as
+    kernel parameter to blacklist a module dynamicly
+	Author: Dennis Stam
 
 1.4.1
   * Added experimental support for ppc64 architecture. Tested under SLES 11.1 with Power 6.

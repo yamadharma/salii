@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 #
 # Author: Bas van der Vlies & Dennis Stam
 # Date  : 28 Juni 2010 & 9 august 2011
@@ -62,9 +62,9 @@ do
 			if [ -n "$(check_exists $(basename $libpath))" ]
 			then
 				NAME=$(basename $libpath)
-				PATH=$(echo $libpath|sed 's/'${NAME}'//')
-				echo "Copying lib from ${libpath} to ${TARGETDIR}/${PATH}"
-				cp ${libpath} ${TARGETDIR}/${PATH}
+				NPATH=$(echo $libpath|sed 's/'${NAME}'//')
+				echo "Copying lib from ${libpath} to ${TARGETDIR}/${NPATH}"
+				cp ${libpath} ${TARGETDIR}/${NPATH}
 			fi
 		done
 	fi
