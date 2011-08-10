@@ -113,9 +113,17 @@ build:	kernel initrd
 	( cd "$(ROOT_DIR)/build/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img )
 	( cp "$(LINUX_IMAGE)" "$(ROOT_DIR)/build/$(ARCH)/kernel" )
 
+	touch $@
+
 ifeq ($(OS),suse) 
 	mkzimage --vmlinux "$(ROOT_DIR)/build/$(ARCH)/kernel" --initrd "$(ROOT_DIR)/build/$(ARCH)/initrd.img" --output "$(ROOT_DIR)/build/$(ARCH)/vmlinuz" 
 endif
+
+	$(foreach doc, $(RELEASE_DOCS), cp $(ROOT_DIR)/$(doc) $(ROOT_DIR)/build/$(doc);)
+
+.PHONY: tarball
+tarball: build
+	cd $(ROOT_DIR)/build && tar -pczf $(ROOT_DIR)/sali-$(ARCH)-$(VERSION).tar.gz *
 
 .PHONY:	help
 help:  show_targets
@@ -138,6 +146,8 @@ show_targets:
 	@echo "    Only build the kernel."
 	@echo " initrd"
 	@echo "    Builds the software for the initrd, skips kernel build!"
+	@echo " tarball"
+	@echo "    Make a tarball with the contents from ROOT_DIR/build."
 	@echo
 	@echo "Dynamic commands (available when imported in initrd.rul):"
 	@echo " <name>"

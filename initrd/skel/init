@@ -57,6 +57,7 @@ udevd --daemon
 
 mkdir -p /dev/.udev/db/ /dev/.udev/queue/
 udevadm trigger
+udevadm settle
 
 mkdir -p /dev/pts
 mount devpts /dev/pts -t devpts
