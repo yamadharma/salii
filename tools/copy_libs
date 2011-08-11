@@ -64,6 +64,10 @@ do
 				NAME=$(basename $libpath)
 				NPATH=$(echo $libpath|sed 's/'${NAME}'//')
 				echo "Copying lib from ${libpath} to ${TARGETDIR}/${NPATH}"
+				if [ ! -d "${TARGETDIR}/${NPATH}" ]
+				then
+					mkdir -p -m 0755 "${TARGETDIR}/${NPATH}"
+				fi
 				cp ${libpath} ${TARGETDIR}/${NPATH}
 			fi
 		done

@@ -116,7 +116,8 @@ build:	kernel initrd
 	touch $@
 
 ifeq ($(OS),suse) 
-	mkzimage --vmlinux "$(ROOT_DIR)/build/$(ARCH)/kernel" --initrd "$(ROOT_DIR)/build/$(ARCH)/initrd.img" --output "$(ROOT_DIR)/build/$(ARCH)/vmlinuz" 
+	( cp "$(LINUX_DIR)/vmlinux" "$(ROOT_DIR)/build/$(ARCH)/vmlinux" )
+	mkzimage --vmlinux "$(ROOT_DIR)/build/$(ARCH)/vmlinux" --initrd "$(ROOT_DIR)/build/$(ARCH)/initrd.img" --output "$(ROOT_DIR)/build/$(ARCH)/vmlinuz" 
 endif
 
 	$(foreach doc, $(RELEASE_DOCS), cp $(ROOT_DIR)/$(doc) $(ROOT_DIR)/build/$(doc);)
