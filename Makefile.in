@@ -104,7 +104,7 @@ $(INITRD_BUILD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 
 # build everything, install nothing
 .PHONY:	build
-build:	kernel initrd
+build:	kernel modules initrd
 
 	( mkdir -p -m 0755 $(ROOT_DIR)/build/$(ARCH) )
 
