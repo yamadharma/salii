@@ -27,6 +27,7 @@ include $(INITRD_MAKED_DIR)/curl.rul
 include $(INITRD_MAKED_DIR)/rsync.rul
 include $(INITRD_MAKED_DIR)/bc.rul
 include $(INITRD_MAKED_DIR)/scrub.rul
+include $(INITRD_MAKED_DIR)/lsscsi.rul
 include $(INITRD_MAKED_DIR)/e2fsprogs.rul
 include $(INITRD_MAKED_DIR)/kerneltools.rul
 include $(INITRD_MAKED_DIR)/kexec.rul
@@ -52,6 +53,7 @@ initrd_build: prepare \
 	curl_install \
 	rsync_install \
 	bc_install \
+    lsscsi_install \
 	scrub_install \
 	e2fsprogs_install \
 	kerneltools_install \
