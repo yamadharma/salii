@@ -1,0 +1,43 @@
+#
+#       $Id: lsscsi.rul 276 2010-11-23 09:08:23Z bas $
+#   vi: set filetype=make:
+#
+
+LSSCSI_VERSION	= 0.25
+LSSCSI_TARBALL	= lsscsi-$(LSSCSI_VERSION).tgz
+
+#### http://sg.danny.cz/scsi/lsscsi.html ####
+LSSCSI_URL 	= ftp://ftp.sara.nl/pub/sali/sources/$(LSSCSI_TARBALL)
+LSSCSI_INFO	= http://sg.danny.cz/scsi/lsscsi.html
+
+LSSCSI_DIR	= $(SRC_DIR)/lsscsi-$(LSSCSI_VERSION)
+
+.PHONY: lsscsi
+lsscsi:	$(LSSCSI_DIR).build
+
+.PHONY: lsscsi_install
+lsscsi_install:	$(LSSCSI_DIR).install
+
+.PHONY: lsscsi_clean
+lsscsi_clean: $(LSSCSI_DIR).clean
+
+$(LSSCSI_DIR).build:  $(LSSCSI_DIR).get
+	cd $(LSSCSI_DIR) && ./configure && make
+
+	touch $@
+
+$(LSSCSI_DIR).install:	$(LSSCSI_DIR).build
+	cd $(LSSCSI_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
+
+	touch $@
+
+$(LSSCSI_DIR).get:
+	rm -rf $(LSSCSI_DIR)
+	$(GETSOURCE) $(LSSCSI_URL) $(SRC_DIR)
+	cd $(SRC_DIR) && tar -xvzf $(SRC_DIR)/$(LSSCSI_TARBALL)
+
+	touch $@
+
+$(LSSCSI_DIR).clean:
+	rm -rf $(LSSCSI_DIR)
+	rm -f  $(LSSCSI_DIR).build $(LSSCSI_DIR).unpack $(LSSCSI_DIR).install
