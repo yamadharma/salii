@@ -116,7 +116,7 @@ run_pre_install_scripts() {
 
         if [ ! -z "`echo ${PRE_INSTALL_SCRIPTS}|sed 's/ //'`" ]; then
 
-            for PRE_INSTALL_SCRIPT in `unique $PRE_INSTALL_SCRIPTS`
+            for PRE_INSTALL_SCRIPT in $( echo $(uniq $PRE_INSTALL_SCRIPTS))
             do
                 logmsg ">>> $PRE_INSTALL_SCRIPT"
                 chmod +x $PRE_INSTALL_SCRIPT || shellout
@@ -171,7 +171,7 @@ run_post_install_scripts() {
 
             rsync -a ${SCRIPTS_DIR}/post-install/ /a/tmp/post-install/ || shellout
 
-            for POST_INSTALL_SCRIPT in `unique $POST_INSTALL_SCRIPTS`
+            for POST_INSTALL_SCRIPT in $(echo $(uniq $POST_INSTALL_SCRIPTS))
             do
                 if [ -e "$POST_INSTALL_SCRIPT" ]; then
                     logmsg ">>> $POST_INSTALL_SCRIPT"
