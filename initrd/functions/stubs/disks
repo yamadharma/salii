@@ -3,7 +3,7 @@ blockdev(){
 	logmsg "blockdev is depricated"
 }
 
-find_all_disks(){
+find_all_disks_by_dev(){
 	## 
 	# First find all disks, we are only interested the whole disk, eg: /dev/sda
 	# line to parse:
@@ -47,6 +47,28 @@ find_all_disks(){
 			;; 
 		esac
 	done
+
+}
+
+find_all_disks_by_lsscsi(){
+
+    if [ -z "${1}" ]
+    then
+        return
+    fi
+
+    lsscsi -t 2>&1 | egrep -v "${1}" | awk '{print $1}' | while read line
+    do
+        RSLT=$(echo ${line} | awk 'match($0,/^(\[[0-9]+:[0-9]+:[0-9]+:[0-9]+\])/) {print substr($0,RSTART,RLENGTH)}')
+        if [ -n "${RSLT}" ]
+        then
+            DISK=$(lsscsi "${RSLT}" | awk '{print $7}')
+            if [ -n "${DISK}" ]
+            then
+                echo $(basename "${DISK}")
+            fi
+        fi
+    done
 
 }
 
@@ -108,8 +130,18 @@ disk_enumerate(){
     #    - A=",a,b,,c" --> A="a b c"
     #
     ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
+    SKIP_PATTERN=$2
 
-    ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks)")
+    if [ -n "${SKIP_PATTERN}" ]
+    then
+        ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks_by_lsscsi $SKIP_PATTERN)")
+    fi
+
+    if [ -z "${ALLDISKS}" ]
+    then
+        ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks_by_dev)")
+    fi
+
     NUMDISKS=-1
 
     for disk in $ALLDISKS
