@@ -1,3 +1,8 @@
+1.4.6
+  * Added lsscsi for finding disks, add an option to disk_enumerate to specify a exclude expression
+    closes ticket #21
+    Author: Dennis Stam
+
 1.4.5
   * An rewrite has been done of the make and configure files.
 	Author: Dennis Stam
