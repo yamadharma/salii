@@ -1,6 +1,14 @@
 1.4.6
   * Added lsscsi for finding disks, add an option to disk_enumerate to specify a exclude expression
     closes ticket #21
+    Reported by: Robert Verkerk
+    Author: Dennis Stam
+
+  * Replaced shell function unique with uniq, please note that shell function unique is still
+    available for backwards compatibility in  masterscripts. Closes #12
+    Author: Dennis Stam
+
+  * Updated aria_autodetect_staging_dir to the new situation without a tmpfs mount, closes #17
     Author: Dennis Stam
 
 1.4.5
