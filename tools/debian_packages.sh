@@ -1,9 +1,7 @@
 #!/bin/sh
 
-echo "Simple bootstrap for debian\n\n"
+PACKAGES="libusb-1.0-0-dev gperf pciutils libxml2-dev expat pkg-config libssl-dev libglib2.0-dev libacl1-dev gettext docbook-to-man flex libreadline5-dev uuid-dev libblkid-dev"
 
-apt-get -y install flex rsync uuid-dev ncurses-dev libreadline-dev gperf \
-	pkg-config build-essential libglib2.0-dev libusb-dev gobject-introspection \
-	libblkid-dev libudev-dev libdevmapper-dev libssl-dev libacl1-dev
 
-apt-get -y build-dep udev
+
+apt-get install --yes ${PACKAGES}
