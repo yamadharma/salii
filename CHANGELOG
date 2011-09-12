@@ -1,5 +1,5 @@
 1.4.7
-  * Added virtio drivers instead of virtio host support (Not for PPC64)
+  * Added virtio drivers instead of virtio host support
     Author: Dennis Stam
 
 1.4.6
