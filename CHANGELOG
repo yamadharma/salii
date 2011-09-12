@@ -1,3 +1,7 @@
+1.4.7
+  * Added virtio drivers instead of virtio host support
+    Author: Dennis Stam
+
 1.4.6
   * Added lsscsi for finding disks, add an option to disk_enumerate to specify a exclude expression
     closes ticket #21
@@ -262,4 +266,5 @@
 
   Authors: Bas van der Vlies and Dennis Stam
 
-systemimager changelog can be found in file CHANGE.LOG
+systemimager changelog can be found in the SVN:
+  https://subtrac.sara.nl/oss/sali/browser/trunk/CHANGE.LOG?rev=4
