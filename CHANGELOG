@@ -1,3 +1,11 @@
+1.X.X
+  * Added passwd command to busybox. So we can set a new root
+    password, closes #25
+    Author: Bas van der Vlies
+
+  * Fixed a bug in detecting scsi disks, closes #26
+    Author: Bas van der Vlies
+
 1.4.7
   * Added virtio drivers instead of virtio host support
     Author: Dennis Stam
