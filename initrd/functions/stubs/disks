@@ -50,7 +50,31 @@ find_all_disks_by_dev(){
 
 }
 
-find_all_disks_by_lsscsi(){
+find_all_disks_by_lsscsi(){                                                                       
+    ###
+    # parse lsscsi output, we can also filter the output by given
+    # a SKIP_PATTERN as $1, eg: SKIP the Fibre Channel disks
+    #
+    # lsscsi output:
+    #   [2:0:0:0]    disk    sas:0x5000c5001af0afe5          -       
+    #   [2:0:1:0]    disk    sas:0x5000c5001af05101          -       
+    #   _tport: no sas_address, wd=/sys/class/sas_device/host2 [2:1:0:0] disk /dev/sda 
+    #
+    # Only interested in the /dev/ entries
+    ###
+    LSSCSI_CMD='lsscsi --transport 2>&1'                                                          
+                                                                                                  
+    if [ -z "${1}" ]                                                                              
+    then                                                                                          
+        RESULT=$(${LSSCSI_CMD} | egrep "\/dev" | awk '{ print $NF }')                             
+    else                                                                                          
+        RESULT=$(${LSSCSI_CMD} | egrep -v "${1}" | egrep "\/dev" | awk '{ print $NF }')           
+    fi                                                                                            
+                                                                                                  
+    echo $RESULT                                                                                  
+}
+
+find_all_disks_by_lsscsi_old(){
 
     if [ -z "${1}" ]
     then
@@ -132,10 +156,12 @@ disk_enumerate(){
     ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
     SKIP_PATTERN=$2
 
-    if [ -n "${SKIP_PATTERN}" ]
-    then
-        ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks_by_lsscsi $SKIP_PATTERN)")
-    fi
+#    if [ -n "${SKIP_PATTERN}" ]
+#    then
+#        ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks_by_lsscsi $SKIP_PATTERN)")
+#    fi
+
+    ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks_by_lsscsi $SKIP_PATTERN)")
 
     if [ -z "${ALLDISKS}" ]
     then
@@ -148,7 +174,8 @@ disk_enumerate(){
     do
         echo "A disk found: $disk"
         NUMDISKS=$(( $NUMDISKS + 1 ))
-        eval "export DISK$NUMDISKS=/dev/$disk"
+        #eval "export DISK$NUMDISKS=/dev/$disk"
+        eval "export DISK$NUMDISKS=$disk"
     done
 
     #Let's export the amount of disks!
