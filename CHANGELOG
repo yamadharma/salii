@@ -1,9 +1,18 @@
 1.X.X
   * Added passwd command to busybox. So we can set a new root
-    password, closes #25
+    password and modified sshd_config to allow root login when
+    ssh is enabled, closes #25
     Author: Bas van der Vlies
 
   * Fixed a bug in detecting scsi disks, closes #26
+
+    When function find_all_disks_by_dev() is used loop over the:
+       - /dev/disk/{by-path by-id by-label} directories
+       - to find all the disks
+
+    Function find_all_disks_by_lsscsi() is simplified so we did not
+    skip valid scsi disks
+
     Author: Bas van der Vlies
 
 1.4.7
