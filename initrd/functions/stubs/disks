@@ -74,6 +74,9 @@ find_all_disks_by_lsscsi(){
     echo $RESULT                                                                                  
 }
 
+
+### BvdV: obsolete wait for Dennis 2 Nov 2011
+#
 find_all_disks_by_lsscsi_old(){
 
     if [ -z "${1}" ]
@@ -155,11 +158,6 @@ disk_enumerate(){
     #
     ORDER=$( echo $1 | sed 's/,/ /g' | sed 's/,,*/ /g' | sed 's/^,/ /' )
     SKIP_PATTERN=$2
-
-#    if [ -n "${SKIP_PATTERN}" ]
-#    then
-#        ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks_by_lsscsi $SKIP_PATTERN)")
-#    fi
 
     ALLDISKS=$(sort_disks "${ORDER}" "$(find_all_disks_by_lsscsi $SKIP_PATTERN)")
 
