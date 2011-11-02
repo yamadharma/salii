@@ -9,45 +9,67 @@ find_all_disks_by_dev(){
 	# line to parse:
 	#  lrwxrwxrwx 1 root root  9 2010-04-05 12:40 pci-0000:02:0e.0-scsi-0:2:0:0 -> ../../sda
 	#  lrwxrwxrwx 1 root root 10 2010-04-05 12:40 pci-0000:02:0e.0-scsi-0:2:0:0-part1 -> ../../sda1
-	#
+	# 
+    # Look in all /dev/disk directories for disks
+    ##
+    disks=""                                                                                      
+    dirs="by-path by-id by-label"      
 
-	if [ -e /dev/disk/by-path ]
-	then
-		disks=$(ls -l /dev/disk/by-path | grep -v part | awk '{ print $NF }' | sort -u)
-	elif [ -e /dev/disk/by-id ]
-	then
-		disks=$(ls -l /dev/disk/by-id | grep -v part | awk '{ print $NF }' | sort -u)
-	elif [ -e /dev/disk/by-label ]
-	then
-		disks=$(ls -l /dev/disk/by-label | grep -v part | awk '{ print $NF }' | sort -u)
-	else
-		logmsg
-		logmsg "Can't find any disk by either path, id or label in /dev/disk"
-		logmsg
-		shellout
-	fi
+    for d in $dirs:
+    do 
+        if [ -e /dev/disk/$d ]                                                                
+        then                                                                                  
+            results=$(ls -l /dev/disk/$d | grep -v part | awk '{ print $NF }' | sort -u)  
+            for r in $results                                                             
+            do                                                                            
+                ##                                                                    
+                # Is this disk already added                                          
+                ##                                                                    
+                match=$(echo $disks | grep -c $r)                                     
+                case $match in               
+                    0)                                                            
+                        disks="$disks $r"                                     
+                    ;;                                                            
+                esac                                                                  
+            done                                                                          
+         fi                                                                                    
+    done                               
 
-	for d in $disks
-	do
-		case $(dirname $d) in
-			../../*)
-				controller="$(basename $(dirname $d))/"
-			;;
-			*)
-				controller=""
-			;;
-		esac
-
-		case $d in
-			../*)
-				if [ "$(cat /proc/partitions | grep $(basename $d))" ]
-				then
-					echo "$controller$(basename $d)"
-				fi
-			;; 
-		esac
-	done
-
+    if [ -z "$disks" ]                                                                        
+    then                                                                                      
+        logmsg                                                                            
+        logmsg "Can't find any disk by either path, id or label in /dev/disk"             
+        logmsg                                                                            
+        return                                                                            
+    fi 
+    
+    for d in $disks                                                                           
+    do                                                                                        
+        ##                                                                                
+        # Must we include the controller directory, eg: HP contoller                      
+        ##                                                                                
+        case $(dirname $d) in                                                             
+            ../../*)                                                                  
+                controller="$(basename $(dirname $d))/"                           
+            ;;                                                                        
+            
+            *)                                                                        
+                controller=""                                                     
+            ;;                                                                        
+        esac                                                                              
+        
+        case $d in                                                                        
+            ../*)                                                                     
+                ##                                                                
+                # Is this an valid disk                                           
+                ##                                                                
+                if [ "$(cat /proc/partitions | grep $(basename $d))" ]            
+                then                                                              
+                    echo "/dev/$controller$(basename $d)"                     
+                fi                                                                
+            ;;                                                                        
+        esac                                                                              
+    done 
 }
 
 find_all_disks_by_lsscsi(){                                                                       
@@ -62,15 +84,17 @@ find_all_disks_by_lsscsi(){
     #
     # Only interested in the /dev/ entries
     ###
-    LSSCSI_CMD='lsscsi --transport 2>&1'                                                          
-                                                                                                  
+    LSSCSI_CMD='lsscsi --transport'                                                          
+
+    OUTPUT=$(${LSSCSI_CMD} 2>/dev/null)
+                               
     if [ -z "${1}" ]                                                                              
-    then                                                                                          
-        RESULT=$(${LSSCSI_CMD} | egrep "\/dev" | awk '{ print $NF }')                             
+    then      
+        RESULT=$(echo $OUTPUT | egrep "/dev" | awk '{ print $NF }')            
     else                                                                                          
-        RESULT=$(${LSSCSI_CMD} | egrep -v "${1}" | egrep "\/dev" | awk '{ print $NF }')           
-    fi                                                                                            
-                                                                                                  
+        RESULT=$(echo $OUTPUT | egrep -v "${1}" | egrep "/dev" | awk '{ print $NF }')           
+    fi                                                                          
+    
     echo $RESULT                                                                                  
 }
 
