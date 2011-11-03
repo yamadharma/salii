@@ -23,6 +23,7 @@ mdadm_clean: $(MDADM_DIR).clean
 
 $(MDADM_DIR).build: $(MDADM_DIR).get
 	cd $(MDADM_DIR) && $(MAKE) -j $(NCPUS)
+	touch $@
 
 $(MDADM_DIR).install: $(MDADM_DIR).build
 	cd $(MDADM_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
