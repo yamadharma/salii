@@ -100,5 +100,5 @@ initrd: initrd_build
 initrd_clean:
 	@echo "\nCLEAN:: Removing initrd specific stuff"
 	rm -rf $(INITRD_BUILD_DIR)
-	rm $(INITRD_DIR)/initrd_build.prep
+	rm $(INITRD_DIR)/build_dir.prep
 	#rm $(INITRD_DIR)/sali/bin/sali_functions
