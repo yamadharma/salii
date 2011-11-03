@@ -40,20 +40,73 @@ include $(INITRD_MAKED_DIR)/xfsprogs.rul
 #
 ## END import rule files
 
-## Please note that the order herebelow is important!!!
+
+.PHONY: initrd_prepare
+initrd_prepare: $(INITRD_DIR).prep
+
+## Prepare the initrd directory
+#
+$(INITRD_DIR).prep:  $(INITRD_DIR)/initrd.rul
+
+	rm -rf $(INITRD_BUILD_DIR)
+	
+	## Also delete install files for packages. 
+	#
+	rm $(SRC_DIR)/*.install  $(SRC_DIR)/modules_build-stamp
+
+	mkdir -p $(INITRD_BUILD_DIR)
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/bin
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/sbin
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/modprobe.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/startup.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/installer.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/sali/stubs
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/dev
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/proc
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/bin
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/tmp
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/var
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/var/log
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/var/run
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/usr
+
+	test ! -d /lib64 || ( cd $(INITRD_BUILD_DIR) && ln -s lib lib64 )
+
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty0 c 4 0
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty1 c 4 1
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty2 c 4 2
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty3 c 4 3
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty4 c 4 4
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty5 c 4 5
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/tty6 c 4 6
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/console c 5 1
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/null c 1 3
+	mknod -m 666 $(INITRD_BUILD_DIR)/dev/zero c 1 5
+
+	chmod +x $(INITRD_DIR)/sali/bin/sali_functions
+
+	touch $@
+
+
+##
+#
 .PHONY: initrd_build
-initrd_build: prepare \
-	$(SKEL_FILES) \
-	$(SRC_DIR)/modules_build-stamp 	\
-	openssh_install 	\
-	busybox_install 		\
+initrd_build:  $(INITRD_DIR).build
+
+## Please note that the order herebelow is important!!!
+#
+$(INITRD_DIR).build: initrd_prepare $(SRC_DIR)/modules_build-stamp \
+	openssh_install \
+	busybox_install \
 	aria2_install \
 	usbutils_install \
 	udev_install \
 	curl_install \
 	rsync_install \
 	bc_install \
-    lsscsi_install \
+	lsscsi_install \
 	scrub_install \
 	e2fsprogs_install \
 	kerneltools_install \
@@ -65,10 +118,14 @@ initrd_build: prepare \
 	jfsutils_install \
 	xfsprogs_install
 
-.PHONY: initrd
-initrd: initrd_build
+## 
+#
+initrd_install: $(INITRD_DIR).build $(INITRD_DIR).install
+
+$(INITRD_DIR).install:
     
-	# Copy over text files from the skel directory.
+	## Copy over text files from the skel directory.
+	#
 	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
 
 	chmod +x $(INITRD_DIR)/sali/bin/sali_functions
@@ -76,6 +133,7 @@ initrd: initrd_build
 	  --tmpfile $(INITRD_DIR)/functions/functions.mbm
 
 	## Copying SALI stuff, will be moved to a separate .rul file in the future
+	#
 	install -m 644 $(INITRD_DIR)/functions/stubs/* $(INITRD_BUILD_DIR)/etc/sali/stubs/
 	install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 	install -m 755 $(ROOT_DIR)/VERSION $(INITRD_BUILD_DIR)/etc/sali_version
@@ -83,22 +141,29 @@ initrd: initrd_build
 	install -m 644 $(INITRD_DIR)/sali/installer.d/* $(INITRD_BUILD_DIR)/etc/installer.d/
 	install -m 755 $(INITRD_DIR)/sali/bin/* $(INITRD_BUILD_DIR)/bin
 
-	# Cleanup the .svn stuff
+	## Cleanup the .svn stuff
+	#
 	find $(INITRD_BUILD_DIR) -depth -type d -name .svn | xargs rm -rf
 
-	#Finally some other libs/files
+	## Finally some other libs/files
+	#
 	cp -a "/$(LIBDIR)/libnss"* "$(INITRD_BUILD_DIR)/lib"
 	cp -a "/$(LIBDIR)/ld"* "$(INITRD_BUILD_DIR)/lib"
 	cp -a "/$(LIBDIR)/libse"* "$(INITRD_BUILD_DIR)/lib"
 
 	$(COPYLIBS) $(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib $(INITRD_BUILD_DIR)/bin:$(INITRD_BUILD_DIR)/sbin:$(INITRD_BUILD_DIR)/usr/bin/:$(INITRD_BUILD_DIR)/usr/sbin/ $(INITRD_BUILD_DIR)
 
-	# make the binaries smaller
+	## make the binaries smaller
+	#
 	strip $(INITRD_BINARIES)
+
+	touch $@
 
 .PHONY: initrd_clean
 initrd_clean:
 	@echo "\nCLEAN:: Removing initrd specific stuff"
 	rm -rf $(INITRD_BUILD_DIR)
-	rm $(INITRD_DIR)/build_dir.prep
+
+	rm $(ROOT_DIR)/initrd.prep
+	rm $(ROOT_DIR)/initrd.install
 	#rm $(INITRD_DIR)/sali/bin/sali_functions

@@ -53,7 +53,8 @@ $(OPENSSH_DIR).get:
 
 	touch $@
 
-$(OPENSSH_DIR).install: $(OPENSSH_DIR).build $(INITRD_BUILD_DIR).prep
+#$(OPENSSH_DIR).install: $(OPENSSH_DIR).build $(INITRD_BUILD_DIR).prep
+$(OPENSSH_DIR).install: $(OPENSSH_DIR).build 
 	cd $(OPENSSH_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
 	
 	$(MAKE) DESTDIR=$(INITRD_BUILD_DIR) -j $(NCPUS) -C $(OPENSSH_DIR) install

@@ -35,7 +35,8 @@ $(BUSYBOX_DIR).build:  $(BUSYBOX_DIR).get
 
 	touch $@
 
-$(BUSYBOX_DIR).install:	$(BUSYBOX_DIR).build $(INITRD_BUILD_DIR).prep
+#$(BUSYBOX_DIR).install:	$(BUSYBOX_DIR).build $(INITRD_BUILD_DIR).prep
+$(BUSYBOX_DIR).install:	$(BUSYBOX_DIR).build 
 	$(MAKE) -j $(NCPUS) -C $(BUSYBOX_DIR) install CONFIG_PREFIX=$(INITRD_BUILD_DIR)/
 	
 	touch $@
