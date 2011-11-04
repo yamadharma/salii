@@ -18,7 +18,7 @@ bc_install: $(BC_DIR).install
 .PHONY: bc_clean
 bc_clean: $(BC_DIR).clean
 
-$(BC_DIR).build:    $(BC_DIR).get
+$(BC_DIR).build:    $(BC_DIR).unpack
 	cd $(BC_DIR) && ./configure --prefix=/usr
 	$(MAKE) -j $(NCPUS) -C $(BC_DIR)
 
@@ -29,9 +29,13 @@ $(BC_DIR).install: $(BC_DIR).build
 
 	touch $@
 
+$(BC_DIR).unpack: $(BC_DIR).get
+	cd $(SRC_DIR) && tar -xvzf $(BC_TARBALL)
+
+	touch $@
+
 $(BC_DIR).get:
 	$(GETSOURCE) $(BC_URL) $(SRC_DIR)
-	cd $(SRC_DIR) && tar -xvzf $(BC_TARBALL)
 
 	touch $@
 
