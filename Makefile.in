@@ -31,6 +31,9 @@ NCPUS=$(shell egrep -c '^processor' /proc/cpuinfo )
 #
 ROOT_DIR=$(CURDIR)
 
+# TAR directory
+TAR_DIR=$(ROOT_DIR)/tar
+
 # The basic
 MAKED_DIR=$(ROOT_DIR)/make.d
 PATCH_DIR=$(ROOT_DIR)/patches
@@ -61,39 +64,52 @@ include $(ROOT_DIR)/make.d/zlib.rul
 include $(ROOT_DIR)/initrd/initrd.rul
 
 # build everything, install nothing
-.PHONY:	build
-build:	kernel modules initrd_install
+#.PHONY:	build
+build:	initrd_install kernel modules $(ROOT_DIR)/build
 
-	( mkdir -p -m 0755 $(ROOT_DIR)/build/$(ARCH) )
+
+$(ROOT_DIR)/build:
+
+	( mkdir -p -m 0755 $(TAR_DIR)/$(ARCH) )
 
 	( make INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_DIR) modules_install )
-	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet -o -H newc > "$(ROOT_DIR)/build/$(ARCH)/initrd" )
-	( cd "$(ROOT_DIR)/build/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img )
-	( cp "$(LINUX_IMAGE)" "$(ROOT_DIR)/build/$(ARCH)/kernel" )
+	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet -o -H newc > "$(TAR_DIR)/$(ARCH)/initrd" )
+	( cd "$(TAR_DIR)/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img )
+	( cp "$(LINUX_IMAGE)" "$(TAR_DIR)/$(ARCH)/kernel" )
+
+
+ifeq ($(OS),suse) 
+	( cp "$(LINUX_DIR)/vmlinux" "$(TAR_DIR)/$(ARCH)/vmlinux" )
+	mkzimage --vmlinux "$(TAR_DIR)/$(ARCH)/vmlinux" --initrd "$(TAR_DIR)/$(ARCH)/initrd.img" --output "$(TAR_DIR)/$(ARCH)/vmlinuz" 
+endif
+
+	$(foreach doc, $(RELEASE_DOCS), cp $(ROOT_DIR)/$(doc) $(TAR_DIR)/$(doc);)
 
 	touch $@
 
-ifeq ($(OS),suse) 
-	( cp "$(LINUX_DIR)/vmlinux" "$(ROOT_DIR)/build/$(ARCH)/vmlinux" )
-	mkzimage --vmlinux "$(ROOT_DIR)/build/$(ARCH)/vmlinux" --initrd "$(ROOT_DIR)/build/$(ARCH)/initrd.img" --output "$(ROOT_DIR)/build/$(ARCH)/vmlinuz" 
-endif
-
-	$(foreach doc, $(RELEASE_DOCS), cp $(ROOT_DIR)/$(doc) $(ROOT_DIR)/build/$(doc);)
-
-.PHONY: tarball
+#.PHONY: tarball
 tarball: build
-	cd $(ROOT_DIR)/build && tar -pczf $(ROOT_DIR)/sali-$(ARCH)-$(VERSION).tar.gz *
+	cd $(TAR_DIR) && tar -pczf $(ROOT_DIR)/sali-$(ARCH)-$(VERSION).tar.gz *
 
 .PHONY:	help
 help:  show_targets
 
+
+.PHONY: clean
+clean:
+	@echo "Removing file for tar distribution"
+	rm $(ROOT_DIR)/build
+	rm -rf $(TAR_DIR)
+    
+
 .PHONY: distclean
 distclean: initrd_clean
 
-	@echo "\nCLEAN:: Removing generic files"
+	@echo "Removing all generated and downloaded files"
 	rm -rf $(ROOT_DIR)/src
-	rm -rf $(ROOT_DIR)/build
-	rm -r Makefile config.log config.status
+	rm -rf $(TAR_DIR)
+	rm $(ROOT_DIR)/build
+	rm -r Makefile config.log config.status initrd/sali/bin/sali_functions
 
 .PHONY:	show_targets
 show_targets:
