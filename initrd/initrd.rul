@@ -166,5 +166,5 @@ initrd_clean:
 	@echo "\nCLEAN:: Removing initrd specific stuff"
 	rm -rf $(INITRD_BUILD_DIR)
 
-	rm $(INITRD_DIR)/prep
-	rm $(INITRD_DIR)/install
+	rm -f $(INITRD_DIR)/prep
+	rm -f $(INITRD_DIR)/install
