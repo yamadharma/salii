@@ -64,7 +64,6 @@ include $(ROOT_DIR)/make.d/zlib.rul
 include $(ROOT_DIR)/initrd/initrd.rul
 
 # build everything, install nothing
-#.PHONY:	build
 build:	initrd_install kernel modules $(ROOT_DIR)/build
 
 $(ROOT_DIR)/build:
@@ -91,9 +90,11 @@ endif
 
 	touch $@
 
-#.PHONY: tarball
 tarball: build
 	cd $(TAR_DIR) && tar -pczf $(ROOT_DIR)/sali-$(ARCH)-$(VERSION).tar.gz *
+
+rebuild_tar:
+	rm -f $(ROOT_DIR)/build
 
 .PHONY:	help
 help:  show_targets

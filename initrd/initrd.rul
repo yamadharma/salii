@@ -98,8 +98,14 @@ $(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 
 ##
 #
-#.PHONY: initrd_build
 initrd_build:  $(INITRD_DIR)/build
+
+	## 
+    # Also regenerate initrd.img if something has changed
+	#
+	rm -f $(ROOT_DIR)/build
+
+	touch $@
 
 ## Please note that the order herebelow is important!!!
 #
@@ -126,7 +132,8 @@ $(INITRD_DIR)/build: initrd_prepare $(SRC_DIR)/modules_build-stamp \
 
 ## 
 #
-initrd_install: $(INITRD_DIR)/build $(INITRD_DIR)/install
+initrd_install: initrd_build $(INITRD_DIR)/install
+	touch $@
 
 $(INITRD_DIR)/install:
     
@@ -168,3 +175,8 @@ initrd_clean:
 
 	rm -f $(INITRD_DIR)/prep
 	rm -f $(INITRD_DIR)/install
+
+	## These files gives a message that everything is up to date
+	#
+	rm -f initrd_install
+	rm -f initrd_build
