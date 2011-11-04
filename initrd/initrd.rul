@@ -53,6 +53,7 @@ $(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 	## Also delete install files for packages. 
 	#
 	rm $(SRC_DIR)/*.install  $(SRC_DIR)/modules_build-stamp
+	rm $(INITRD_DIR)/install
 
 	mkdir -p $(INITRD_BUILD_DIR)
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/bin
@@ -92,7 +93,7 @@ $(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 
 ##
 #
-.PHONY: initrd_build
+#.PHONY: initrd_build
 initrd_build:  $(INITRD_DIR)/build
 
 ## Please note that the order herebelow is important!!!

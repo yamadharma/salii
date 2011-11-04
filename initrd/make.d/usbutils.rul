@@ -38,5 +38,5 @@ $(USBUTILS_DIR).get:
 	touch $@
 
 $(USBUTILS_DIR).clean:
-	rm -rf $(SRC_DIR)/$(USBUTILS_DIR)
+	rm -rf $(USBUTILS_DIR)*
 

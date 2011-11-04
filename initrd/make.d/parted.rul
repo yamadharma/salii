@@ -48,5 +48,5 @@ $(PARTED_DIR).get:
 	touch $@
 
 $(PARTED_DIR).clean:
-	rm -rf $(SRC_DIR)/$(PARTED_DIR)
+	rm -rf $(PARTED_DIR)*
 

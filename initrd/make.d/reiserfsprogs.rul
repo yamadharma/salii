@@ -38,4 +38,4 @@ $(REISERFSPROGS_DIR).get:
 	touch $@
 
 $(REISERFSPROGS_DIR).clean:
-	rm -rf $(INITRD_SRC_DIR)/$(REISERFSPROGS_DIR)
+	rm -rf $(REISERFSPROGS_DIR)*

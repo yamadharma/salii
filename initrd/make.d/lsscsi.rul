@@ -39,5 +39,4 @@ $(LSSCSI_DIR).get:
 	touch $@
 
 $(LSSCSI_DIR).clean:
-	rm -rf $(LSSCSI_DIR)
-	rm -f  $(LSSCSI_DIR).build $(LSSCSI_DIR).unpack $(LSSCSI_DIR).install
+	rm -rf $(LSSCSI_DIR)*

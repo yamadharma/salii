@@ -40,6 +40,4 @@ $(BC_DIR).get:
 	touch $@
 
 $(BC_DIR).clean:
-	rm -rf $(BC_DIR)
-	rm -f  $(BC_DIR).unpack
-	rm -f  $(BC_DIR).build
+	rm -rf $(BC_DIR)*

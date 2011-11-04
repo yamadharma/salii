@@ -40,5 +40,4 @@ $(UDEV_DIR).get:
 udev_clean: $(UDEV_DIR).clean
 
 $(UDEV_DIR).clean:
-	rm -rf $(UDEV_DIR)
-	rm -f  $(UDEV_DIR).build $(UDEV_DIR).unpack $(UDEV_DIR).install
+	rm -rf $(UDEV_DIR)*

@@ -39,5 +39,4 @@ $(SCRUB_DIR).get:
 	touch $@
 
 $(SCRUB_DIR).clean:
-	rm -rf $(SCRUB_DIR)
-	rm -f  $(SCRUB_DIR).build $(SCRUB_DIR).unpack $(SCRUB_DIR).install
+	rm -rf $(SCRUB_DIR)*
