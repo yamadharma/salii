@@ -42,11 +42,11 @@ include $(INITRD_MAKED_DIR)/xfsprogs.rul
 
 
 .PHONY: initrd_prepare
-initrd_prepare: $(INITRD_DIR).prep
+initrd_prepare: $(INITRD_DIR)/prep
 
 ## Prepare the initrd directory
 #
-$(INITRD_DIR).prep:  $(INITRD_DIR)/initrd.rul
+$(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 
 	rm -rf $(INITRD_BUILD_DIR)
 	
@@ -93,11 +93,11 @@ $(INITRD_DIR).prep:  $(INITRD_DIR)/initrd.rul
 ##
 #
 .PHONY: initrd_build
-initrd_build:  $(INITRD_DIR).build
+initrd_build:  $(INITRD_DIR)/build
 
 ## Please note that the order herebelow is important!!!
 #
-$(INITRD_DIR).build: initrd_prepare $(SRC_DIR)/modules_build-stamp \
+$(INITRD_DIR)/build: initrd_prepare $(SRC_DIR)/modules_build-stamp \
 	openssh_install \
 	busybox_install \
 	aria2_install \
@@ -120,9 +120,9 @@ $(INITRD_DIR).build: initrd_prepare $(SRC_DIR)/modules_build-stamp \
 
 ## 
 #
-initrd_install: $(INITRD_DIR).build $(INITRD_DIR).install
+initrd_install: $(INITRD_DIR)/build $(INITRD_DIR)/install
 
-$(INITRD_DIR).install:
+$(INITRD_DIR)/install:
     
 	## Copy over text files from the skel directory.
 	#
@@ -164,6 +164,6 @@ initrd_clean:
 	@echo "\nCLEAN:: Removing initrd specific stuff"
 	rm -rf $(INITRD_BUILD_DIR)
 
-	rm $(ROOT_DIR)/initrd.prep
-	rm $(ROOT_DIR)/initrd.install
+	rm $(INITRD_DIR)/prep
+	rm $(INITRD_DIR)/install
 	#rm $(INITRD_DIR)/sali/bin/sali_functions

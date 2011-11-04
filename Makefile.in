@@ -103,12 +103,10 @@ clean:
     
 
 .PHONY: distclean
-distclean: initrd_clean
+distclean: initrd_clean clean
 
 	@echo "Removing all generated and downloaded files"
 	rm -rf $(ROOT_DIR)/src
-	rm -rf $(TAR_DIR)
-	rm $(ROOT_DIR)/build
 	rm -r Makefile config.log config.status initrd/sali/bin/sali_functions
 
 .PHONY:	show_targets
