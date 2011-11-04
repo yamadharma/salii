@@ -52,8 +52,13 @@ $(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 	
 	## Also delete install files for packages. 
 	#
-	rm $(SRC_DIR)/*.install  $(SRC_DIR)/modules_build-stamp
-	rm $(INITRD_DIR)/install
+	rm -f $(SRC_DIR)/*.install  
+	#$(SRC_DIR)/modules_build-stamp
+	rm -f $(INITRD_DIR)/install
+
+	## Also regenerate initrd.img
+	#
+	rm -f $(ROOT_DIR)/build
 
 	mkdir -p $(INITRD_BUILD_DIR)
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/bin
@@ -154,10 +159,6 @@ $(INITRD_DIR)/install:
 
 	$(COPYLIBS) $(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib $(INITRD_BUILD_DIR)/bin:$(INITRD_BUILD_DIR)/sbin:$(INITRD_BUILD_DIR)/usr/bin/:$(INITRD_BUILD_DIR)/usr/sbin/ $(INITRD_BUILD_DIR)
 
-	## make the binaries smaller
-	#
-	strip $(INITRD_BINARIES)
-
 	touch $@
 
 .PHONY: initrd_clean
@@ -167,4 +168,3 @@ initrd_clean:
 
 	rm $(INITRD_DIR)/prep
 	rm $(INITRD_DIR)/install
-	#rm $(INITRD_DIR)/sali/bin/sali_functions

@@ -67,12 +67,16 @@ include $(ROOT_DIR)/initrd/initrd.rul
 #.PHONY:	build
 build:	initrd_install kernel modules $(ROOT_DIR)/build
 
-
 $(ROOT_DIR)/build:
 
 	( mkdir -p -m 0755 $(TAR_DIR)/$(ARCH) )
 
 	( make INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_DIR) modules_install )
+
+	## make the binaries smaller
+	#
+	strip $(INITRD_BINARIES)
+
 	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet -o -H newc > "$(TAR_DIR)/$(ARCH)/initrd" )
 	( cd "$(TAR_DIR)/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img )
 	( cp "$(LINUX_IMAGE)" "$(TAR_DIR)/$(ARCH)/kernel" )
