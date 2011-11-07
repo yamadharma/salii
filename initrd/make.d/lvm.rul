@@ -54,5 +54,5 @@ $(LVM_DIR).get:
 	cd $(SRC_DIR) && tar -xvzf $(LVM_TARBALL)
 	touch $@
 
-$(LVM_DIR).clean:
+$(LVM_DIR).clean: initrd_clean
 	rm -rf $(LVM_DIR)*

@@ -38,5 +38,5 @@ $(SCRUB_DIR).get:
 
 	touch $@
 
-$(SCRUB_DIR).clean:
+$(SCRUB_DIR).clean: initrd_clean
 	rm -rf $(SCRUB_DIR)*

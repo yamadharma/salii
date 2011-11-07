@@ -38,5 +38,5 @@ $(LSSCSI_DIR).get:
 
 	touch $@
 
-$(LSSCSI_DIR).clean:
+$(LSSCSI_DIR).clean: initrd_clean
 	rm -rf $(LSSCSI_DIR)*

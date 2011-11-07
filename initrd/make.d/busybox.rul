@@ -50,5 +50,5 @@ $(BUSYBOX_DIR).get:	$(INITRD_DIR)/make.d/busybox.rul $(BUSYBOX_CONFIG) $(BUSYBOX
 
 	touch $@
 
-$(BUSYBOX_DIR).clean:
+$(BUSYBOX_DIR).clean: initrd_clean
 	rm -rf $(BUSYBOX_DIR)*

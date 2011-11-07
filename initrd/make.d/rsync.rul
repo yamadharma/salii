@@ -41,5 +41,5 @@ $(RSYNC_DIR).install: $(RSYNC_DIR).build
 
 	touch $@
 
-$(RSYNC_DIR).clean:
+$(RSYNC_DIR).clean: initrd_clean
 	rm -rf $(RSYNC_DIR)*

@@ -17,9 +17,6 @@ aria2:	$(ARIA2_DIR).build
 .PHONY: aria2_install
 aria2_install:	$(ARIA2_DIR).install
 
-.PHONY: aria2_clean
-aria2_clean: $(ARIA2_DIR).clean
-
 $(ARIA2_DIR).build:  $(ARIA2_DIR).get
 	cd $(ARIA2_DIR) && ./configure --without-sqlite3 --with-openssl \
 		--with-openssl-prefix=$(OPENSSL_DIR) --with-libz-prefix=$(SRC_DIR)/$(ZLIB_TARBALL) --prefix=/usr  && make
@@ -36,5 +33,6 @@ $(ARIA2_DIR).get: $(INITRD_DIR)/make.d/aria2.rul
 	cd $(SRC_DIR) && tar -xvjf $(ARIA2_TARBALL)
 	touch $@
 
-$(ARIA2_DIR).clean:
+.PHONY: aria2_clean
+aria2_clean: initrd_clean
 	rm -rf $(ARIA2_DIR)*

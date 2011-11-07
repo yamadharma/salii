@@ -38,5 +38,5 @@ $(CURL_DIR).get:
 
 	touch $@
 
-$(CURL_DIR).clean:
+$(CURL_DIR).clean: initrd_clean
 	rm -rf $(CURL_DIR)*

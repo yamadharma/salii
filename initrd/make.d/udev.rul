@@ -39,5 +39,5 @@ $(UDEV_DIR).get:
 .PHONY: udev_clean
 udev_clean: $(UDEV_DIR).clean
 
-$(UDEV_DIR).clean:
+$(UDEV_DIR).clean: initrd_clean
 	rm -rf $(UDEV_DIR)*

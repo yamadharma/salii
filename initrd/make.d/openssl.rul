@@ -58,5 +58,5 @@ $(OPENSSL_DIR).get:
 
 	touch $@
 
-$(OPENSSL_DIR).clean:
+$(OPENSSL_DIR).clean: initrd_clean
 	rm -rf $(OPENSSL_DIR)*

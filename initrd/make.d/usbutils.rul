@@ -37,6 +37,6 @@ $(USBUTILS_DIR).get:
 	cd $(SRC_DIR) && tar -xvjf $(USBUTILS_TARBALL)
 	touch $@
 
-$(USBUTILS_DIR).clean:
+$(USBUTILS_DIR).clean: initrd_clean
 	rm -rf $(USBUTILS_DIR)*
 

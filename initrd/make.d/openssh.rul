@@ -64,5 +64,5 @@ $(OPENSSH_DIR).install: $(OPENSSH_DIR).build
 
 	touch $@
 
-$(OPENSSH_DIR).clean:
+$(OPENSSH_DIR).clean: initrd_clean
 	rm -rf $(OPENSSH_DIR)*

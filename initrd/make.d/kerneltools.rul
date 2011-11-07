@@ -34,5 +34,5 @@ $(KERNELTOOLS_DIR).get:
 	cd $(SRC_DIR) && tar -xvzf $(KERNELTOOLS_TARBALL)
 	touch $@
 
-$(KERNELTOOLS_DIR).clean:
+$(KERNELTOOLS_DIR).clean: initrd_clean
 	rm -rf $(KERNELTOOLS_DIR)*

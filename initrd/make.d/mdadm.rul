@@ -34,5 +34,5 @@ $(MDADM_DIR).get:
 	cd $(SRC_DIR) && tar zxvf $(MDADM_TARBALL)
 	touch $@
 
-$(MDADM_DIR).clean:
+$(MDADM_DIR).clean: initrd_clean
 	rm -rf $(MDADM_DIR)*

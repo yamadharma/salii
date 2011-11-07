@@ -34,5 +34,5 @@ $(KEXEC_DIR).get:
 	cd $(SRC_DIR) && tar -xvjf $(KEXEC_TARBALL)
 	touch $@
 
-$(KEXEC_DIR).clean:
+$(KEXEC_DIR).clean: initrd_clean
 	rm -rf $(KEXEC_DIR)*

@@ -36,5 +36,5 @@ $(JFSUTILS_DIR).get:
 
 	touch $@
 
-$(JFSUTILS_DIR).clean:
+$(JFSUTILS_DIR).clean: initrd_clean
 	rm -rf $(JFSUTILS_DIR)*

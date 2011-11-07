@@ -42,5 +42,5 @@ $(XFSPROGS_DIR).get:
 	cd $(SRC_DIR) && tar xfvz $(XFSPROGS_TARBALL)
 	touch $@
 
-xfsprogs_clean:
+xfsprogs_clean:  initrd_clean
 	rm -rf $(XFSPROGS_DIR)*

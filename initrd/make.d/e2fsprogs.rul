@@ -42,5 +42,5 @@ $(E2FSPROGS_DIR).get:
 	cd $(SRC_DIR) && tar -xvzf $(E2FSPROGS_TARBALL)
 	touch $@
 
-$(E2FSPROGS_DIR).clean:
+$(E2FSPROGS_DIR).clean: initrd_clean
 	rm -rf $(E2FSPROGS_DIR)
