@@ -1,16 +1,16 @@
 #
-#   $Id: usbutils.rul 3649 2006-06-19 18:04:56Z finley $
+#   $Id$
 #    vi: set filetype=make:
 #
 USBUTILS_VERSION 	= 0.91
-USBUTILS_DIR 			= $(SRC_DIR)/usbutils-$(USBUTILS_VERSION)
+USBUTILS_DIR 		= $(SRC_DIR)/usbutils-$(USBUTILS_VERSION)
 USBUTILS_TARBALL 	= usbutils-$(USBUTILS_VERSION).tar.bz2
 
 #### http://ftp.gnu.org/gnu/usbutils/ ####
 USBUTILS_URL 		= ftp://ftp.sara.nl/pub/sali/sources/$(USBUTILS_TARBALL)
 USBUTILS_INFO 	= http://www.linux-usb.org
 
-export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib"
+export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib"
 
 .PHONY: usbutils
 usbutils:	$(USBUTILS_DIR).build
@@ -21,13 +21,14 @@ usbutils_install:	$(USBUTILS_DIR).install
 .PHONY: usbutils_clean
 usbutils_clean:	$(USBUTILS_DIR).clean
 
-$(USBUTILS_DIR).build:	$(USBUTILS_DIR).get
+$(USBUTILS_DIR).build:	$(USBUTILS_DIR).get $(INITRD_MAKED_DIR)/usbutils.rul
 	cd $(USBUTILS_DIR) && \
-   LIBUSB_CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/usr/lib" \
+   CFLAGS="-I$(INITRD_BUILD_DIR)/include -L$(INITRD_BUILD_DIR)/lib" \
+   LDFLAGS="-L$(INITRD_BUILD_DIR)/lib -lusb-1.0" \
 	./configure && make
 	touch $@
 
-$(USBUTILS_DIR).install: $(USBUTILS_DIR).build
+$(USBUTILS_DIR).install: $(USBUTILS_DIR).build 
 	cd $(USBUTILS_DIR) && $(MAKE) DESTDIR=$(INITRD_BUILD_DIR) install
 	touch $@
 
