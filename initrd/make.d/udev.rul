@@ -10,6 +10,13 @@ UDEV_DIR	= $(SRC_DIR)/udev-$(UDEV_VERSION)
 UDEV_URL	= ftp://ftp.sara.nl/pub/sali/sources/
 UDEV_INFO	= http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 
+UDEV_CONFIGURE_DEFAULT	= --prefix=/usr --sysconfdir=/etc --sbindir=/sbin --libdir=/lib --with-rootlibdir=/lib --libexecdir=/lib/udev --disable-introspection
+UDEV_CONFIGURE 		= $(UDEV_CONFIGURE_DEFAULT)
+
+ifeq ($(ARCH),ppc64)
+        UDEV_CONFIGURE = USBUTILS_CFLAGS=-I$(INITRD_BUILD_DIR)/include USBUTILS_LIBS=-L$(INITRD_BUILD_DIR)/lib $(UDEV_CONFIGURE_DEFAULT)
+endif
+
 export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib"
 
 .PHONY: udev
@@ -17,9 +24,7 @@ udev: $(UDEV_DIR).build
 
 $(UDEV_DIR).build:  $(UDEV_DIR).get
 	cd $(UDEV_DIR) && CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/usr/lib" \
-	./configure --prefix=/usr --sysconfdir=/etc \
-		--sbindir=/sbin --libdir=/lib --with-rootlibdir=/lib --libexecdir=/lib/udev \
-		--disable-introspection && make
+	./configure $(UDEV_CONFIGURE) && make
 	touch $@
 
 .PHONY: udev_install
