@@ -93,12 +93,8 @@ endif
 tarball: build
 	cd $(TAR_DIR) && tar -pczf $(ROOT_DIR)/sali-$(ARCH)-$(VERSION).tar.gz *
 
-rebuild_tar:
-	rm -f $(ROOT_DIR)/build
-
 .PHONY:	help
 help:  show_targets
-
 
 .PHONY: clean
 clean:

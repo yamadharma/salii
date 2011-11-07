@@ -39,5 +39,5 @@ $(BC_DIR).get:
 
 	touch $@
 
-$(BC_DIR).clean: rebuild_tar
+$(BC_DIR).clean: initrd_clean
 	rm -rf $(BC_DIR)*
