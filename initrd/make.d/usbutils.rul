@@ -12,6 +12,15 @@ USBUTILS_INFO 	= http://www.linux-usb.org
 
 export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib"
 
+# To make it more verbose.
+#USBUTILS_CONFIGURE_DEFAULT	= --disable-silent-rules
+USBUTILS_CONFIGURE_DEFAULT	= 
+USBUTILS_CONFIGURE		= $(USBUTILS_CONFIGURE_DEFAULT)
+
+ifeq ($(ARCH),ppc64)
+        USBUTILS_CONFIGURE = $(USBUTILS_CONFIGURE_DEFAULT)
+endif
+
 .PHONY: usbutils
 usbutils:	$(USBUTILS_DIR).build
 
@@ -23,9 +32,7 @@ usbutils_clean:	$(USBUTILS_DIR).clean
 
 $(USBUTILS_DIR).build:	$(USBUTILS_DIR).get $(INITRD_MAKED_DIR)/usbutils.rul
 	cd $(USBUTILS_DIR) && \
-   CFLAGS="-I$(INITRD_BUILD_DIR)/include -L$(INITRD_BUILD_DIR)/lib" \
-   LDFLAGS="-L$(INITRD_BUILD_DIR)/lib -lusb-1.0" \
-	./configure && make
+	./configure $(USBUTILS_CONFIGURE) && make
 	touch $@
 
 $(USBUTILS_DIR).install: $(USBUTILS_DIR).build 
