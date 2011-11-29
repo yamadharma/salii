@@ -22,7 +22,7 @@ else
 	LIBDIR=lib
 endif
 
-RELEASE_DOCS = CHANGELOG LICENSE CREDITS README VERSION
+RELEASE_DOCS = CHANGELOG LICENSE CREDITS README VERSION AUTHORS
 NCPUS=$(shell egrep -c '^processor' /proc/cpuinfo )
 #
 ## END General options
