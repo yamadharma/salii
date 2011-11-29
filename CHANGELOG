@@ -1,4 +1,4 @@
-1.X.X
+1.4.10
   * Added passwd command to busybox. So we can set a new root
     password and modified sshd_config to allow root login when
     ssh is enabled, closes #25
