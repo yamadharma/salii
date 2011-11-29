@@ -98,31 +98,6 @@ find_all_disks_by_lsscsi(){
     echo $RESULT                                                                                  
 }
 
-
-### BvdV: obsolete wait for Dennis 2 Nov 2011
-#
-find_all_disks_by_lsscsi_old(){
-
-    if [ -z "${1}" ]
-    then
-        return
-    fi
-
-    lsscsi -t 2>&1 | egrep -v "${1}" | awk '{print $1}' | while read line
-    do
-        RSLT=$(echo ${line} | awk 'match($0,/^(\[[0-9]+:[0-9]+:[0-9]+:[0-9]+\])/) {print substr($0,RSTART,RLENGTH)}')
-        if [ -n "${RSLT}" ]
-        then
-            DISK=$(lsscsi "${RSLT}" | awk '{print $7}')
-            if [ -n "${DISK}" ]
-            then
-                echo $(basename "${DISK}")
-            fi
-        fi
-    done
-
-}
-
 sort_disks(){
     DISKORDER=$1
     DISKS=$2
