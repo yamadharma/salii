@@ -68,25 +68,28 @@ write_variables() {
 
         echo "MONITOR_SERVER=$MONITOR_SERVER"           >> /tmp/variables.txt
         echo "MONITOR_PORT=$MONITOR_PORT"               >> /tmp/variables.txt
-        echo "MONITOR_CONSOLE=$MONITOR_CONSOLE"         >> /tmp/variables.txt
+        echo "MONITOR_CONSOLE=$MONITOR_CONSOLE"         >> /tmp/variables.txt 
 
-	echo "PROTOCOL=$PROTOCOL" 			>> /tmp/variables.txt
-	echo "STAGING=$STAGING" 			>> /tmp/variables.txt
-
-	# Keep these two variables for compatibility
+        echo "PROTOCOL=$PROTOCOL"                       >> /tmp/variables.txt
+        echo "STAGING=$STAGING"                         >> /tmp/variables.txt 
+        
+        ## Keep these two variables for compatibility
+        # they are replaced by: PROTOCOL and STAGING
+        #
         echo "BITTORRENT=$BITTORRENT"                   >> /tmp/variables.txt
         echo "BITTORRENT_STAGING=$BITTORRENT_STAGING"   >> /tmp/variables.txt
 
         echo "GROUPNAMES=\"$GROUPNAMES\""               >> /tmp/variables.txt
-        echo "GROUP_OVERRIDES=\"$GROUP_OVERRIDES\""     >> /tmp/variables.txt
+        echo "GROUP_OVERRIDES=\"$GROUP_OVERRIDES\""     >> /tmp/variables.txt 
+        
+        echo "VERBOSELEVEL=\"$VERBOSELEVEL\""           >> /tmp/variables.txt
+        echo "ARCH=\"$ARCH\""                           >> /tmp/variables.txt
 
-	echo "VERBOSELEVEL=\"$VERBOSELEVEL\"" 		>> /tmp/variables.txt
-	echo "ARCH=\"$ARCH\"" 				>> /tmp/variables.txt
-    echo "SCRUB=\"$SCRUB\""  >> /tmp/variables.txt
-    echo "SCRUB_DISKS=\"$SCRUB_DISKS\""  >> /tmp/variables.txt
-    echo "SCRUB_REBOOT=\"$SCRUB_REBOOT\""  >> /tmp/variables.txt
-    echo "SCRUB_HALT=\"$SCRUB_HALT\""  >> /tmp/variables.txt
-    echo "SCRUB_OPTIONS=\"$SCRUB_OPTIONS\""  >> /tmp/variables.txt
+        echo "SCRUB=\"$SCRUB\""                         >> /tmp/variables.txt
+        echo "SCRUB_DISKS=\"$SCRUB_DISKS\""             >> /tmp/variables.txt
+        echo "SCRUB_REBOOT=\"$SCRUB_REBOOT\""           >> /tmp/variables.txt
+        echo "SCRUB_HALT=\"$SCRUB_HALT\""               >> /tmp/variables.txt
+        echo "SCRUB_OPTIONS=\"$SCRUB_OPTIONS\""         >> /tmp/variables.txt
 }
 
 ################################################################################
