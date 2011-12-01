@@ -11,6 +11,7 @@ mount sysfs /sys -t sysfs
 
 init="/sbin/init"
 udev=y
+
 for i in $(cat /proc/cmdline); do
     case $i in
         init=*)
@@ -25,6 +26,8 @@ for i in $(cat /proc/cmdline); do
     esac
 done
 
+# Filling the blacklist with modules from de 
+# kernel cmdline
 if [ -n "${blacklist}" ]
 then
 	cat /dev/null > /etc/modprobe.d/pxe_blacklist.conf
@@ -49,6 +52,11 @@ make_extra_nodes() {
   done
 }
 
+mount_dev_pts(){
+    mkdir -p /dev/pts
+    mount devpts /dev/pts -t devpts
+}
+
 ## Starting udev
 start_udev() {
 
@@ -58,14 +66,13 @@ start_udev() {
     mount -n -o mode=0755 -t tmpfs tmpfs /dev
     make_extra_nodes
 
-    /sbin/udevd --daemon --debug
+    /sbin/udevd --daemon
 
     mkdir -p /dev/.udev/db/ /dev/.udev/queue/
     udevadm trigger
     udevadm settle
 
-    mkdir -p /dev/pts
-    mount devpts /dev/pts -t devpts
+    mount_dev_pts
 
     if [ -d /sys/bus/scsi ]; then
         modprobe -q scsi_wait_scan && modprobe -r scsi_wait_scan || true
@@ -78,8 +85,7 @@ start_udev() {
 start_mdev() {
     echo -e "Starting mdev...\n"
 
-    mkdir -p /dev/pts
-    mount devpts /dev/pts -t devpts
+    mount_dev_pts
 
     echo /sbin/mdev > /proc/sys/kernel/hotplug
     /sbin/mdev -s
@@ -97,8 +103,5 @@ case "${udev}" in
 esac
     
 dmesg -n 6
-touch /tmp/si_monitor.log
-
-lsmod
 
 exec $init
