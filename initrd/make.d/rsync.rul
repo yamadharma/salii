@@ -3,7 +3,7 @@
 #   vi: set filetype=make:
 #
 
-RSYNC_VERSION 	= 3.0.7
+RSYNC_VERSION 	= 3.0.9
 RSYNC_TARBALL 	= rsync-$(RSYNC_VERSION).tar.gz
 
 #### http://www.samba.org/rsync/ ####

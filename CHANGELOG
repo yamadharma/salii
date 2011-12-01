@@ -1,6 +1,14 @@
 1.5.0
   * Updated kernel version to 3.1.4
   * Updated busybox to 1.19.3
+  * Updated aria2 to 1.13.0
+  * Updated curl to 7.23.1
+  * Updated e2fsprogs to 1.42
+  * Updated jfsutils to 1.1.15
+  * Updated openssh to 5.9p1
+  * Updated LVM to 2.2.02.88
+  * Updated parted to 3.0
+  * Updated rsync to 3.0.9
 
 1.4.10
   * Added passwd command to busybox. So we can set a new root

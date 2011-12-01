@@ -3,7 +3,7 @@
 #   vi: set filetype=make:
 #
 
-JFSUTILS_VERSION 	= 1.1.14
+JFSUTILS_VERSION 	= 1.1.15
 JFSUTILS_DIR 			= $(SRC_DIR)/jfsutils-$(JFSUTILS_VERSION)
 JFSUTILS_TARBALL 	= jfsutils-$(JFSUTILS_VERSION).tar.gz
 

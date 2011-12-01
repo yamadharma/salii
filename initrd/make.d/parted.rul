@@ -6,7 +6,7 @@
 #   - go to 1.6.19
 #
 
-PARTED_VERSION 	= 2.3
+PARTED_VERSION 	= 3.0
 PARTED_DIR 			= $(SRC_DIR)/parted-$(PARTED_VERSION)
 PARTED_TARBALL 	= parted-$(PARTED_VERSION).tar.gz
 
