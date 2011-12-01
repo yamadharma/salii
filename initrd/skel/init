@@ -10,6 +10,7 @@ mount sysfs /sys -t sysfs
 ## End
 
 init="/sbin/init"
+udev=y
 for i in $(cat /proc/cmdline); do
     case $i in
         init=*)
@@ -18,6 +19,9 @@ for i in $(cat /proc/cmdline); do
 		BLACKLIST=*)
 			blacklist=${i#BLACKLIST=}
 		;;
+        MDEV=y)
+            udev=n
+        ;;
     esac
 done
 
@@ -30,7 +34,6 @@ then
 	done
 fi
 
-echo -e "Starting udev...\n"
 
 make_extra_nodes() {
   [ -e /etc/udev/links.conf ] || return 0
@@ -47,30 +50,55 @@ make_extra_nodes() {
 }
 
 ## Starting udev
+start_udev() {
 
-echo > /sys/kernel/uevent_helper
+    echo -e "Starting udev...\n"
+    echo > /sys/kernel/uevent_helper
 
-mount -n -o mode=0755 -t tmpfs tmpfs /dev
-make_extra_nodes
+    mount -n -o mode=0755 -t tmpfs tmpfs /dev
+    make_extra_nodes
 
-udevd --daemon
+    /sbin/udevd --daemon --debug
 
-mkdir -p /dev/.udev/db/ /dev/.udev/queue/
-udevadm trigger
-udevadm settle
+    mkdir -p /dev/.udev/db/ /dev/.udev/queue/
+    udevadm trigger
+    udevadm settle
 
-mkdir -p /dev/pts
-mount devpts /dev/pts -t devpts
+    mkdir -p /dev/pts
+    mount devpts /dev/pts -t devpts
 
-if [ -d /sys/bus/scsi ]; then
-    modprobe -q scsi_wait_scan && modprobe -r scsi_wait_scan || true
-    udevadm settle || true
-fi
+    if [ -d /sys/bus/scsi ]; then
+        modprobe -q scsi_wait_scan && modprobe -r scsi_wait_scan || true
+        udevadm settle || true
+    fi
 
+    echo -e "Done with udev initialization, starting sali...\n"
+}
+
+start_mdev() {
+    echo -e "Starting mdev...\n"
+
+    mkdir -p /dev/pts
+    mount devpts /dev/pts -t devpts
+
+    echo /sbin/mdev > /proc/sys/kernel/hotplug
+    /sbin/mdev -s
+
+    echo -e "Done with mdev initialization, starting sali...\n"
+}
+
+case "${udev}" in
+    n)
+        start_mdev
+    ;;
+    *)
+        start_udev
+    ;;
+esac
+    
 dmesg -n 6
-
 touch /tmp/si_monitor.log
 
-echo -e "Done with udev initialization, starting sali...\n"
+lsmod
 
 exec $init

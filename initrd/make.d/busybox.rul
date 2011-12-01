@@ -7,7 +7,7 @@
 #	- upgrade to bb 1.x
 #
 
-BUSYBOX_VERSION	= 1.18.3
+BUSYBOX_VERSION	= 1.19.3
 BUSYBOX_DIR 	= $(SRC_DIR)/busybox-$(BUSYBOX_VERSION)
 BUSYBOX_TARBALL = busybox-$(BUSYBOX_VERSION).tar.bz2
 

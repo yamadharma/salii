@@ -4,13 +4,4 @@
 # common initialization first, especially if more dhcp event notifications
 # are added.
 
-DHCPVARFILE=/tmp/udhcpc
-
-echo "SALIIMAGESRV=$saliimgsrv" > $DHCPVARFILE
-echo "IPADDR=$ip" >> $DHCPVARFILE
-echo "HOSTNAME=$hostname" >> $DHCPVARFILE
-echo "NETMASK=$subnet" >> $DHCPVARFILE
-echo "BROADCAST=$broadcast" >> $DHCPVARFILE
-echo "DOMAINNAME=$(hostname -d)" >> $DHCPVARFILE
-
 exec /etc/udhcpc/default.$1
