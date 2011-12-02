@@ -108,7 +108,7 @@ distclean: initrd_clean clean
 
 	@echo "Removing all generated and downloaded files"
 	rm -rf $(ROOT_DIR)/src
-	rm -f Makefile config.log config.status initrd/sali/bin/sali_functions
+	rm -f Makefile config.log config.status initrd/sali/bin/sali_functions initrd/functions/functions.mbm
 
 .PHONY:	show_targets
 show_targets:
