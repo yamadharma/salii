@@ -16,6 +16,7 @@
   * Updated LVM to 2.2.02.88
   * Updated parted to 3.0
   * Updated rsync to 3.0.9
+  * Updated scrub to 2.4.1
 
 1.4.10
   * Added passwd command to busybox. So we can set a new root
