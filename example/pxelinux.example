@@ -12,6 +12,9 @@ label rsync_lenny
   kernel sali/trunk/kernel
   append vga=extended initrd=sali/trunk/initrd.img ramdisk_size=131072 root=/dev/ram MONITOR_SERVER=si_monitor MONITOR_CONSOLE=yes PROTOCOL=rsync tmpfs_size=2400M STAGING=/tmp SCRIPTNAME=amd64_lenny_lisa.master rw
 
+label scrubme
+  kernel sali/trunk/kernel
+  append vga=extended initrd=sali/trunk/initrd.img VERBOSELEVEL=2 SSHD=y RESCUE=yes SCRUB=y SCRUB_OPTIONS="-pfastold" rw
 
 label bittorent
   kernel sali/trunk/kernel append vga=extended initrd=sali/trunk/initrd.img ramdisk_size=131072 root=/dev/ram MONITOR_SERVER=si_monitor MONITOR_CONSOLE=yes PROTOCOL=bittorrent tmpfs_size=2400M STAGING=/tmp GRUB2=yes SCRIPTNAME=amd64_squeeze_lisa.master rw
