@@ -114,7 +114,7 @@ sort_disks(){
      
         ## If the length of the diskname is 2 then it is a controller
         ##  ie. sd or c0
-        if [ $(length $DISKNAME) -eq 2 ]
+        if [ ${#DISKNAME} -eq 2 ]
         then 
             CONTROLLER=true
         fi   

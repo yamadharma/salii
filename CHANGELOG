@@ -1,4 +1,11 @@
 1.5.0
+  * Fixed log location for tty4
+    Author: Dennis Stam
+
+  * Since busybox 1.19.0 command length has been removed. Now using ${#VAR}
+    to get the length of the variable VAR.
+    Author: Dennis Stam
+
   * Updated kernel version to 3.1.4
   * Updated busybox to 1.19.3
   * Updated aria2 to 1.13.0
