@@ -7,7 +7,7 @@ if [ "x${RESCUE}" == "xyes" ]
 then
 	p_service "RESCUE var has been set opening console"
 	open_console
-	return 0
+    exit
 fi
 
 ## Let's gather the given kernel arguments
