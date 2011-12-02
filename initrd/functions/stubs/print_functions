@@ -1,6 +1,12 @@
 
 p_log(){
-	printf "$1" >> /var/log/monitor.log
+	#printf "$1" >> /var/log/monitor.log
+    LINE="$(echo -e $1 | tr -d '\n')"
+
+    if [ -n "${LINE}" ]
+    then
+        logger -t sali "${LINE}"
+    fi
 }
 
 p_whitespace(){
@@ -36,8 +42,8 @@ p_section(){
 		fi
 	fi
 
-	p_log "${LINE}"
 	printf "${LINE}"
+	p_log "${LINE}"
 }
 
 p_header(){
@@ -61,22 +67,21 @@ p_separator(){
 		fi
 	done
 
-	p_log "${LINE}"
 	printf "${LINE}"
 }
 
 p_stage(){
 	LINE="\n> ${1}\n"
 
-	p_log "${LINE}"
 	printf "${LINE}"
+	p_log "${LINE}"
 }
 
 p_service(){
 	LINE="  :: $1\n"
 
-	p_log "${LINE}"
 	printf "${LINE}"
+	p_log "${LINE}"
 }
 
 p_comment(){
@@ -92,7 +97,7 @@ p_comment(){
 	then
 		LINE="     .${2}${END}"
 
-		p_log "${LINE}"
 		printf "${LINE}"
+		p_log "${LINE}"
 	fi
 }
