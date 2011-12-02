@@ -11,7 +11,7 @@ ping_test() {
                                                                                            
     PING_RESULT=1                                                                          
                                                                                            
-    p_comment 10 "trying to ping your imagserver, ${PING_DESTINATION}"                     
+    p_comment 20 "trying to ping your imagserver, ${PING_DESTINATION}"                     
                                                                                            
     # Ping test code submitted by Grant Noruschat <grant@eigen.ee.ualberta.ca>             
     # modified slightly by Brian Finley.                                                   
@@ -20,13 +20,13 @@ ping_test() {
     while [ $PING_EXIT_STATUS -ge 0 ]                                                      
     do                                                                                     
                                                                                            
-        p_comment 10 "ping attempt ${PING_COUNT}"                                          
+        p_comment 20 "ping attempt ${PING_COUNT}"                                          
         ping -c 1 $PING_DESTINATION > /dev/null 2>&1                                       
         PING_EXIT_STATUS=$?                                                                
                                                                                            
         if [ "$PING_EXIT_STATUS" = "0" ]                                                   
         then                                                                               
-                p_comment 10 "we have connectivity to your IMAGESERVER!"                                       
+                p_comment 20 "we have connectivity to your IMAGESERVER!"                                       
                 PING_RESULT=0                                                              
                 break                                                                      
         fi                                                                                 
@@ -51,7 +51,7 @@ dhcp(){
                                                                                            
         DHCP_RESULT=1                                                                                    
                                                                                            
-        p_comment 10 "starting udhcp on interface ${1}"                                    
+        p_comment 20 "starting udhcp on interface ${1}"                                    
                                                                                            
         if [ $VERBOSELEVEL -ge "256" ]                                                     
         then                                                                               
@@ -72,7 +72,7 @@ dhcp(){
                                 then                                                       
                                         IMAGESERVER=$SALIIMAGESRV                          
                                 else                                                       
-                                        p_comment 10 "the imageserver could not be located"
+                                        p_comment 0 "the imageserver could not be located"
                                         echo 1                                                                 
                                         return                                             
                                 fi                                                         
@@ -107,12 +107,11 @@ dhcp_guess(){
                                                                                            
         for NIC in $NICS                                                                   
         do                                                                                 
-                p_comment 10 "starting dhcp for interface ${NIC}"                          
                 dhcp $NIC                                                                  
                                                                                            
                 if [ $DHCP_RESULT -eq 0 ]                                                  
                 then                                                                       
-                        p_comment 10 "succesfull configuration for interface ${NIC}"                           
+                        p_comment 20 "succesfull configuration for interface ${NIC}"                           
                         DHCPG_RESULT=0                                                           
                         DEVICE=$NIC                                                        
                         break                                                              

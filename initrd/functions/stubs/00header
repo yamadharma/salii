@@ -51,12 +51,3 @@ FLAVOR="SYSTEMIMAGER_FLAVOR_STRING"
 
 ################################################################################
 #
-## SALI Just start udev, don't use the static dev.tar.gz
-start_udevd() {
-    #
-    # Start udevd first, then hotplug
-
-    logmsg
-    logmsg start_udevd
-    /etc/init.d/udev start
-}

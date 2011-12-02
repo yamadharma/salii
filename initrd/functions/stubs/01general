@@ -4,8 +4,7 @@
 #
 # Usage: log a message, redirects to console / syslog depending on usage
 logmsg() {
-	echo "$@"
-	echo "$@" >> /var/log/monitor.log
+	p_comment 10 "$@"
 }
 
 #

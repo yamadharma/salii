@@ -15,15 +15,15 @@ then
 
             disk_enumerate "sd hd cciss"
 
-            p_comment 2 "Found '${NUMDISKS}' to scrub"
+            p_comment 0 "Found '${NUMDISKS}' to scrub"
 
             for disk in $(seq 0 1 $(( $NUMDISKS -1 )))
             do
                 p_service "SCRUB starting on disk $disk"
                 eval d_name="\${DISK${disk}}"
-                p_comment 2 "  scrub $SCRUB_OPTIONS $d_name"
+                p_comment 20 "  scrub $SCRUB_OPTIONS $d_name"
                 scrub $SCRUB_OPTIONS $d_name &
-                p_comment 2 "PID of process is ${!}"
+                p_comment 20 "PID of process is ${!}"
             done
         ;;
         *)
@@ -39,9 +39,9 @@ then
         			scrub_disk="/dev/${disk}"
         		fi
         		
-	                p_comment 2 "  scrub $SCRUB_OPTIONS $scrub_disk"
+	                p_comment 20 "  scrub $SCRUB_OPTIONS $scrub_disk"
 	                scrub $SCRUB_OPTIONS $scrub_disk &
-	                p_comment 2 "PID of process is ${!}"
+	                p_comment 20 "PID of process is ${!}"
         	done
     esac
 

@@ -4,10 +4,10 @@ p_service "Starting syslogd"
 
 if [ -n "${LOG_SERVER}" ]
 then
-	p_comment 0 "starting remote syslogging"
+	p_comment 20 "starting remote syslogging"
 	/sbin/syslogd -R "${LOG_SERVER}":"${LOG_SERVER_PORT}" -O /var/log/monitor.log -L -S
 else
-	p_comment 0 "starting syslogging to file"
+	p_comment 20 "starting syslogging to file"
 	/sbin/syslogd -O /var/log/monitor.log -S
 fi
 
@@ -27,7 +27,7 @@ then
 		while :; do nc -p 8181 -l < /var/log/monitor.log; done &
 	fi
 
-	p_comment 0 "monitoring initialized"
+	p_comment 20 "monitoring initialized"
 fi
 
 return 0
