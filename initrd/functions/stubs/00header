@@ -19,6 +19,7 @@
 #  Authors:
 #   Bas van der Vlies
 #   Dennis Stam
+#   Michel Scheerman
 #
 #  Original authors and contributers:
 #   Brian
@@ -33,7 +34,7 @@
 
 ################################################################################
 #
-#   Variables
+#   Global Variables
 #
 PATH=/sbin:/bin:/usr/bin:/usr/sbin:/tmp
 LD_LIBRARY_PATH=/lib
@@ -46,6 +47,8 @@ TORRENTS_DIR=/torrents
 
 VERSION="SYSTEMIMAGER_VERSION_STRING"
 FLAVOR="SYSTEMIMAGER_FLAVOR_STRING"
+
+LOG_FILE="/var/log/monitor.log"
 #
 ################################################################################
 
