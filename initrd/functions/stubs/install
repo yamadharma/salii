@@ -183,7 +183,13 @@ run_post_install_scripts() {
             logmsg "No post-install scripts found."
         fi
 
-        # Clean up post-install script directory.
+        ## Clean up post-install script directory.
+        #
         rm -rf /a/tmp/post-install/ || shellout
     fi
+
+    ## Always copy log file to root user directory
+    #
+    cp -f /var/log/monitor.log /a/root/sali_monitor.log
+
 }
