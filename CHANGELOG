@@ -18,6 +18,9 @@
   * Updated rsync to 3.0.9
   * Updated scrub to 2.4.1
 
+  * Always copy installation log to /root/sali_monitor.log
+    Author: Bas van der Vlies
+
 1.4.10
   * Added passwd command to busybox. So we can set a new root
     password and modified sshd_config to allow root login when
