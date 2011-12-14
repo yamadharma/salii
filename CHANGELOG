@@ -1,3 +1,8 @@
+1.4.11
+  * Critical fix in detecting the disks in a system. Parsing
+    the output of lsscsi was wrong, closes #31
+    Author: Bas van der Vlies
+
 1.4.10
   * Added passwd command to busybox. So we can set a new root
     password and modified sshd_config to allow root login when
