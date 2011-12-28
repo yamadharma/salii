@@ -102,7 +102,7 @@ getimage(){
     
     ## Set the verbose flag for the getimage command
     #
-    if [ $VERBOSELEVEL -ge "256" ]
+    if [ $VERBOSE_LEVEL -ge "256" ]
     then  
         VERBOSE_GETIMAGE_OPT="v"
     fi

@@ -21,6 +21,20 @@
   * Always copy installation log to /root/sali_monitor.log
     Author: Bas van der Vlies
 
+  * Fixed report_task for rsync
+    Author: Bas van der Vlies
+
+  * sali log file is : /var/log/sali.log
+    Author: Bas van der Vlies
+
+  * Monitoring now logs to MONITOR_SERVER and /var/log/monitor.log.
+    So we can monitor the process on the node via ssh
+    Author: Bas van der Vlies
+
+  * If VERBOSE_LEVEL is greater then or equal 256. Then the getimage
+    image routine will be verbos (tar, rsync)
+    Author: Bas van der Vlies
+
 1.4.11
   * Critical fix in detecting the disks in a system. Parsing
     the output of lsscsi was wrong, closes #31
