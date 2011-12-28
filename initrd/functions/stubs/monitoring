@@ -58,6 +58,10 @@ send_monitor_msg() {
     # Report the message to the monitor server.
     send_msg=`echo "mac=$mac:ip=$IPADDR:host=$HOSTNAME:cpu=$cpu:ncpus=$ncpus:kernel=$kernel_name:mem=$mem:os=$IMAGENAME:tmpfs=$tmpfs:time=$time:$msg"`
 
+    ## So we can support monitoring via web server
+    #
+    printf "$send_msg" >> ${MONITOR_LOG_FILE}
+
     # Send data to monitor server.
     echo "$send_msg" | nc $MONITOR_SERVER $MONITOR_PORT
 }
