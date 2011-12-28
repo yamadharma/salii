@@ -12,8 +12,8 @@ old_getimage(){
 
 getimage_rsync(){
 
-     logmsg "rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/"
-     rsync -aHS${VERBOSE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/ > /dev/console || shellout
+     logmsg "rsync -aHS${VERBOSE_GETIMAGE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/"
+     rsync -aHS${VERBOSE_GETIMAGE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/ > /dev/console || shellout
      if [ ! -z $MONITOR_SERVER ]; then
          stop_report_task 101
      fi
@@ -70,10 +70,10 @@ getimage_aria_bm(){
 
     case $compress in
 	"z")
-		zcat ${STAGING}/${tarball} | tar -px${VERBOSE_OPT}f -
+		zcat ${STAGING}/${tarball} | tar -px${VERBOSE_GETIMAGE_OPT}f -
 	;;
 	*)
-		tar -px${VERBOSE_OPT}f ${STAGING}/${tarball}
+		tar -px${VERBOSE_GETIMAGE_OPT}f ${STAGING}/${tarball}
 	;;
     esac
 
@@ -83,10 +83,28 @@ getimage_aria_bm(){
 
 getimage(){
 
-   logmsg ""
-   logmsg "Getting image via protocol: $PROTOCOL"
-   logmsg ""
+    logmsg ""
+    logmsg "Getting image via protocol: $PROTOCOL"
+    logmsg "" 
+   
+    ## Default VERBOSE level for getimage
+    #
+    VERBOSE_GETIMAGE_OPT=""
 
+    ## To support systemimager install script option
+    # 
+    case "$VERBOSE_OPT" in
+        "v")
+            VERBOSE_GETIMAGE_OPT="v"
+        ;;
+    esac 
+    
+    ## Set the verbose flag for the getimage command
+    #
+    if [ $VERBOSELEVEL -ge "256" ]
+    then  
+        VERBOSE_GETIMAGE_OPT="v"
+    fi
 
    case "$PROTOCOL" in
        "bittorrent")
