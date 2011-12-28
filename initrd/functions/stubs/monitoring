@@ -60,7 +60,7 @@ send_monitor_msg() {
 
     ## So we can support monitoring via web server
     #
-    printf "$send_msg" >> ${MONITOR_LOG_FILE}
+    printf "$send_msg\n" >> ${MONITOR_LOG_FILE}
 
     # Send data to monitor server.
     echo "$send_msg" | nc $MONITOR_SERVER $MONITOR_PORT
