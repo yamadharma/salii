@@ -81,7 +81,7 @@ write_variables() {
         echo "GROUPNAMES=\"$GROUPNAMES\""               >> /tmp/variables.txt
         echo "GROUP_OVERRIDES=\"$GROUP_OVERRIDES\""     >> /tmp/variables.txt 
         
-        echo "VERBOSELEVEL=\"$VERBOSELEVEL\""           >> /tmp/variables.txt
+        echo "VERBOSE_LEVEL=\"$VERBOSE_LEVEL\""           >> /tmp/variables.txt
         echo "ARCH=\"$ARCH\""                           >> /tmp/variables.txt
 
         echo "SCRUB=\"$SCRUB\""                         >> /tmp/variables.txt
