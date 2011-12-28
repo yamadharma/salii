@@ -138,9 +138,6 @@ initrd_install: initrd_build $(INITRD_DIR)/install
 
 $(INITRD_DIR)/install:
     
-	## Copy over text files from the skel directory.
-	#
-	cp -a $(INITRD_DIR)/skel/* $(INITRD_BUILD_DIR)
 
 	chmod +x $(INITRD_DIR)/sali/bin/sali_functions
 	$(INITRD_DIR)/sali/bin/sali_functions --makefile --stubsdir $(INITRD_DIR)/functions/stubs \
@@ -148,13 +145,13 @@ $(INITRD_DIR)/install:
 
 	## Copying SALI stuff, will be moved to a separate .rul file in the future
 	#
+	# Copy the sali directory.
+	#
+	cp -a $(INITRD_DIR)/sali/* $(INITRD_BUILD_DIR)
+
 	install -m 644 $(INITRD_DIR)/functions/stubs/* $(INITRD_BUILD_DIR)/etc/sali/stubs/
 	install -m 755 $(INITRD_DIR)/functions/functions.mbm $(INITRD_BUILD_DIR)/etc/init.d/functions
 	install -m 755 $(ROOT_DIR)/VERSION $(INITRD_BUILD_DIR)/etc/sali_version
-
-	install -m 644 $(INITRD_DIR)/sali/startup.d/* $(INITRD_BUILD_DIR)/etc/startup.d/
-	install -m 644 $(INITRD_DIR)/sali/installer.d/* $(INITRD_BUILD_DIR)/etc/installer.d/
-	install -m 755 $(INITRD_DIR)/sali/bin/* $(INITRD_BUILD_DIR)/bin
 
 	## Cleanup the .svn stuff
 	#
