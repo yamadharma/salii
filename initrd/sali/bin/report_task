@@ -98,7 +98,7 @@ case "${PROTOCOL}" in
                 #CURSIZE=$(df 2>/dev/null | grep "/a" | awk '{ print $3}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
                 #CURSIZE=$(echo $CURSIZE|bc)
 
-                CURSIZE=$(du -sk /a | awk '{ print $1 }')
+                CURSIZE=$(du -sk /a 2>/dev/null| awk '{ print $1 }')
 
                 PERCENT=$(echo "scale=2; ($CURSIZE / $IMAGESIZE) * 100"| bc)
                 SPEED=$(echo "scale=2; ($CURSIZE - $PREVSIZE) / 10" | bc)

@@ -1,5 +1,5 @@
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-              This is the SystemImager autoinstall system
+              This is the SALI autoinstall system
 
  Your autoinstall has failed.  You can use the shell prompt to try and see 
  what happened.  You may be able to use the <Shift>+<Page Up> keys to scroll 
@@ -9,14 +9,12 @@
  re-read the documentation to see if your problem is described there.  
  You have read the documentation, right? :-)
 
- If you absolutely cannot figure it out, visit the SystemImager support page 
- at http://systemimager.org.  There you can search the email list  archives,
- ask your question on IRC, or even join a mailing list to ask your question.
- There's a good chance someone else has experienced this very same issue and
- can help answer your question.  If you find the answer and it's not in the
- documentation, or if you identify a bug, please submit a bug report at the
- SystemImager support page. 
+ If you absolutely cannot figure it out, visit the SALI support page 
+ at https://subtrac.sara.nl/oss/sali. 
+
+ If you find the answer and it's not in the documentation, or if you identify a bug, 
+ please submit a bug report at the SALI support page. 
  
- Have fun!  http://systemimager.org
+ Good Luck!!  https://subtrac.sara.nl/oss/sali
 
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
