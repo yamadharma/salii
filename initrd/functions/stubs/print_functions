@@ -93,7 +93,7 @@ p_comment(){
         END="\n"
     fi
 
-	if [ $VERBOSELEVEL -ge $LEVEL ]
+	if [ $VERBOSE_LEVEL -ge $LEVEL ]
 	then
 		LINE="     .${2}${END}"
 
