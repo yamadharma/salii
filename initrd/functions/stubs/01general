@@ -146,14 +146,14 @@ load_variables(){
 shellout() {
 	p_service "An error has occured, killing off running processes."
 
-	killall -9 udp-receiver rsync  >/dev/null 2>/dev/null
+	killall -9 rsync  >/dev/null 2>/dev/null
 	write_variables
 
-	cat /etc/si_error
+	cat $ERROR_MSG_FILE
 
 	if [ ! -z $MONITOR_SERVER ]; then
 		p_comment 0 "installation failed!! stopping report task."
-		stop_report_task -1
+		stop_report_task
 	fi
 
 	exec cttyhack /bin/login -f root

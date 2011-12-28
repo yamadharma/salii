@@ -51,6 +51,8 @@ FLAVOR="SYSTEMIMAGER_FLAVOR_STRING"
 LOG_FILE="/var/log/sali.log"
 MONITOR_LOG_FILE="/var/log/monitor.log"
 
+ERROR_MSG_FILE="/etc/sali_error"
+
 #
 ################################################################################
 
