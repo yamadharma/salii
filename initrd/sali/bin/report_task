@@ -87,7 +87,7 @@ case "${PROTOCOL}" in
         done
     ;;
     rsync)
-        IMAGESIZE=$(rsync -avn --numeric-ids $IMAGESERVER::$IMAGENAME|grep "total size"|awk '{print $4}')
+        IMAGESIZE=$(rsync -a --verbose --dry-run --numeric-ids $IMAGESERVER::$IMAGENAME|grep "total size"|awk '{print $4}')
         IMAGESIZE=$(( $IMAGESIZE / 1024 ))
         PREVSIZE=0
 
@@ -95,8 +95,11 @@ case "${PROTOCOL}" in
         do
             if [ -e "/a" ]
             then
-                CURSIZE=$(df 2>/dev/null | grep "/a" | awk '{ print $3}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
-                CURSIZE=$(echo $CURSIZE|bc)
+                #CURSIZE=$(df 2>/dev/null | grep "/a" | awk '{ print $3}' | sed -ne 's/^\([0-9]*\)$/\1+/p')0
+                #CURSIZE=$(echo $CURSIZE|bc)
+
+                CURSIZE=$(du -sk /a | awk '{ print $1 }')
+
                 PERCENT=$(echo "scale=2; ($CURSIZE / $IMAGESIZE) * 100"| bc)
                 SPEED=$(echo "scale=2; ($CURSIZE - $PREVSIZE) / 10" | bc)
 
