@@ -10,9 +10,9 @@ p_separator
 variableize_kernel_append_parameters
 read_kernel_append_parameters
 
-if [ -z "${VERBOSELEVEL}" ]
+if [ -z "${VERBOSE_LEVEL}" ]
 then
-        VERBOSELEVEL=2
+        VERBOSE_LEVEL=2
 fi
 
 write_variables
