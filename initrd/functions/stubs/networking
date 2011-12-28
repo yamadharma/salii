@@ -53,7 +53,7 @@ dhcp(){
                                                                                            
         p_comment 20 "starting udhcp on interface ${1}"                                    
                                                                                            
-        if [ $VERBOSELEVEL -ge "256" ]                                                     
+        if [ $VERBOSE_LEVEL -ge "256" ]                                                     
         then                                                                               
                 udhcpc -i $1 -n -t 12                                                      
         else                                                                               
