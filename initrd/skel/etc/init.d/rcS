@@ -74,7 +74,7 @@ if [ -z $SCRIPTNAME ] && [ -z $IMAGENAME ] && [ -z $HOSTNAME ]; then
     logmsg "  2)  DNS"
     logmsg
     logmsg "Finally, you can explicitly set many variables pre-boot, including SCRIPTNAME,"
-    logmsg "IMAGENAME, and HOSTNAME, as kernel append parameters or with a local.cfg file."
+    logmsg "IMAGENAME, as kernel append parameters (pxelinux.cfg file) or with a local.cfg file."
     logmsg
     shellout
 fi
