@@ -65,10 +65,11 @@ $(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/bin
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/sbin
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc
-	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/modprobe.d
-	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/startup.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/init.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/installer.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/modprobe.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/sali/stubs
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/startup.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/dev
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/proc
