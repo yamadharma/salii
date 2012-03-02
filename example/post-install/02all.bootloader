@@ -1,0 +1,40 @@
+# Author: Bas van der Vlies
+# Date  : 6 Sep 2007
+# Desc. : This will setup the GRUB bootloader
+#
+# SVN INFO:
+#	$Id$
+#	$URL$
+
+# Get the Systemimager variables
+. /tmp/post-install/variables.txt
+
+echo "setting up grub: running grub.."
+#
+
+if [ -e "/etc/default/grub" ]
+then
+
+echo "Using GRUB2 install method! :: $DISK0"
+
+echo "grub-install --no-floppy $DISK0"
+grub-install --no-floppy $DISK0
+
+echo "grub-mkconfig -o /boot/grub/grub.cfg"
+echo "This command can take while..."
+grub-mkconfig -o /boot/grub/grub.cfg
+
+echo "GRUB2 install done"
+
+else
+
+echo "Using Legacy GRUB install method!"
+grub --batch <<EOF
+root (hd0,0)
+setup (hd0)
+EOF
+echo "setting up grub: done."
+
+fi
+
+exit 0
