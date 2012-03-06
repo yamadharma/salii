@@ -499,40 +499,63 @@ create_disk_mount_file(){
 
 chroot_mount_system_fs(){
 
-	logmsg "Mounting /proc /sys and /dev to /a"
+    ## We only have to mount this one time
+    # Now we can this function multiple times
+    #
+	logmsg "Mounting /a//proc /a//sys and /a/dev"
 
-	logmsg "mkdir -p /a/proc"
-	mkdir -p /a/proc
-	logmsg "mount proc /a/proc -t proc -o defaults"
-	mount proc /a/proc -t proc -o defaults
-
-	logmsg "mkdir -p /a/sys"
-	mkdir -p /a/sys
-	logmsg "mount sysfs /a/sys -t sysfs -o defaults"
-	mount sysfs /a/sys -t sysfs -o defaults
-
-	logmsg "mkdir -p /a/dev"
-	mkdir -p /a/dev
-	logmsg "mount /dev /a/dev -o bind"
-	mount /dev /a/dev -o bind
+    if [ ! -d /a/proc ]
+    then
+        logmsg "mkdir -p /a/proc"
+        mkdir -p /a/proc 
+        logmsg "mount proc /a/proc -t proc -o defaults"
+        mount proc /a/proc -t proc -o defaults 
+    fi
+        
+    if [ ! -d /a/sys ]
+    then
+        logmsg "mkdir -p /a/sys"
+        mkdir -p /a/sys 
+        logmsg "mount sysfs /a/sys -t sysfs -o defaults"
+        mount sysfs /a/sys -t sysfs -o defaults 
+    fi
+        
+    if [ ! -d /a/dev ]
+    then
+        logmsg "mkdir -p /a/dev" 
+        mkdir -p /a/dev 
+        logmsg "mount /dev /a/dev -o bind"
+        mount /dev /a/dev -o bind 
+    fi
 
 	logmsg
 }
 
 chroot_umount_system_fs(){
 
-	logmsg "Umounting /proc /sys and /dev to /a"
+    ## We only have to umount this one time
+    # Now we can this function multiple times
+    #
+	logmsg "Umounting /a/proc /a/sys and /a/dev"
 
-	logmsg "umount /a/proc"
-	umount /a/proc
-
-	logmsg "umount /a/sys"
-	umount /a/sys
-
-	logmsg "umount /a/dev"
-	umount /a/dev
-
-	logmsg
+    if [ -d /a/proc ]
+    then
+        logmsg "umount /a/proc"
+        umount /a/proc 
+    fi
+        
+    if [ -d /a/sys ]
+    then
+        logmsg "umount /a/sys"
+        umount /a/sys 
+    fi
+        
+    if [ -d /a/dev ]
+    then
+        logmsg "umount /a/dev" 
+        umount /a/dev 
+    fi
+    logmsg
 }
 
 ## Allows you to mount disks according the information stored in /tmp/mounts.*
