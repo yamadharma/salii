@@ -1,0 +1,7 @@
+## SVN Info
+#   $Id$
+#   $URL$
+#
+p_stage "Running post-install scripts fro installer not immplemented yet"
+
+#run_post_installer_scripts
