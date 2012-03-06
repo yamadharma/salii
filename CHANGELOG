@@ -38,6 +38,14 @@
     image routine will be verbos (tar, rsync)
     Author: Bas van der Vlies
 
+  * Added some post-install examples for:
+     - grub/grub2
+     - pxeconfig
+    Author: Dennis Stam
+
+  * Added VMXNET3 network module for kernel
+    Author: Bas van der Vlies
+
 1.4.11
   * Critical fix in detecting the disks in a system. Parsing
     the output of lsscsi was wrong, closes #31
