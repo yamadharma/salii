@@ -621,3 +621,26 @@ umount_disks(){
 
 	logmsg
 }
+
+grub2_install()
+{
+    target=$1
+
+    logmsg "Using GRUB2 install method! :: $target"
+    chroot /a grub2_install_chroot $target
+}
+
+grub2_install_chroot()
+{
+
+    target=$1
+    logmsg "grub-install --no-floppy $target" 
+    grub-install --no-floppy $target 
+    
+    logmsg "grub-mkconfig -o /boot/grub/grub.cfg"
+    logmsg "This command can take while..."
+    grub-mkconfig -o /boot/grub/grub.cfg
+
+    logmsg "GRUB2 install done"
+}
+
