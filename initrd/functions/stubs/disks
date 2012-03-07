@@ -624,23 +624,20 @@ umount_disks(){
 
 grub2_install()
 {
+    if [ $# -lt 1 ]
+    then
+        logmsg
+        logmsg "Must specify a disk device, eg $DISK0 or /dev/sda"
+        logmsg
+        shellout
+    fi
     target=$1
 
     logmsg "Using GRUB2 install method! :: $target"
-    chroot /a grub2_install_chroot $target
+
+    logmsg "chroot /a grub-install --no-floppy $target"
+    chroot /a grub-install --no-floppy $target
+
+    logmsg " /a grub-mkconfig -o /boot/grub/grub.cfg"
+    chroot /a grub-mkconfig -o /boot/grub/grub.cfg
 }
-
-grub2_install_chroot()
-{
-
-    target=$1
-    logmsg "grub-install --no-floppy $target" 
-    grub-install --no-floppy $target 
-    
-    logmsg "grub-mkconfig -o /boot/grub/grub.cfg"
-    logmsg "This command can take while..."
-    grub-mkconfig -o /boot/grub/grub.cfg
-
-    logmsg "GRUB2 install done"
-}
-
