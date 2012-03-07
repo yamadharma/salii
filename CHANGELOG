@@ -46,6 +46,9 @@
   * Added VMXNET3 network module for kernel
     Author: Bas van der Vlies
 
+  * Added grub2_install function
+    Author: Bas van der Vlies
+
 1.4.11
   * Critical fix in detecting the disks in a system. Parsing
     the output of lsscsi was wrong, closes #31

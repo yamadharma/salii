@@ -624,6 +624,9 @@ umount_disks(){
 
 grub2_install()
 {
+    
+    chroot_mount_system_fs
+
     if [ $# -lt 1 ]
     then
         logmsg
