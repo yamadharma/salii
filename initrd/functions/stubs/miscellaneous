@@ -114,6 +114,33 @@ shutdown() {
 
 }
 
+reboot() {
+
+    logmsg "rebooting the system"
+    
+    if [ ! -z $MONITOR_SERVER ] 
+    then 
+        # Report the 'imaged' state to the monitor server.
+        send_monitor_msg "status=100:speed=0"
+        if [ "x$MONITOR_CONSOLE" = "xyes" ] 
+        then 
+            # Print some empty lines and sleep some seconds to give time to
+            # the virtual console to get last messages.  
+            # XXX: this is a dirty solution, we should find a better way to 
+            # sync last messages... -AR-
+            logmsg ""
+            logmsg ""
+            logmsg "" 
+            sleep 10
+        fi
+
+        # Report the post-install action.
+        send_monitor_msg "status=104:speed=0"
+    fi
+
+    /sbin/reboot
+}
+
 open_console(){
 	printf "\nOpening console...\n"
 	printf "\n"

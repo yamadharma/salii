@@ -153,7 +153,7 @@ shellout() {
 
 	if [ ! -z $MONITOR_SERVER ]; then
 		p_comment 0 "installation failed!! stopping report task."
-		stop_report_task
+		stop_report_task -1
 	fi
 
 	exec cttyhack /bin/login -f root

@@ -16,7 +16,7 @@ getimage_rsync(){
      rsync -aHS${VERBOSE_GETIMAGE_OPT} --exclude=lost+found/ --exclude=/proc/* --numeric-ids ${IMAGESERVER}::${IMAGENAME}/ /a/ > /dev/console || shellout
      if [ ! -z $MONITOR_SERVER ]
      then
-         stop_report_task 
+         stop_report_task 100
      fi
 }
 

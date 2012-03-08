@@ -49,6 +49,10 @@
   * Added grub2_install function
     Author: Bas van der Vlies
 
+  * Added reboot function. If monitor is enabled first send a status 
+    message and the use the real reboot
+    Author: Bas van der Vlies & Dennis Stam
+
 1.4.11
   * Critical fix in detecting the disks in a system. Parsing
     the output of lsscsi was wrong, closes #31
