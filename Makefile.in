@@ -91,7 +91,7 @@ endif
 
 	$(foreach doc, $(RELEASE_DOCS), cp $(ROOT_DIR)/$(doc) $(TAR_DIR)/$(doc);)
 
-	cp -a $(ROOT_DIR)/$(EXAMPLE_DIR) $(TAR_DIR)/$(EXAMPLE_DIR)
+	cp -a $(ROOT_DIR)/$(EXAMPLE_DIR) $(TAR_DIR)
 	rm -rf $(TAR_DIR)/$(EXAMPLE_DIR)/.svn
 	rm -rf $(TAR_DIR)/$(EXAMPLE_DIR)/post-install/.svn
 
