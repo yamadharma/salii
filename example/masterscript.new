@@ -49,23 +49,6 @@ echo $IMAGENAME
 export IMAGENAME
 save_param IMAGENAME "${IMAGENAME}"
 
-### BEGIN Check to be sure this not run from a working machine ###
-# Test for mounted SCSI or IDE disks
-mount | grep [hs]d[a-z][1-9] > /dev/null 2>&1
-[ $? -eq 0 ] &&  logmsg Sorry.  Must not run on a working machine... && shellout
-
-# Test for mounted software RAID devices
-mount | grep md[0-9] > /dev/null 2>&1
-[ $? -eq 0 ] &&  logmsg Sorry.  Must not run on a working machine... && shellout
-
-# Test for mounted hardware RAID disks
-mount | grep c[0-9]+d[0-9]+p > /dev/null 2>&1
-[ $? -eq 0 ] &&  logmsg Sorry.  Must not run on a working machine... && shellout
-### END Check to be sure this not run from a working machine ###
-
-#
-# disk enumeration
-
 ## Sort disk, first disk to be found are sd* disk
 #
 disk_enumerate "sd hd vd cciss"
@@ -128,18 +111,6 @@ fi
 
 #
 ################################################################################
-
-
-##################################################################
-#
-# Uncomment the line below to leave your hostname blank.
-# Certain distributions use this as an indication to take on the
-# hostname provided by a DHCP server.  The default is to have
-# SystemConfigurator assign your clients the hostname that
-# corresponds to the IP address the use during the install.
-# (If you used to use the static_dhcp option, this is your man.)
-#
-#HOSTNAME=""
 
 
 ################################################################################
