@@ -71,6 +71,8 @@ write_variables() {
 
         echo "PROTOCOL=$PROTOCOL"                       >> /tmp/variables.txt
         echo "STAGING=$STAGING"                         >> /tmp/variables.txt 
+
+        echo "SALI_VERSION=`cat /etc/sali_version`"     >> /tmp/variables.txt
         
         ## Keep these two variables for compatibility
         # they are replaced by: PROTOCOL and STAGING
