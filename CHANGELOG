@@ -53,6 +53,10 @@
     message and the use the real reboot
     Author: Bas van der Vlies & Dennis Stam
 
+  * Added SALI_VERSION environment variable so we can check which
+    version we use.
+    Author: Bas van der Vlies & Dennis Stam
+
 1.4.11
   * Critical fix in detecting the disks in a system. Parsing
     the output of lsscsi was wrong, closes #31
