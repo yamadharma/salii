@@ -34,6 +34,9 @@ ROOT_DIR=$(CURDIR)
 # TAR directory
 TAR_DIR=$(ROOT_DIR)/tar
 
+# EXAMPLE directory
+EXAMPLE_DIR=example
+
 # The basic
 MAKED_DIR=$(ROOT_DIR)/make.d
 PATCH_DIR=$(ROOT_DIR)/patches
@@ -87,6 +90,10 @@ ifeq ($(OS),suse)
 endif
 
 	$(foreach doc, $(RELEASE_DOCS), cp $(ROOT_DIR)/$(doc) $(TAR_DIR)/$(doc);)
+
+	cp -a $(ROOT_DIR)/$(EXAMPLE_DIR) $(TAR_DIR)/$(EXAMPLE_DIR)
+	rm -rf $(TAR_DIR)/$(EXAMPLE_DIR)/.svn
+	rm -rf $(TAR_DIR)/$(EXAMPLE_DIR)/post-install/.svn
 
 	touch $@
 

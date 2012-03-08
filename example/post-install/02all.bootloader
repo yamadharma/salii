@@ -15,25 +15,32 @@ echo "setting up grub: running grub.."
 if [ -e "/etc/default/grub" ]
 then
 
-echo "Using GRUB2 install method! :: $DISK0"
+    if [ "x$SALI_VERSION" != "x" ]
+    then
+        echo "sali version $SALI_VERSION has grub2_install funcion"
+        exit 0
+    else
+        echo $SALI_VERSION
+        echo "Using GRUB2 install method! :: $DISK0"
 
-echo "grub-install --no-floppy $DISK0"
-grub-install --no-floppy $DISK0
+        echo "grub-install --no-floppy $DISK0"
+        grub-install --no-floppy $DISK0
 
-echo "grub-mkconfig -o /boot/grub/grub.cfg"
-echo "This command can take while..."
-grub-mkconfig -o /boot/grub/grub.cfg
+        echo "grub-mkconfig -o /boot/grub/grub.cfg"
+        echo "This command can take while..."
+        grub-mkconfig -o /boot/grub/grub.cfg
 
-echo "GRUB2 install done"
+        echo "GRUB2 install done"
+    fi
 
 else
 
-echo "Using Legacy GRUB install method!"
+    echo "Using Legacy GRUB install method!"
 grub --batch <<EOF
 root (hd0,0)
 setup (hd0)
 EOF
-echo "setting up grub: done."
+    echo "setting up grub: done."
 
 fi
 

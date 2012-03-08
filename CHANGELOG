@@ -1,4 +1,7 @@
 1.5.0
+  * Added example directory
+    Author Bas van der Vlies
+
   * Enabled 'blkid' command in busybox
     Author Bas van der Vlies
 
