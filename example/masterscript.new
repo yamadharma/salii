@@ -118,14 +118,17 @@ fi
 logmsg "getimage"
 getimage
 
-#
-################################################################################
-
 # Leave notice of which image is installed on the client
 echo $IMAGENAME > /a/root/IMAGE_LAST_SYNCED_TO || shellout
 
+if [ "$GRUB2" == "yes" ]
+then
+	grub2_install $DISK0
+fi
+
 #
 ################################################################################
+
 
 ##################################################################
 #
@@ -143,8 +146,9 @@ echo $IMAGENAME > /a/root/IMAGE_LAST_SYNCED_TO || shellout
 #
 #   Post Install Scripts
 #
-export DISK0
+
 run_post_install_scripts
+
 #
 ################################################################################
 
@@ -155,7 +159,7 @@ run_post_install_scripts
 if [ ! -z $MONITOR_SERVER ]; then
     if [ "x$MONITOR_CONSOLE" = "xyes" ]; then 
         [ ! -d /a/root ] && mkdir -p /a/root
-        cp -f /tmp/si_monitor.log /a/root/si_monitor.log
+        cp -f /var/log/sali.log /a/root/sali.log
     fi
 fi
 
@@ -185,27 +189,5 @@ rsync $IMAGESERVER::scripts/imaging_complete > /dev/null 2>&1
 logmsg "Imaging completed"
 #
 ################################################################################
-
-if [ ! -z $MONITOR_SERVER ]; then
-    # Report the 'imaged' state to the monitor server.
-    send_monitor_msg "status=100:speed=0"
-    if [ "x$MONITOR_CONSOLE" = "xyes" ]; then 
-        # Print some empty lines and sleep some seconds to give time to
-        # the virtual console to get last messages.
-        # XXX: this is a dirty solution, we should find a better way to
-        # sync last messages... -AR-
-        logmsg ""
-        logmsg ""
-        logmsg ""
-        sleep 10
-    fi
-    # Report the post-install action.
-    send_monitor_msg "status=104:speed=0"
-fi
-
-
-# Take network interface down
-[ -z $DEVICE ] && DEVICE=eth0
-ifconfig $DEVICE down || shellout
 
 reboot
