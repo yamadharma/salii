@@ -67,12 +67,12 @@ aria_monitor_log(){
                       
         case $LINE in
                 *"download completed"*|*SEEDING*)
-                        echo "Done with downloading file"
+                        p_comment 0  "Done with downloading file"
                         DONE=1
                 ;;                                                              
 
                 *)
-                        echo $LINE                                              
+                        p_comment 0 $LINE                                              
         		sleep 5
                 ;;
         esac            
