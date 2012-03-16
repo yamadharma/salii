@@ -66,6 +66,9 @@ def read_maked(path):
         if item.endswith('.rul'):
             program = item[:-4]
 
+            if program == 'xmlrpc-c':
+                program = 'xmlrpc'
+
             if program == 'popt':
                 continue
 
