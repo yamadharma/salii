@@ -14,7 +14,7 @@
 
   * Updated kernel version to 3.1.4
   * Updated busybox to 1.19.4
-  * Updated aria2 to 1.13.0
+  * Updated aria2 to 1.14.2
   * Updated curl to 7.23.1
   * Updated e2fsprogs to 1.42
   * Updated jfsutils to 1.1.15
@@ -37,8 +37,8 @@
     So we can monitor the process on the node via ssh
     Author: Bas van der Vlies
 
-  * If VERBOSE_LEVEL is greater then or equal 256. Then the getimage
-    image routine will be verbos (tar, rsync)
+  * If VERBOSE_LEVEL is greater or equal then 256. Then the getimage
+    image routine will be verbose (tar, rsync)
     Author: Bas van der Vlies
 
   * Added some post-install examples for:
@@ -59,6 +59,14 @@
   * Added SALI_VERSION environment variable so we can check which
     version we use.
     Author: Bas van der Vlies & Dennis Stam
+
+  * Added xmlrpc-c to monitor aria via the rpc functionality. This way
+    the progress way more reliable then grepping the stdout of aria2c.
+    Fixes ticket #36
+    Author: Dennis Stam
+
+  * When we are using bittorrent, print that the image is being unpacked
+    Author: Dennis Stam
 
 1.4.11
   * Critical fix in detecting the disks in a system. Parsing

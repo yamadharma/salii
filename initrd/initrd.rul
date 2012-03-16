@@ -38,6 +38,7 @@ include $(INITRD_MAKED_DIR)/mdadm.rul
 include $(INITRD_MAKED_DIR)/reiserfsprogs.rul
 include $(INITRD_MAKED_DIR)/jfsutils.rul
 include $(INITRD_MAKED_DIR)/xfsprogs.rul
+include $(INITRD_MAKED_DIR)/xmlrpc-c.rul
 #
 ## END import rule files
 
@@ -130,7 +131,8 @@ $(INITRD_DIR)/build: initrd_prepare $(SRC_DIR)/modules_build-stamp \
 	mdadm_install \
 	reiserfsprogs_install \
 	jfsutils_install \
-	xfsprogs_install
+	xfsprogs_install \
+	xmlrpc_install
 
 ## 
 #

@@ -69,6 +69,8 @@ getimage_aria_bm(){
     logmsg "Extracting image from ${tarball}"
     cd /a/ || shellout
 
+    p_comment 0 "Unpacking image file: ${STAGING}/${tarball}"
+
     case $compress in
 	"z")
 		zcat ${STAGING}/${tarball} | tar -px${VERBOSE_GETIMAGE_OPT}f -

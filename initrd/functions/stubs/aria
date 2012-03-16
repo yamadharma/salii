@@ -57,23 +57,59 @@ aria_autodetect_staging_dir() {
 
 }
 
+aria_get_rpc_progress() {
+    METAFILE=$1
+
+    if [ -n "${2}" ]
+    then
+        SCALE=$2
+    else
+        SCALE=0
+    fi
+
+    #first save some data
+    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellStatus 1 2> $METAFILE.err > $METAFILE.rpc
+
+    if [ "$?" != 0 ]
+    then
+        echo 0
+        exit
+    fi
+
+    TOTALSIZE=$(cat $METAFILE.rpc | grep "totalLength" -A1 -m1| grep Value | awk -F"'" '{print $2}')
+    COMPLETEDSIZE=$(cat $METAFILE.rpc | grep "completedLength" -A1 -m1| grep Value | awk -F "'" '{print $2}')
+
+    echo "$(echo "scale=$SCALE; $COMPLETEDSIZE * 100 / $TOTALSIZE"| bc)"
+}
+
+aria_get_rpc_speed() {
+    METAFILE=$1
+
+    #first save some data
+    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellStatus 1 2> $METAFILE.err > $METAFILE.rpc
+
+    SPEED=$(cat $METAFILE.rpc | grep "downloadSpeed" -A1 -m1| grep Value | awk -F"'" '{print $2}')
+
+    echo $SPEED
+}
+
 aria_monitor_log(){
     FILE=$1
 
     DONE=0
     while [ $DONE -lt 1 ]
     do              
-        LINE=$(tail -n1 $FILE)
-                      
-        case $LINE in
-                *"download completed"*|*SEEDING*)
+        PROGRESS=$(aria_get_rpc_progress $FILE)
+        SPEED=$(aria_get_rpc_speed $FILE)
+        case $PROGRESS in
+                *100*)
                         p_comment 0  "Done with downloading file"
                         DONE=1
                 ;;                                                              
 
                 *)
-                        p_comment 0 $LINE                                              
-        		sleep 5
+                        p_comment 0 "Downloading: ${PROGRESS} percent at ${SPEED} bytes/sec"
+                        sleep 5
                 ;;
         esac            
     done 
@@ -88,8 +124,8 @@ aria_get_file() {
     save_param ARIA_LOG /tmp/aria.log
 
     ##Starting aria2c and sending the stdout to a file
-    logmsg "/usr/bin/aria2c --human-readable=false --dir $destination $metafile > $metafile_log &"
-    /usr/bin/aria2c --human-readable=false --dir $destination $metafile > $metafile_log &
+    logmsg "/usr/bin/aria2c --enable-rpc --human-readable=false --dir $destination $metafile &> $metafile_log &"
+    /usr/bin/aria2c --enable-rpc --human-readable=false --dir $destination $metafile &> $metafile_log &
 
     pid=$!
     if [ ! -d /proc/$pid ]; then
