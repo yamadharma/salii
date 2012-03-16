@@ -3,40 +3,40 @@
 #   vi: set filetype=make:
 #
 
-XMPRPC_VERSION	= 01.25.14
-XMPRPC_TARBALL	= xmlrpc-c_$(XMPRPC_VERSION).tar.gz
+XMLRPC_VERSION	= 01.25.14
+XMLRPC_TARBALL	= xmlrpc-c_$(XMLRPC_VERSION).tar.gz
 
 ### download = http://xmlrpc-c.sourceforge.net/downloading.php
-XMPRPC_URL 	= ftp://ftp.sara.nl/pub/sali/sources/xmlrpc-c_$(XMPRPC_VERSION).tar.gz
-XMPRPC_INFO	= http://xmlrpc-c.sourceforge.net
+XMLRPC_URL 	= ftp://ftp.sara.nl/pub/sali/sources/xmlrpc-c_$(XMLRPC_VERSION).tar.gz
+XMLRPC_INFO	= http://xmlrpc-c.sourceforge.net
 
-XMPRPC_DIR	= $(SRC_DIR)/xmlrpc-c_$(XMPRPC_VERSION)
+XMLRPC_DIR	= $(SRC_DIR)/xmlrpc-c_$(XMLRPC_VERSION)
 
 .PHONY: xmlrpc
-xmlrpc: $(XMPRPC_DIR).build
+xmlrpc: $(XMLRPC_DIR).build
 
 .PHONY: xmlrpc_install
-xmlrpc_install: $(XMPRPC_DIR).install
+xmlrpc_install: $(XMLRPC_DIR).install
 
 .PHONY: xmlrpc_clean
-xmlrpc_clean: $(XMPRPC_DIR).clean
+xmlrpc_clean: $(XMLRPC_DIR).clean
 
-$(XMPRPC_DIR).build: $(OPENSSL_DIR).build $(XMPRPC_DIR).get
-	cd $(XMPRPC_DIR) && ./configure  --disable-libwww-client --disable-abyss-threads --disable-cplusplus --disable-cgi-server--disable-abyss-server --enable-tools --prefix=/usr && make
-
-	touch $@
-
-$(XMPRPC_DIR).install: $(XMPRPC_DIR).build
-	cd $(XMPRPC_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
+$(XMLRPC_DIR).build: $(OPENSSL_DIR).build $(XMLRPC_DIR).get
+	cd $(XMLRPC_DIR) && ./configure  --disable-libwww-client --disable-abyss-threads --disable-cplusplus --disable-cgi-server--disable-abyss-server --enable-tools --prefix=/usr && make
 
 	touch $@
 
-$(XMPRPC_DIR).get:
-	$(GETSOURCE) $(XMPRPC_URL) $(SRC_DIR)
-	rm -rf $(XMPRPC_DIR)
-	cd $(SRC_DIR) && tar -xzvf $(SRC_DIR)/$(XMPRPC_TARBALL)
+$(XMLRPC_DIR).install: $(XMLRPC_DIR).build
+	cd $(XMLRPC_DIR) && make DESTDIR=$(INITRD_BUILD_DIR) install
 
 	touch $@
 
-$(XMPRPC_DIR).clean: initrd_clean
-	rm -rf $(XMPRPC_DIR)*
+$(XMLRPC_DIR).get:
+	$(GETSOURCE) $(XMLRPC_URL) $(SRC_DIR)
+	rm -rf $(XMLRPC_DIR)
+	cd $(SRC_DIR) && tar -xzvf $(SRC_DIR)/$(XMLRPC_TARBALL)
+
+	touch $@
+
+$(XMLRPC_DIR).clean: initrd_clean
+	rm -rf $(XMLRPC_DIR)*
