@@ -1,3 +1,7 @@
+1.5.X
+  * Build LVM with the sali udev instead of the system one
+    Author Bas van der Vlies & Michel Scheerman
+
 1.5.0
   * Added example directory
     Author Bas van der Vlies
