@@ -39,9 +39,9 @@ lvm_clean: $(LVM_DIR).clean
 # for instance `--prefix=$HOME'.
 $(LVM_DIR).build:	$(LVM_DIR).get $(UDEV_DIR).build
 	cd $(LVM_DIR) && \
-     CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/lib" \
-        UDEV_CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include" \
-         UDEV_LIBS="-L$(INITRD_BUILD_DIR)/lib -ludev" \
+		CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include -L$(INITRD_BUILD_DIR)/lib -ludev" \
+		UDEV_CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include" \
+         	UDEV_LIBS="-L$(INITRD_BUILD_DIR)/lib -ludev" \
 		./configure --enable-udev_sync --enable-udev_rules
 	cd $(LVM_DIR) && $(MAKE) -j $(NCPUS)
 
