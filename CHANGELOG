@@ -2,6 +2,10 @@
   * Build LVM with the sali udev instead of the system one
     Author Bas van der Vlies & Michel Scheerman
 
+  * Added export LD_LIBRARY_PATH=/lib:/usr/lib to /etc/profile
+    for PowerPC installations
+    Author Bas van der Vlies & Michel Scheerman
+
 1.5.0
   * Added example directory
     Author Bas van der Vlies
