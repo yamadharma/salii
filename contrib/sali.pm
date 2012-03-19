@@ -22,6 +22,7 @@ use Sys::Hostname;
 use xCAT::Table;
 use xCAT::Utils;
 use xCAT::MsgUtils;
+use Socket;
 my $tftpdir = xCAT::Utils->getTftpDir();
 1;
 
@@ -66,7 +67,6 @@ sub preprocess_request
 		my %rsp;
 		$rsp->{data}->[0] = "Input noderange missing. Useage: sali <noderange> \n";
 		xCAT::MsgUtils->message("I", $rsp, $callback, 0);
-		return 1;
 	}
 }
 
@@ -103,6 +103,35 @@ sub get_noderes_table
 	return $node_noderes_data;
 }
 
+sub create_hex_hardlink
+{
+	my $request     = shift;
+        my $node        = shift;
+	my $callback	= shift;
+	my %rsp;
+	$ip_adress = inet_ntoa(inet_aton($node));;
+
+        @ipadress_split=split(/\./,$ip_adress);
+        $hex_address = sprintf("%02x%02x%02x%02x",@ipadress_split);
+	if ( $hex_address )
+	{
+		unlink($tftpdir."/etc/".$hex_address);
+   		link($tftpdir."/etc/".$node,$tftpdir."/etc/".$hex_address);		
+	}
+	else
+	{
+		$rsp->{data}->[0] = "sali plugin: Failed to create hex hardlink";
+                xCAT::MsgUtils->message("I", $rsp, $callback, 0);
+	}
+}
+
+sub set_node_state
+{
+	my $node	= shift;
+	my $chaintab  = xCAT::Table->new('chain',-create=>1);
+	$chaintab->setNodeAttribs($node,{ currstate => "install", currchain => "sali image install", chain => "boot"});
+}
+
 sub process_request
 {
 	my $request	= shift;
@@ -134,6 +163,8 @@ sub process_request
 			print $open_pxe_config "	initrd-size=32768\n";
 			print $open_pxe_config "	append=\"DEVICE=".get_noderes_table($request, $node)->{installnic}." ".get_bootparams_table($request, $node)->{kcmdline}."\"\n";
 			close($open_pxe_config);
+			&create_hex_hardlink($request, $node, $callback);
+			&set_node_state($node);
 			$i++;
 		}
 		xCAT::MsgUtils->message("I", $rsp, $callback, 0);
