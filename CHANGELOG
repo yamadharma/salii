@@ -6,6 +6,11 @@
     for PowerPC installations
     Author Bas van der Vlies & Michel Scheerman
 
+  * You can now use SSHD="y|Y|yes"|Yes|YES" in pxeconfig file
+    to start sshd daemon.
+    Requested by: Jaap Dijkshoorn <jaap at sara dot nl>
+    Author Bas van der Vlies
+  
 1.5.0
   * Added example directory
     Author Bas van der Vlies
