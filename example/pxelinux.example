@@ -1,4 +1,4 @@
-default bittorent
+default shell
 
 label shell
   kernel sali/trunk/kernel
