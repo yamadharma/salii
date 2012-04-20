@@ -71,7 +71,7 @@ include $(KERNEL_MAKED_DIR)/zlib.rul
 include $(INITRD_DIR)/initrd.rul
 
 # build everything, install nothing
-build:	initrd_install kernel modules $(ROOT_DIR)/build
+build:	initrd_install kernel $(ROOT_DIR)/build
 
 $(ROOT_DIR)/build:
 

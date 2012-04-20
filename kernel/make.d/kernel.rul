@@ -68,7 +68,7 @@ install_kernel:	$(LINUX_IMAGE)
 # build the kernel that autoinstall clients will boot from during
 # autoinstallation
 PHONY += kernel
-kernel:	$(LINUX_IMAGE)
+kernel:	$(LINUX_IMAGE) modules
 
 $(LINUX_IMAGE): $(SRC_DIR)/patched_kernel-stamp
 	$(MAKE) -j$(NCPUS) -C $(LINUX_DIR) $(LINUX_TARGET)
