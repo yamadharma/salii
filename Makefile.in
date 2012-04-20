@@ -38,10 +38,14 @@ TAR_DIR=$(ROOT_DIR)/tar
 EXAMPLE_DIR=example
 
 # The basic
-MAKED_DIR=$(ROOT_DIR)/make.d
-PATCH_DIR=$(ROOT_DIR)/patches
 SRC_DIR=$(ROOT_DIR)/src
 STAMP_DIR=$(SRC_DIR)
+
+# The kernel locations
+KERNEL_DIR=$(ROOT_DIR)/kernel
+KERNEL_MAKED_DIR=$(KERNEL_DIR)/make.d
+KERNEL_PATCH_DIR=$(KERNEL_DIR)/patches
+KERNEL_BUILD_DIR=$(KERNEL_DIR)/build_dir
 
 # The initrd locations
 INITRD_DIR=$(ROOT_DIR)/initrd
@@ -62,9 +66,9 @@ COPYLIBS=$(ROOT_DIR)/tools/copy_libs
 #
 ## END utilities
 
-include $(ROOT_DIR)/make.d/kernel.rul
-include $(ROOT_DIR)/make.d/zlib.rul
-include $(ROOT_DIR)/initrd/initrd.rul
+include $(KERNEL_MAKED_DIR)/kernel.rul
+include $(KERNEL_MAKED_DIR)/zlib.rul
+include $(INITRD_DIR)/initrd.rul
 
 # build everything, install nothing
 build:	initrd_install kernel modules $(ROOT_DIR)/build

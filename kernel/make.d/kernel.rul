@@ -36,14 +36,14 @@ LINUX_TARBALL 	:= linux-$(LINUX_VERSION).tar.bz2
 LINUX_URL 		:= ftp://ftp.sara.nl/pub/sali/sources/$(LINUX_TARBALL)
 LINUX_INFO 		:= http://kernel.org
 
-LINUX_CONFIG 	:= $(PATCH_DIR)/linux.$(ARCH).config
+LINUX_CONFIG 	:= $(KERNEL_PATCH_DIR)/linux.$(ARCH).config
 
 ## names for kernel patch files can be of 2 forms:
 ##  1) patches that apply to all architectures
 ##       linux.all.XX<name>.patch
 ##  2) patch applies to a subset of arches
 ##    linux.<arch1>,<arch2>,...,<archN>.XX<name>.patch
-LINUX_PATCHES = $(sort $(shell find $(PATCH_DIR) \
+LINUX_PATCHES = $(sort $(shell find $(KERNEL_PATCH_DIR) \
                                     -name "linux.$(ARCH).*.patch" -o \
                                     -name "linux.all.*.patch" -o \
                                     -name "linux.$(ARCH),*.*.patch" -o \
