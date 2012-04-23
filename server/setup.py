@@ -11,11 +11,11 @@ setup(
         name = 'SALI',
         version = '1.4.0',
 
-        description = 'sali server and server client',
-        long_description = 'sali server and server client',
+        description = 'sali server and utilities',
+        long_description = 'sali server and utilities',
         author = 'Dennis Stam',
         author_email = 'sali@sara.nl',
-        url = 'https://subtrac.sara.nl/oss',
+        url = 'https://subtrac.sara.nl/oss/sali',
         license = 'GPL',
         
         classifiers = [
