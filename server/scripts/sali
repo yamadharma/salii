@@ -14,11 +14,11 @@ import subprocess
 import tempfile
 import atexit
 import datetime
-
+    
 try:
     from sali import general
 except ImportError:
-    sys.path.append( '../python-libs' )
+    sys.path.append( '../' )
 
     from sali import general
 
@@ -298,9 +298,23 @@ OPTIONS = {
 }
 
 if __name__ == '__main__':
+
+    usage = '''%(prog)s <getimage|rsync> [options]
+
+getimage:
+  Fetch an image from a goldenclient, see --help for the options
+
+rsync:
+  Updates the rsynd.conf file by reading the stub files and images
+
+options:
+  Use --help
+'''
+
     parser = argparse.ArgumentParser( 
         description='The server client tool for fetching images and creating the rsynd file',
         conflict_handler='resolve',
+        usage=usage,
     )
 
     parser.add_argument( 
@@ -308,7 +322,7 @@ if __name__ == '__main__':
         metavar='OPTION', 
         type=str, 
         choices=OPTIONS.keys(),
-        help='specify which operation must be done' 
+        help='Specify which operation must be done' 
     )
 
     parser.add_argument(
@@ -316,28 +330,28 @@ if __name__ == '__main__':
         metavar='CONFIG',
         type=str,
         default='/etc/sali/sali.cfg',
-        help='configuration of sali'
+        help='Configuration file of sali'
     )
 
     parser.add_argument(
         '-h', '--host',
         metavar='HOSTNAME',
         type=str,
-        help='is used for getimage option',
+        help='Specify which host that must be imaged',
     )
 
     parser.add_argument(
         '-i', '--image',
         metavar='IMAGENAME',
         type=str,
-        help='is ised for getimage option',
+        help='The name of the image, if the image already exists the image will be updated',
     )
 
     parser.add_argument(
         '-e', '--exclude',
         metavar='EXCLUDE',
         type=str,
-        help='is ised for getimage option',
+        help='Specify the exlude file (rsync style)',
     )
 
     args = parser.parse_args()
