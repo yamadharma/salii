@@ -11,6 +11,7 @@ import sys
 import atexit
 import logging
 import time
+from logging import handlers
 from ConfigParser import SafeConfigParser
 from ConfigParser import NoSectionError
 from ConfigParser import NoOptionError
@@ -142,7 +143,8 @@ class Logging( object ):
             logger.addHandler( ch ) 
 
         if not cli:
-            fh = logging.FileHandler( self.logfile )
+            #fh = logging.FileHandler( self.logfile )
+            fh = handlers.TimedRotatingFileHandler( self.logfile, when='D', interval=1, backupCount=14 )
             fh.setLevel( self.level )
             fh.setFormatter( logging.Formatter( '%(asctime)s - %(name)-12s - %(levelname)-7s - %(message)s' ) )
             logger.addHandler( fh )

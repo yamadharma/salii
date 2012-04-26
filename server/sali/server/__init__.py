@@ -243,6 +243,7 @@ class UpdateImages( process.Task ):
                             self.ci.create_tarball( image )
             self.log.info( 'sleeping for %s' % self.human_time( self.sleeptime ) )
             time.sleep( self.sleeptime )
+            self.log.doRollover()
 
 class sali_server( general.Daemon ):
 

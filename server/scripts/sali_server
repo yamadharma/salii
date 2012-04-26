@@ -12,7 +12,7 @@ try:
     from sali import general
     from sali import server
 except ImportError:
-    sys.path.append( '../python-libs' )
+    sys.path.append( '../' )
 
     from sali import general
     from sali import server
