@@ -29,7 +29,7 @@ setup(
                 'Topic :: System :: System Administration',
         ],
 
-        packages = ['sali','sali.server','BitTornado','BitTornado.BT1'],
+        packages = ['sali','sali.server','SaliBitTornado','SaliBitTornado.BT1'],
         scripts = ['scripts/sali','scripts/sali_server'],
         data_files = [ 
         (   '/etc/sali', [ 
