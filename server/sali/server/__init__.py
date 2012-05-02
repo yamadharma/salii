@@ -4,7 +4,7 @@
 #
 #   $Id: server.py 287 2010-11-30 15:11:19Z dennis $
 
-## BitTornado uses the old sha module which is deprecated. So
+## SaliBitTornado uses the old sha module which is deprecated. So
 ## added a filter to ignore these DeprecationWarning.
 import warnings
 warnings.filterwarnings( 'ignore', category=DeprecationWarning )
@@ -23,18 +23,18 @@ import subprocess
 import socket
 import signal
 
-## Import some BitTornado modules
-from BitTornado.BT1.track import track
-from BitTornado.launchmanycore import LaunchMany
-from BitTornado.download_bt1 import defaults, get_usage
-from BitTornado.parseargs import parseargs
-from BitTornado import version, report_email
-from BitTornado.ConfigDir import ConfigDir
+## Import some SaliBitTornado modules
+from SaliBitTornado.BT1.track import track
+from SaliBitTornado.launchmanycore import LaunchMany
+from SaliBitTornado.download_bt1 import defaults, get_usage
+from SaliBitTornado.parseargs import parseargs
+from SaliBitTornado import version, report_email
+from SaliBitTornado.ConfigDir import ConfigDir
 
 ## Import PSYCO. note: Psyco only works on 32bit systems!
 ## Maybe I must remove this because we are only using 64bit
 ## systems.
-from BitTornado import PSYCO
+from SaliBitTornado import PSYCO
 
 if PSYCO.psyco:
     try:

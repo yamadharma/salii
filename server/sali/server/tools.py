@@ -12,7 +12,7 @@ import subprocess
 import operator
 import shutil
 
-from BitTornado.BT1.makemetafile import make_meta_file
+from SaliBitTornado.BT1.makemetafile import make_meta_file
 
 class CreateImage( object ):
 
