@@ -15,6 +15,8 @@ from logging import handlers
 from ConfigParser import SafeConfigParser
 from ConfigParser import NoSectionError
 from ConfigParser import NoOptionError
+from ConfigParser import InterpolationDepthError
+from ConfigParser import InterpolationMissingOptionError
 
 class Config( SafeConfigParser ):
 
@@ -55,7 +57,11 @@ class Config( SafeConfigParser ):
 
     def get_default( self, option ):
         if self.has_option( 'DEFAULT', option ):
-            return self.get( 'DEFAULT', option )
+            try:
+                value = self.get( 'DEFAULT', option )
+            except InterpolationMissingOptionError, detail:
+                print 'could not get value for option: %s\n %s' %(option, detail)
+                sys.exit(1)
 
     def do_bittorrent( self ):
         try:
