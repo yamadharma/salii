@@ -7,7 +7,7 @@ from os import listdir
 from sha import sha
 from copy import copy
 from string import strip
-from BitTornado.bencode import bencode
+from SaliBitTornado.bencode import bencode
 from btformats import check_info
 from threading import Event
 from time import time

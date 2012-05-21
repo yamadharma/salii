@@ -1,13 +1,13 @@
 # Written by John Hoffman
 # see LICENSE.txt for license information
 
-from BitTornado.CurrentRateMeasure import Measure
+from SaliBitTornado.CurrentRateMeasure import Measure
 from random import randint
 from urlparse import urlparse
 from httplib import HTTPConnection
 from urllib import quote
 from threading import Thread
-from BitTornado.__init__ import product_name,version_short
+from SaliBitTornado.__init__ import product_name,version_short
 try:
     True
 except:

@@ -3,7 +3,7 @@
 # Written by John Hoffman
 # see LICENSE.txt for license information
 
-from BitTornado import PSYCO
+from SaliBitTornado import PSYCO
 if PSYCO.psyco:
     try:
         import psyco

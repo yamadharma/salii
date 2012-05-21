@@ -1,7 +1,7 @@
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
-from BitTornado.CurrentRateMeasure import Measure
+from SaliBitTornado.CurrentRateMeasure import Measure
 
 try:
     True

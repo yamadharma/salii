@@ -1,9 +1,9 @@
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
-from BitTornado.bitfield import Bitfield
+from SaliBitTornado.bitfield import Bitfield
 from sha import sha
-from BitTornado.clock import clock
+from SaliBitTornado.clock import clock
 from traceback import print_exc
 from random import randrange
 try:

@@ -11,6 +11,7 @@ import os
 import subprocess
 import operator
 import shutil
+import re
 
 from SaliBitTornado.BT1.makemetafile import make_meta_file
 
@@ -66,6 +67,39 @@ class CreateImage( object ):
     def space( self, level=0 ):
         return " " * level
 
+    def get_interfaces(self):
+    
+        p = subprocess.Popen(
+            'ip addr',
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
+        )
+
+        stdout, stderr = p.communicate()
+
+        if p.returncode != 0:
+            self.log.critical('Could not fetch interfaces')
+
+        ## A simple 
+        in_int = None
+        addresses = dict()
+        for line in stdout.splitlines():
+            if re.search(r'^[0-9]+:.+', line):
+                int_name = line.split()[1][:-1]
+                if int_name in ['lo',]:
+                    continue
+                in_int = int_name
+            elif in_int:
+                if line.strip().split()[0] == 'inet':
+                    ip = line.strip().split()[1].split('/')[0]
+                    if not addresses.has_key(int_name):
+                        addresses[int_name] = ip
+                        int_name = None
+                    else:
+                        print "Duplicate interface name found!"                   
+        return addresses
+
     def display_torrent( self, complete ):
         percent = operator.mul( complete, 100 )
 
@@ -74,9 +108,26 @@ class CreateImage( object ):
 
     def create_torrent( self, targetfile ):
 
-        params = dict( target='%s.torrent' % targetfile )
+        trackers = self.trackeradress.split(',')
 
-        make_meta_file( targetfile, self.trackeradress, progress=self.display_torrent, params=params ) 
+        if len(trackers) == 1:
+            URL = trackers[0]
+            if re.search(r'0.0.0.0', URL):
+                trackers = list()
+                for intf, ip in self.get_interfaces().items():
+                    trackers.append(re.sub(r'0.0.0.0', ip, URL)) 
+
+        if len(trackers) > 1:
+            params = dict( 
+                target='%s.torrent' % targetfile,
+                announce_list="|".join(trackers[1:]),
+            )
+        else:
+            params = dict( 
+                target='%s.torrent' % targetfile
+            )
+
+        make_meta_file( targetfile, trackers[0], progress=self.display_torrent, params=params ) 
 
     def find_tar( self ):
         p = subprocess.Popen( 

@@ -1,18 +1,18 @@
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
-from BitTornado.parseargs import parseargs, formatDefinitions
-from BitTornado.RawServer import RawServer, autodetect_ipv6, autodetect_socket_style
-from BitTornado.HTTPHandler import HTTPHandler, months, weekdays
-from BitTornado.parsedir import parsedir
+from SaliBitTornado.parseargs import parseargs, formatDefinitions
+from SaliBitTornado.RawServer import RawServer, autodetect_ipv6, autodetect_socket_style
+from SaliBitTornado.HTTPHandler import HTTPHandler, months, weekdays
+from SaliBitTornado.parsedir import parsedir
 from NatCheck import NatCheck
 from T2T import T2TList
-from BitTornado.subnetparse import IP_List, ipv6_to_ipv4, to_ipv4, is_valid_ip, is_ipv4
-from BitTornado.iprangeparse import IP_List as IP_Range_List
-from BitTornado.torrentlistparse import parsetorrentlist
+from SaliBitTornado.subnetparse import IP_List, ipv6_to_ipv4, to_ipv4, is_valid_ip, is_ipv4
+from SaliBitTornado.iprangeparse import IP_List as IP_Range_List
+from SaliBitTornado.torrentlistparse import parsetorrentlist
 from threading import Event, Thread
-from BitTornado.bencode import bencode, bdecode, Bencached
-from BitTornado.zurllib import urlopen, quote, unquote
+from SaliBitTornado.bencode import bencode, bdecode, Bencached
+from SaliBitTornado.zurllib import urlopen, quote, unquote
 from Filter import Filter
 from urlparse import urlparse
 from os import rename, getpid
@@ -20,7 +20,7 @@ from os.path import exists, isfile
 from cStringIO import StringIO
 from traceback import print_exc
 from time import time, gmtime, strftime, localtime
-from BitTornado.clock import clock
+from SaliBitTornado.clock import clock
 from random import shuffle, seed, randrange
 from sha import sha
 from types import StringType, IntType, LongType, ListType, DictType
@@ -29,8 +29,8 @@ from string import lower
 import sys, os
 import signal
 import re
-import BitTornado.__init__
-from BitTornado.__init__ import version, createPeerID
+import SaliBitTornado.__init__
+from SaliBitTornado.__init__ import version, createPeerID
 try:
     True
 except:

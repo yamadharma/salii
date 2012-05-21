@@ -1,10 +1,10 @@
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
-from BitTornado.CurrentRateMeasure import Measure
-from BitTornado.bitfield import Bitfield
+from SaliBitTornado.CurrentRateMeasure import Measure
+from SaliBitTornado.bitfield import Bitfield
 from random import shuffle
-from BitTornado.clock import clock
+from SaliBitTornado.clock import clock
 try:
     True
 except:

@@ -62,6 +62,7 @@ class Config( SafeConfigParser ):
             except InterpolationMissingOptionError, detail:
                 print 'could not get value for option: %s\n %s' %(option, detail)
                 sys.exit(1)
+            return value
 
     def do_bittorrent( self ):
         try:

@@ -1,8 +1,8 @@
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
-from BitTornado.bitfield import Bitfield
-from BitTornado.clock import clock
+from SaliBitTornado.bitfield import Bitfield
+from SaliBitTornado.clock import clock
 from binascii import b2a_hex
 
 try:

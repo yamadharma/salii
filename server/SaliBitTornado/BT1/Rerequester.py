@@ -2,11 +2,11 @@
 # modified for multitracker operation by John Hoffman
 # see LICENSE.txt for license information
 
-from BitTornado.zurllib import urlopen, quote
+from SaliBitTornado.zurllib import urlopen, quote
 from urlparse import urlparse, urlunparse
 from socket import gethostbyname
 from btformats import check_peers
-from BitTornado.bencode import bdecode
+from SaliBitTornado.bencode import bdecode
 from threading import Thread, Lock
 from cStringIO import StringIO
 from traceback import print_exc

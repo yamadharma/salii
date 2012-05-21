@@ -1,3 +1,21 @@
+sali (1.5.0-6) unstable; urgency=low
+
+  * Fixed import BitTornado to SaliBitTornado
+
+ -- root <root@test3.irc.sara.nl.irc.sara.nl>  Mon, 21 May 2012 12:17:37 +0200
+
+sali (1.5.0-5) unstable; urgency=low
+
+  * Fixed a indentent error 
+
+ -- root <root@test3.irc.sara.nl.irc.sara.nl>  Mon, 21 May 2012 12:10:38 +0200
+
+sali (1.5.0-4) unstable; urgency=low
+
+  * Now you can specify multiple tracker/announce urls. separate with ,
+
+ -- root <root@test3.irc.sara.nl.irc.sara.nl>  Mon, 21 May 2012 12:08:34 +0200
+
 sali (1.5.0-3) unstable; urgency=low
 
   * Just changed some defaults 
