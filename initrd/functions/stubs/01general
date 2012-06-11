@@ -43,6 +43,10 @@ adjust_arch() {
 write_variables() {
 
 	# pass all variables set here on to the hostname.sh script
+    if [ -e /tmp/variables.txt ]
+    then
+        . /tmp/variables.txt
+    fi
         cat /dev/null > /tmp/variables.txt
 
         echo "HOSTNAME=$HOSTNAME"                       >> /tmp/variables.txt

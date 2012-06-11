@@ -8,8 +8,17 @@
 
   * You can now use SSHD="y|Y|yes"|Yes|YES" in pxeconfig file
     to start sshd daemon.
-    Requested by: Jaap Dijkshoorn <jaap at sara dot nl>
+    Requested by: Jaap Dijkshoorn
     Author Bas van der Vlies
+
+  * Complete redsign of the network configuration during startup. We
+    we now use the ifup/ifdown method. The IMAGESERVER variable is not
+    necessary when you want to use SCRUB or RESCUE.
+    Reported by/Requested by: Ole Holm Nielsen
+    Author: Dennis Stam
+
+  * run-parts in busybox
+    Author: Dennis Stam
   
 1.5.0
   * Added example directory

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DHCPVARFILE=/tmp/udhcpc
+DHCPVARFILE=/tmp/udhcpc.$interface
 
 echo "SALIIMAGESRV=$saliimgsrv" > $DHCPVARFILE
 echo "IPADDR=$ip" >> $DHCPVARFILE

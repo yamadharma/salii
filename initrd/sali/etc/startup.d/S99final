@@ -12,6 +12,13 @@ then
 
     p_service "Checking for SystemImager specific things"
 
+    ping_test_imageserver
+    if [ ! $PING_SERVER -eq 0 ]
+    then
+        p_comment 0 "Unable to ping imagserver, check variable IMAGESERVER"
+        return 1
+    fi
+
     if [ -z "${SCRIPTNAME}" -a -z "${IMAGENAME}" -a -z "${HOSTNAME}" ]
     then
 	    p_comment 0 "Could not found any of the following variables:"

@@ -41,83 +41,59 @@ ping_test() {
                                                                                                
 }
 
-###############################################################################
-#
-# Usage: dhpc device
-#
-## SALI this method has been added to enable networking for a specific interface
-#
-dhcp(){                                                                                    
-                                                                                           
-        DHCP_RESULT=1                                                                                    
-                                                                                           
-        p_comment 20 "starting udhcp on interface ${1}"                                    
-                                                                                           
-        if [ $VERBOSE_LEVEL -ge "256" ]                                                     
-        then                                                                               
-                udhcpc -i $1 -n -t 12                                                      
-        else                                                                               
-                udhcpc -i $1 -n -t 12 > /dev/null 2>&1                                     
-        fi                                                                                 
-                                                                                           
-        if [ -s /tmp/udhcpc ]                                                              
-        then                                                                               
-                . /tmp/udhcpc                                                              
-                                                                                           
-                if [ -n "${IPADDR}" ]                                                      
-                then                                                                       
-                        if [ -z "${IMAGESERVER}" ]                                         
-                        then                                                               
-                                if [ -n "${SALIIMAGESRV}" ]                                
-                                then                                                       
-                                        IMAGESERVER=$SALIIMAGESRV                          
-                                else                                                       
-                                        p_comment 0 "the imageserver could not be located"
-                                        echo 1                                                                 
-                                        return                                             
-                                fi                                                         
-                        fi                                                                 
-                                                                                           
-                        ping_test $IMAGESERVER                                             
-                                                                                           
-                        if [ $PING_RESULT -eq 0 ]                                          
-                        then                                                               
-                                DHCP_RESULT=0                                              
-                        fi                                                                 
-                                                                                               
-                fi                                                                             
-        fi                                                                                     
-                                                                                               
+ping_test_imageserver(){
+    PING_SERVER=1
+
+    if [ -z "${IMAGESERVER}" ]
+    then
+        for file in $(ls -1 /tmp/udhcpc.*)
+        do
+            . $file
+            if [ -n $SALIIMAGESRV ]
+            then
+                ping_test $SALIIMAGESRV
+
+                if [ $PING_RESULT -eq 0 ]
+                then
+                    save_param IMAGESERVER $SALIIMAGESRV
+                    PING_SERVER=0
+                    break
+                fi
+            fi
+        done
+    else
+        ping_test $IMAGESERVER
+        save_param IMAGESERVER $IMAGESERVER
+        
+        if [ $PING_RESULT -eq 0 ]
+        then
+            PING_SERVER=0
+        fi
+    fi
 }
 
-#################################################################################
-#
-# Usage: dhcp_guess
-#
-## SALI This method uses the /sys/class/net to determine wich interfaces are
-## available on the current machine. This function stops until an interface
-## is able to connect with the imageserver.
-dhcp_guess(){                                                                              
-                                                                                           
-        NICS=$(ls -1 /sys/class/net | grep -v lo)                                          
-                                                                                           
-        p_comment 0 "choosing one of the following interfaces: $( echo $NICS)"                      
-                                                                                           
-        DHCPG_RESULT=1                                                                           
-                                                                                           
-        for NIC in $NICS                                                                   
-        do                                                                                 
-                dhcp $NIC                                                                  
-                                                                                           
-                if [ $DHCP_RESULT -eq 0 ]                                                  
-                then                                                                       
-                        p_comment 20 "succesfull configuration for interface ${NIC}"                           
-                        DHCPG_RESULT=0                                                           
-                        DEVICE=$NIC                                                        
-                        break                                                              
-                fi                                                                         
-        done                                                                               
+
+## 
+# Wrapper around the ifup command, due to VERBOSE logging
+do_ifup() {
+
+    if [ $VERBOSE_LEVEL -ge "256" ]
+    then
+        /sbin/ifup $1
+    else
+        /sbin/ifup $1 2&>1 > /dev/null
+    fi
 }
+do_gateway() {
+
+    if [ $VERBOSE_LEVEL -ge "256" ]
+    then
+        /sbin/route add default gw $1
+    else
+        /sbin/route add default gw $1 2&>1 > /dev/null
+    fi
+}
+
 
 ################################################################################
 #
