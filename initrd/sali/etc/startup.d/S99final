@@ -15,7 +15,7 @@ then
     ping_test_imageserver
     if [ ! $PING_SERVER -eq 0 ]
     then
-        p_comment 0 "Unable to ping imagserver, check variable IMAGESERVER"
+        p_comment 0 "Unable to ping image server, check variable IMAGESERVER"
         return 1
     fi
 
