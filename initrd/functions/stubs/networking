@@ -117,3 +117,32 @@ get_group_name() {
     fi
 }
 
+add_interface(){
+    NIC=$1
+
+    case "${2}" in
+        dhcp)
+            cat >> /etc/network/interfaces << EOF
+
+auto ${NIC}
+iface ${NIC} inet dhcp
+EOF
+        ;;
+        static)
+            if [ -z "${3}" -a -z "${4}" ]
+            then
+                return 1
+            fi
+
+            cat >> /etc/network/interfaces << EOF
+
+auto ${NIC}
+iface ${NIC} inet static
+    address ${3}
+    netmask ${4}
+EOF
+        ;;
+    esac
+
+}
+

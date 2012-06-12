@@ -13,26 +13,10 @@ then
     then
         p_comment 0 "Static configuration with ip ${IPADDR} and netmask ${NETMASK}"
 
-        echo "auto ${DEVICE}" >> /etc/network/interfaces
-        echo "iface ${DEVICE} inet static" >> /etc/network/interfaces
-        echo "    address ${IPADDR}" >> /etc/network/interfaces
-        echo "    netmask ${NETMASK}" >> /etc/network/interfaces
+        add_interface $DEVICE static $IPADDR $NETMASK
 
         save_param IPADDR $IPADDR
         save_param NETMASK $NETMASK
-
-        if [ -n "${NETWORK}" ]
-        then
-            echo "    network ${NETWORK}" >> /etc/network/interfaces
-            save_param NETWORK $NETWORK
-        fi
-
-        if [ -n "${BROADCAST}" ]
-        then
-            echo "    broadcast ${BROADCAST}" >> /etc/network/interfaces
-            save_param BROADCAST $BROADCAST
-        fi
-        echo "" >> /etc/network/interfaces
 
         if [ -n "${NAMESERVER}" ]
         then
@@ -49,10 +33,8 @@ then
 
     else
         p_comment 0 "Using DHCP"
-        
-        echo "auto ${DEVICE}" >> /etc/network/interfaces
-        echo "iface ${DEVICE} inet dhcp" >> /etc/network/interfaces
-        echo "" >> /etc/network/interfaces
+
+        add_interface $DEVICE dhcp
     fi
 
     do_ifup $DEVICE
@@ -78,9 +60,7 @@ else
 
     for NIC in $(ls -1 /sys/class/net | grep -v lo)
     do
-        echo "auto ${NIC}" >> /etc/network/interfaces
-        echo "iface ${NIC} inet dhcp" >> /etc/network/interfaces
-        echo "" >> /etc/network/interfaces
+        add_interface $NIC dhcp
     done
 
     for NIC in $(ls -1 /sys/class/net | grep -v lo)
@@ -92,7 +72,7 @@ else
             if [ $? -eq 0 ]
             then
                 p_comment 0 "Interface $NIC configured"
-                echo "$NIC" > /tmp/nics_configured
+                touch /tmp/network_available
             else
                 p_comment 0 "Interface $NIC failed"
             fi
@@ -102,7 +82,7 @@ else
     # Wait to finish
     wait 
 
-    if [ $(wc -l /tmp/nics_configured | awk '{print $1}') -eq 0 ]
+    if [ ! -f "/tmp/network_available" ]
     then
         p_service "No network connection found!"
         return 1

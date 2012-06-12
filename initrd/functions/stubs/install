@@ -68,6 +68,7 @@ choose_autoinstall_script() {
         shellout
     fi
     logmsg "Using autoinstall script: ${SCRIPTNAME}"
+    save_param SCRIPTNAME $SCRIPTNAME
 }
 
 #

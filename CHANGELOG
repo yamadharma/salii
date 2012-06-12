@@ -1,4 +1,4 @@
-1.5.X
+1.5.2
   * Build LVM with the sali udev instead of the system one
     Author Bas van der Vlies & Michel Scheerman
 
@@ -17,7 +17,16 @@
     Reported by/Requested by: Ole Holm Nielsen
     Author: Dennis Stam
 
-  * run-parts in busybox
+  * Function write_variables is now only used when there is no /tmp/variables.txt
+    use function save_param to save parameters. Ie. save_param IMAGESERVER $IMAGESERVER 
+    The function write_variables will be removed in the future.
+    Author: Dennis Stam
+
+  * The variables NETWORK and BROADCAST are now deprecated and are not used. With a
+    IPADDR and NETMASK the BROADCAST and NETWORK are automaticly calculated by ifconfig.
+    Author: Dennis Stam
+
+  * Enabled utility run-parts in busybox
     Author: Dennis Stam
   
 1.5.0

@@ -42,11 +42,6 @@ adjust_arch() {
 # Usage: write_variables
 write_variables() {
 
-	# pass all variables set here on to the hostname.sh script
-    if [ -e /tmp/variables.txt ]
-    then
-        . /tmp/variables.txt
-    fi
         cat /dev/null > /tmp/variables.txt
 
         echo "HOSTNAME=$HOSTNAME"                       >> /tmp/variables.txt
@@ -54,7 +49,6 @@ write_variables() {
         echo "DEVICE=$DEVICE"                           >> /tmp/variables.txt
         echo "IPADDR=$IPADDR"                           >> /tmp/variables.txt
         echo "NETMASK=$NETMASK"                         >> /tmp/variables.txt
-        echo "BROADCAST=$BROADCAST"                     >> /tmp/variables.txt
         echo "GATEWAY=$GATEWAY"                         >> /tmp/variables.txt
         echo "GATEWAYDEV=$GATEWAYDEV"                   >> /tmp/variables.txt
         echo "IMAGESERVER=$IMAGESERVER"                 >> /tmp/variables.txt
@@ -111,8 +105,7 @@ save_param(){
 
     if [ ! -e "/tmp/variables.txt" ]
     then
-        echo "$PARAM=$VALUE" > /tmp/variables.txt
-        return
+        write_variables
     fi
 
     ##Which line must be removed!
@@ -209,7 +202,16 @@ read_kernel_append_parameters() {
 # Variable-ize /proc/cmdline arguments
 #
 variableize_kernel_append_parameters() {
+    ## For compatability create the old parameters file
     cat /proc/cmdline | tr ' ' '\n' | grep '=' > /tmp/kernel_append_parameter_variables.txt
+
+    ## Now save the rest to the variables.txt file
+    for VAR in $(cat /proc/cmdline | sed 's/ /\n/g' | egrep "^[A-Z\_0-9]+=.+")
+    do
+        KEY=$(echo $VAR | awk -F"=" '{print $1}')
+        VALUE=$(echo $VAR | awk -F"=" '{print $2}')
+        save_param $KEY $VALUE
+    done
 }
 
 #
