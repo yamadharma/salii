@@ -71,6 +71,10 @@ $(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/modprobe.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/sali/stubs
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/startup.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/network/if-down.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/network/if-post-down.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/network/if-pre-up.d
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/network/if-up.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/dev
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/proc

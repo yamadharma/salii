@@ -5,5 +5,10 @@ choose_autoinstall_script
 
 load_variables
 
-p_service "Starting old installer file"
+p_service "Starting old installer file ${SCRIPTNAME}"
+
 sh $SCRIPTNAME
+
+p_service "Finished running install script"
+
+exit 0
