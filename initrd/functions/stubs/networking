@@ -56,6 +56,9 @@ ping_test_imageserver(){
                 if [ $PING_RESULT -eq 0 ]
                 then
                     save_param IMAGESERVER $SALIIMAGESRV
+                    save_param IPADDR $IPADDR
+                    save_param NETMASK $NETMASK
+                    save_param DOMAINNAME $DOMAINNAME
                     PING_SERVER=0
                     break
                 fi

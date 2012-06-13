@@ -25,7 +25,7 @@ then
             if [ -n "${DOMAIN}" ]
             then
                 echo "domain ${DOMAIN}" >> /etc/resolv.conf
-                save_param NAMESERVER $NAMESERVER
+                save_param DOMAIN_NAME $DOMAIN_NAME
             fi
         else
             p_comment 0 "Unable to create a resolv.conf file"
@@ -93,5 +93,7 @@ if [ -z "${HOSTNAME}" ]
 then
 	HOSTNAME=$(hostname)
 fi
+
+save_param HOSTNAME $HOSTNAME
 
 return 0
