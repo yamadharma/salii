@@ -10,7 +10,7 @@ import getpass
 
 WIKI_URL = 'https://%s:%s@subtrac.sara.nl/oss/sali/login/xmlrpc'
 WIKI_PAGE = 'SaliUsedPrograms'
-EXCLUDE_VERSIONS = ['1.1.0','1.1.1','1.2.0','1.2.1','1.2.2','1.2.3','1.2.4','1.3.0','1.3.1','1.3.2']
+EXCLUDE_VERSIONS = ['1.1.0','1.1.1','1.2.0','1.2.1','1.2.2','1.2.3','1.2.4','1.3.0','1.3.1','1.3.2', '1.4.0', '1.4.5', '1.4.6']
 
 ### TAKEN FROM http://code.activestate.com/recipes/135435-sort-a-string-using-numeric-order
 def sorted_copy(alist):
@@ -120,9 +120,11 @@ def append_to_dict(path,sversion):
 
         DATA[program]['versions'][version].append(sversion)
 
-def append_main_maked(path,sversion):
+def append_main_maked(ipath,sversion):
 
-    path = os.path.join(os.path.join(path,sversion),'make.d')
+    path = os.path.join(os.path.join(ipath,sversion),'make.d')
+    if not os.path.exists(path):
+        path = os.path.join(os.path.join(ipath,sversion),'kernel/make.d')
 
     for program,version,tarball,info in read_maked(path):
         if not DATA.has_key(program):
