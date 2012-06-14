@@ -26,6 +26,11 @@
     IPADDR and NETMASK the BROADCAST and NETWORK are automaticly calculated by ifconfig.
     Author: Dennis Stam
 
+  * Added ssh keys in the initrd. This way SALI always boots with the same ssh keys. With
+    kernel option SSHD_GENKEY you can force SALI to generate new keys. SSHD_GENKEY=y
+    Requested by: Ole Holm Nielsen
+    Author: Dennis Stam
+
   * Enabled utility run-parts in busybox
     Author: Dennis Stam
   

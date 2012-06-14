@@ -1,6 +1,14 @@
 start_sshd(){
 	p_stage "Starting ssh server"
 
+    case "${SSHD_GENKEYS}" in
+        y|Y|yes|Yes|YES)
+            p_service "removing SALI default rsa/dsa/ecdsa keys"
+            rm -rf /etc/ssh/ssh_host* 2&>1 > /dev/null
+        ;;
+    esac
+
+
 	if [ ! -f "/etc/ssh/ssh_host_dsa_key" ]
 	then
 		p_service "creating a new dsa key"
