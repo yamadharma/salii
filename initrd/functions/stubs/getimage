@@ -119,7 +119,9 @@ getimage(){
        "http"|"ftp")
            getimage_aria_hf $URL
        ;;
-       "rsync")
+       *)
+          export PROTOCOL=rsync
+          save_param PROTOCOL rsync
           getimage_rsync
        ;;
     esac

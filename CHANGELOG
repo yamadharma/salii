@@ -1,3 +1,8 @@
+1.5.3
+  * Fixed a critical bug when PROTOCOL is not defined. If PROTOCOL is not set then
+    rsync will be used by default.
+    Author: Dennis Stam
+
 1.5.2
   * Build LVM with the sali udev instead of the system one
     Author Bas van der Vlies & Michel Scheerman

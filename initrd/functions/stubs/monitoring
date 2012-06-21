@@ -83,13 +83,11 @@ start_report_task() {
             p_service "Enabling reporting for bittorrent/metafile"
             p_comment 0 " note: when progress is 90%% and speed 0 or -, image is unpacking!"
         ;;
-        rsync)
+        *)
+            export PROTOCOL=rsync
+            save_param PROTOCOL rsync
             p_service "Enabling reporting for rsync"
             p_comment 0 "  note: it will take a couple of minutes before the reporting starts!"
-        ;;
-        *)
-            p_comment 0 "Given protocol is not supported"
-            return
         ;;
     esac
 

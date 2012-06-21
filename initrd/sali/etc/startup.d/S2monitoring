@@ -14,6 +14,21 @@ fi
 p_service "Starting klogd for kernel messages"
 /sbin/klogd -c 2
 
+case "${MONITOR_SERVER}" in
+    imageserver|IMAGESERVER)
+
+        ping_test_imageserver
+        if [ ! $PING_SERVER -eq 0 ]
+        then
+            MONITOR_SERVER=""
+        else
+            . /tmp/variables.txt
+            MONITOR_SERVER=$IMAGESERVER
+            save_param MONITOR_SERVER $IMAGESERVER
+        fi
+    ;;
+esac
+
 if [ -n "${MONITOR_SERVER}" ]
 then
 	p_service "Starting monitoring to your monitorserver ( ${MONITOR_SERVER} )"
