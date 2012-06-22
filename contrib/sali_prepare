@@ -1,0 +1,99 @@
+#!/bin/sh
+#
+#       "SALI" 
+#
+#   Copyright (C) 2012 SARA
+#   
+
+if [ -z "${1}" ]
+then
+    echo "Usage: $0 <imageserver hostname>"
+    exit 1
+fi
+
+if [ -z "$(echo $1 | egrep '^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' -o)" ]
+then
+	DIG=$(dig +short $1 | tail -n1)
+	if [ -z "${DIG}" ]
+	then
+		DOMAIN=$(cat /etc/resolv.conf | awk '/domain/ {print $2}')
+        if [ -z "${DOMAIN}" ]
+        then
+		    DOMAIN=$(cat /etc/resolv.conf | awk '/search/ {print $2}')
+        fi
+		DIG=$(dig +short "${1}.${DOMAIN}" | tail -n1)
+	fi
+
+	if [ -z "${DIG}" ]
+	then
+		echo "Unable to find ip address for host '${1}'"
+		exit 1
+	fi
+	
+	SERVER_IP=$DIG
+else
+	SERVER_IP=$1
+fi
+
+echo "Using IP $SERVER_IP for host ${1}"
+
+RSYNC_CFG=/tmp/sali_cfg.$$
+RSYNC_LOG=/tmp/sali_log.$$
+RSYNC_MAGIC_STRING="__cloning_completed__"
+SYSTEMIMAGER_DIR_CREATED=0
+
+## Saving current mounts
+if [ ! -e /etc/systemimager ]
+then
+    mkdir -p /etc/systemimager
+		SYSTEMIMAGER_DIR_CREATED=1
+fi
+
+mount > /etc/systemimager/mounted_filesystems
+## End saving mounts
+
+cat > "${RSYNC_CFG}" <<DELIM
+#
+# sali_prepare
+#
+#  This file: ${RSYNC_CFG}
+#
+list = yes
+timeout = 900
+dont compress = *.gz *.tgz *.zip *.Z *.ZIP *.bz2 *.deb *.rpm *.dbf
+uid = root
+gid = root
+hosts allow = ${SERVER_IP}/32
+log file = ${RSYNC_LOG}
+
+[root]
+    path = /
+    exclude = ${RSYNC_CFG} ${RSYNC_LOG}
+
+DELIM
+
+echo "Created a config file in ${RSYNC_CFG}"
+echo "   starting rsync daemon: rsync --daemon --config=${RSYNC_CFG}"
+rsync --daemon --config="${RSYNC_CFG}"
+
+RSYNC_PID=$(pidof rsync)
+
+tail -f "${RSYNC_LOG}" | while read line
+do
+    if [ -n "$(echo $line | grep "${RSYNC_MAGIC_STRING}")" ]
+    then
+        echo "Server says done, killing rsync daemon"
+        kill "${RSYNC_PID}"
+        break
+    fi
+done
+
+## Cleaning
+rm -rf "${RSYNC_CFG}"
+rm -rf "${RSYNC_LOG}"
+
+## Only remove if we have created it!!
+if [ $SYSTEMIMAGER_DIR_CREATED -eq 1 ]
+then
+	rm -rf /etc/systemimager
+fi
