@@ -2,8 +2,16 @@
   * make initrd, did not work anymore
     Author Bas van der Vlies
 
-  * Applied contributed patch for the configure.ac to add CentOS/RedHat
-    Author: proche
+  * Applied contributed patch for the configure.ac to add CentOS/RedHat, #46
+    Author: proche add rainmaker dot com
+    Applied by: Dennis Stam
+
+  * Applied contributed patch to add Xen support in the kernel, #49
+    Author: proche add rainmaker dot com
+    Applied by: Dennis Stam
+
+  * Applied contributed patch to increase the number of attempts with udhcp, #48
+    Author: proche add rainmaker dot com
     Applied by: Dennis Stam
 
 1.5.3
