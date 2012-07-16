@@ -103,6 +103,8 @@ $(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 	touch $@
 
 
+initrd: initrd_build 
+
 ##
 #
 initrd_build:  $(INITRD_DIR)/build
