@@ -31,6 +31,10 @@ case "$(uname -s)" in
 			OS=suse
 			OS_RELEASE=$(cat /etc/SuSE-release|awk '/VERSION =/ {print $3}')
 			AC_MSG_RESULT(found ${OS} release ${OS_RELEASE})
+		elif [ test -e /etc/redhat-release ]; then
+			OS=rhel
+			OS_RELEASE=$(cat /etc/redhat-release|awk '{print $3}')
+			AC_MSG_RESULT(found ${OS} release ${OS_RELEASE})
 		else
 			AC_MSG_RESULT(no)
 			AC_MSG_ERROR(Found an unsupported Linux distribution)

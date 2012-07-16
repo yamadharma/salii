@@ -2,6 +2,10 @@
   * make initrd, did not work anymore
     Author Bas van der Vlies
 
+  * Applied contributed patch for the configure.ac to add CentOS/RedHat
+    Author: proche
+    Applied by: Dennis Stam
+
 1.5.3
   * Fixed a critical bug when PROTOCOL is not defined. If PROTOCOL is not set then
     rsync will be used by default.
