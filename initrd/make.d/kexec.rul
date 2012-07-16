@@ -3,7 +3,7 @@
 #  vi: set filetype=make:
 #
 
-KEXEC_VERSION	= 2.0.2
+KEXEC_VERSION	= 2.0.3
 KEXEC_TARBALL	= kexec-tools-$(KEXEC_VERSION).tar.bz2
 KEXEC_DIR	= $(SRC_DIR)/kexec-tools-$(KEXEC_VERSION)
 
