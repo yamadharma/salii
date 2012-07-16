@@ -3,7 +3,7 @@
 #   vi: set filetype=make:
 #
 
-XMLRPC_VERSION	= 01.25.14
+XMLRPC_VERSION	= 01.25.17
 XMLRPC_TARBALL	= xmlrpc-c_$(XMLRPC_VERSION).tar.gz
 
 ### download = http://xmlrpc-c.sourceforge.net/downloading.php

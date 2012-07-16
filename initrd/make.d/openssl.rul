@@ -9,7 +9,7 @@
 #   - don't always rebuild
 #
 
-OPENSSL_VERSION         := 0.9.8r
+OPENSSL_VERSION         := 1.0.1c
 OPENSSL_DIR             := $(SRC_DIR)/openssl-$(OPENSSL_VERSION)
 OPENSSL_TARBALL         := openssl-$(OPENSSL_VERSION).tar.gz
 OPENSSL_MD5SUM          := 40b6ea380cc8a5bf9734c2f8bf7e701e

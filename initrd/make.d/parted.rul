@@ -6,9 +6,9 @@
 #   - go to 1.6.19
 #
 
-PARTED_VERSION 	= 3.0
+PARTED_VERSION 	= 3.1
 PARTED_DIR 			= $(SRC_DIR)/parted-$(PARTED_VERSION)
-PARTED_TARBALL 	= parted-$(PARTED_VERSION).tar.gz
+PARTED_TARBALL 	= parted-$(PARTED_VERSION).tar.xz
 
 #### http://ftp.gnu.org/gnu/parted/ ####
 PARTED_URL 		= ftp://ftp.sara.nl/pub/sali/sources/$(PARTED_TARBALL)
@@ -44,7 +44,7 @@ $(PARTED_DIR).install: $(PARTED_DIR).build
 
 $(PARTED_DIR).get:
 	$(GETSOURCE) $(PARTED_URL) $(SRC_DIR)
-	cd $(SRC_DIR) && tar -xvzf $(PARTED_TARBALL)
+	cd $(SRC_DIR) && tar -xvJf $(PARTED_TARBALL)
 	touch $@
 
 $(PARTED_DIR).clean:

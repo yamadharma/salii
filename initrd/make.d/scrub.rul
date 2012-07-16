@@ -3,13 +3,13 @@
 #   vi: set filetype=make:
 #
 
-SCRUB_VERSION	= 2.4.1
+SCRUB_VERSION	= 2.5.2
 #SCRUB_TARBALL	= scrub-$(SCRUB_VERSION).tar.bz2
 SCRUB_TARBALL	= scrub-$(SCRUB_VERSION).tar.gz
 
 #### http://scrub.sourceforge.net ####
-#SCRUB_URL 	= ftp://ftp.sara.nl/pub/sali/sources/scrub-$(SCRUB_VERSION).tar.bz2
-SCRUB_URL 	= ftp://ftp.sara.nl/pub/sali/sources/scrub-$(SCRUB_VERSION).tar.gz
+SCRUB_URL 	= ftp://ftp.sara.nl/pub/sali/sources/scrub-$(SCRUB_VERSION).tar.bz2
+#SCRUB_URL 	= ftp://ftp.sara.nl/pub/sali/sources/scrub-$(SCRUB_VERSION).tar.gz
 SCRUB_INFO	= http://code.google.com/p/diskscrub/
 
 SCRUB_DIR	= $(SRC_DIR)/scrub-$(SCRUB_VERSION)
@@ -36,8 +36,8 @@ $(SCRUB_DIR).install:	$(SCRUB_DIR).build
 $(SCRUB_DIR).get:
 	rm -rf $(SCRUB_DIR)
 	$(GETSOURCE) $(SCRUB_URL) $(SRC_DIR)
-	#cd $(SRC_DIR) && tar -xvjf $(SRC_DIR)/$(SCRUB_TARBALL)
-	cd $(SRC_DIR) && tar -xvzf $(SRC_DIR)/$(SCRUB_TARBALL)
+	cd $(SRC_DIR) && tar -xvjf $(SRC_DIR)/$(SCRUB_TARBALL)
+	#cd $(SRC_DIR) && tar -xvzf $(SRC_DIR)/$(SCRUB_TARBALL)
 
 	touch $@
 

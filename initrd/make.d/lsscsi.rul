@@ -3,7 +3,7 @@
 #   vi: set filetype=make:
 #
 
-LSSCSI_VERSION	= 0.25
+LSSCSI_VERSION	= 0.26
 LSSCSI_TARBALL	= lsscsi-$(LSSCSI_VERSION).tgz
 
 #### http://sg.danny.cz/scsi/lsscsi.html ####

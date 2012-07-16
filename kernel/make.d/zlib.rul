@@ -5,7 +5,7 @@
 #	- version to 1.2.2; Erich Focht patch
 #
 
-ZLIB_VERSION := 1.2.5
+ZLIB_VERSION := 1.2.7
 ZLIB_DIR := zlib-$(ZLIB_VERSION)
 ZLIB_TARBALL := zlib-$(ZLIB_VERSION).tar.gz
 ZLIB_URL := ftp://ftp.sara.nl/pub/sali/sources/$(ZLIB_TARBALL)
