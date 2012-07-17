@@ -4,8 +4,8 @@
 #
 
 SCRUB_VERSION	= 2.5.2
-#SCRUB_TARBALL	= scrub-$(SCRUB_VERSION).tar.bz2
-SCRUB_TARBALL	= scrub-$(SCRUB_VERSION).tar.gz
+SCRUB_TARBALL	= scrub-$(SCRUB_VERSION).tar.bz2
+#SCRUB_TARBALL	= scrub-$(SCRUB_VERSION).tar.gz
 
 #### http://scrub.sourceforge.net ####
 SCRUB_URL 	= ftp://ftp.sara.nl/pub/sali/sources/scrub-$(SCRUB_VERSION).tar.bz2
