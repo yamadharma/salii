@@ -4,7 +4,7 @@
 #
 
 AC_PREREQ(2.59)
-AC_INIT(SALI, [m4_esyscmd(cat VERSION)], sali@sara.nl)
+AC_INIT(SALI, m4_esyscmd([cat VERSION | tr -d '\n']), sali@sara.nl)
 
 # Checks for programs.
 AC_PROG_CXX

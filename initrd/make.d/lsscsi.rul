@@ -22,7 +22,7 @@ lsscsi_install:	$(LSSCSI_DIR).install
 lsscsi_clean: $(LSSCSI_DIR).clean
 
 $(LSSCSI_DIR).build:  $(LSSCSI_DIR).get
-	cd $(LSSCSI_DIR) && ./configure && make
+	cd $(LSSCSI_DIR) && ./configure --prefix=/usr && make
 
 	touch $@
 

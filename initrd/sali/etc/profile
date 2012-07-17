@@ -1,4 +1,4 @@
-export PATH="/etc/sali/bin:/bin:/sbin:/usr/bin:/usr/sbin"
+export PATH="/bin:/sbin:/usr/bin:/usr/sbin"
 export MANPATH="$MANPATH:/usr/local/share/man:/usr/man:/usr/share/man"
 export SHELL="/bin/ash"
 export LD_LIBRARY_PATH=/lib:/usr/lib
