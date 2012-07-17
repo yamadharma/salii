@@ -2,7 +2,7 @@
 #  vi: set filetype=make:
 #
 
-UDEV_VERSION	= 166
+UDEV_VERSION	= 182
 UDEV_TARBALL	= udev-$(UDEV_VERSION).tar.bz2
 UDEV_DIR	= $(SRC_DIR)/udev-$(UDEV_VERSION)
 
