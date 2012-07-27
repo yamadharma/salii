@@ -1,3 +1,13 @@
+1.5.5
+  * Enabled more network drivers 10/100 MBIT for embedded systems, #50
+    Requested by: lodeiroja add gmail dot com
+    Author Bas van der Vlies
+
+  * In the SALI i386/i686 build a lot of options are disabled. So this can
+    be used for embedded systems. Use x86_64 SALI build to install modern
+    i386/i686 systems. 
+    Author Bas van der Vlies
+
 1.5.4
   * make initrd, did not work anymore
     Author Bas van der Vlies
