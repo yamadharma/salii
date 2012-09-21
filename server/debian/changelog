@@ -1,3 +1,21 @@
+sali (1.5.0-9) unstable; urgency=low
+
+  * Make sure that an user answer all questions
+
+ -- root <root@test3.irc.sara.nl.irc.sara.nl>  Fri, 21 Sep 2012 14:32:20 +0200
+
+sali (1.5.0-8) unstable; urgency=low
+
+  * Again a bug fix 
+
+ -- root <root@test3.irc.sara.nl.irc.sara.nl>  Fri, 21 Sep 2012 14:26:52 +0200
+
+sali (1.5.0-7) unstable; urgency=low
+
+  * Fixed 2 major bugs
+
+ -- root <root@test3.irc.sara.nl.irc.sara.nl>  Fri, 21 Sep 2012 14:25:31 +0200
+
 sali (1.5.0-6) unstable; urgency=low
 
   * Fixed import BitTornado to SaliBitTornado

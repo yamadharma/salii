@@ -59,7 +59,7 @@ def ask( question, choices=list(), default=None, showlist=False ):
     elif showlist and answer.isdigit() or len( choices ) > 3 and answer.isdigit():
         return choices[ int( answer ) - 1 ]
     elif not answer:
-        return choices( question, choices, default, showlist )
+        return ask( question, choices, default, showlist=False )
         
     return answer
 
