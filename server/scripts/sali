@@ -104,7 +104,7 @@ class GetImage( ServerClient ):
         self.no_tarball = os.path.join( self.cfg.get_default( 'maindir' ), 'notorrent' )
 
         if not os.path.exists( self.no_tarball ):
-            os.makedirs( imagepath, 0777 )
+            os.makedirs( self.no_tarball, 0777 )
 
         fo = open( os.path.join( self.no_tarball, self.imagename ), 'w' )
         fo.write( "Busy" )
