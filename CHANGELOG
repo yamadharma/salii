@@ -1,3 +1,6 @@
+1.6.X
+  * Trunk is broken and does not work
+
 1.5.4
   * make initrd, did not work anymore
     Author Bas van der Vlies
