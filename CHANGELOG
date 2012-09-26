@@ -11,6 +11,10 @@
   * The sshd private keys had wrong permission. So sshd failed to start, #51
     Reported by: Isaac <triguero add decsai dot ugr dot es>
     Fixed by: Bas van der Vlies
+
+  * Include 'sali-<version>' in the generated tarball. So we extract the contents 
+    to a newly created directory instead of the current one.
+    Author: Bas van der Vlies
     
 1.5.4
   * make initrd, did not work anymore
