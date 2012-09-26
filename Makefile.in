@@ -37,6 +37,9 @@ TAR_DIR=$(ROOT_DIR)/tar
 # EXAMPLE directory
 EXAMPLE_DIR=example
 
+# contrib directory
+CONTRIB_DIR=contrib
+
 # The basic
 SRC_DIR=$(ROOT_DIR)/src
 STAMP_DIR=$(SRC_DIR)
@@ -75,7 +78,7 @@ build:	initrd_install kernel $(ROOT_DIR)/build
 
 $(ROOT_DIR)/build:
 
-	( mkdir -p -m 0755 $(TAR_DIR)/$(ARCH) )
+	( mkdir -p -m 0755 $(TAR_DIR)/sali-$(VERSION)/$(ARCH) )
 
 	( make INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_DIR) modules_install )
 
@@ -83,21 +86,24 @@ $(ROOT_DIR)/build:
 	#
 	strip $(INITRD_BINARIES)
 
-	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet -o -H newc > "$(TAR_DIR)/$(ARCH)/initrd" )
-	( cd "$(TAR_DIR)/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img )
-	( cp "$(LINUX_IMAGE)" "$(TAR_DIR)/$(ARCH)/kernel" )
+	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet -o -H newc > "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/initrd" )
+	( cd "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img )
+	( cp "$(LINUX_IMAGE)" "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/kernel" )
 
 
 ifeq ($(OS),suse) 
-	( cp "$(LINUX_DIR)/vmlinux" "$(TAR_DIR)/$(ARCH)/vmlinux" )
-	mkzimage --vmlinux "$(TAR_DIR)/$(ARCH)/vmlinux" --initrd "$(TAR_DIR)/$(ARCH)/initrd.img" --output "$(TAR_DIR)/$(ARCH)/vmlinuz" 
+	( cp "$(LINUX_DIR)/vmlinux" "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/vmlinux" )
+	mkzimage --vmlinux "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/vmlinux" --initrd "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/initrd.img" --output "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/vmlinuz" 
 endif
 
-	$(foreach doc, $(RELEASE_DOCS), cp $(ROOT_DIR)/$(doc) $(TAR_DIR)/$(doc);)
+	$(foreach doc, $(RELEASE_DOCS), cp $(ROOT_DIR)/$(doc) $(TAR_DIR)/sali-$(VERSION)/$(doc);)
 
-	cp -a $(ROOT_DIR)/$(EXAMPLE_DIR) $(TAR_DIR)
-	rm -rf $(TAR_DIR)/$(EXAMPLE_DIR)/.svn
-	rm -rf $(TAR_DIR)/$(EXAMPLE_DIR)/post-install/.svn
+	cp -a $(ROOT_DIR)/$(EXAMPLE_DIR) $(TAR_DIR)/sali-$(VERSION)
+	rm -rf $(TAR_DIR)/sali-$(VERSION)/$(EXAMPLE_DIR)/.svn
+	rm -rf $(TAR_DIR)/sali-$(VERSION)/$(EXAMPLE_DIR)/post-install/.svn
+
+	cp -a $(ROOT_DIR)/$(CONTRIB_DIR) $(TAR_DIR)/sali-$(VERSION)
+	rm -rf $(TAR_DIR)/sali-$(VERSION)/$(CONTRIB_DIR)/.svn
 
 	touch $@
 
