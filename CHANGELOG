@@ -1,3 +1,9 @@
+1.5.6
+  * Fedora distribution uses different commands for grub2 installation adjusted
+    the grub2_install function to check if we must use other grub2 commands, #51
+    Reported by: Isaac <triguero add decsai dot ugr dot es>
+    Fixed by: Bas van der Vlies
+
 1.5.5
   * Enabled more network drivers 10/100 MBIT for embedded systems, #50
     Requested by: lodeiroja add gmail dot com
