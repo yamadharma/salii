@@ -636,11 +636,24 @@ grub2_install()
     fi
     target=$1
 
+    GRUB2_INSTALL=grub-install
+    GRUB2_MKCONFIG=grub-mkconfig
+    GRUB2_CONFIG=/boot/grub/grub.cfg
+
+    ## Determine the grub2 command it is linux distribution depended
+    #
+    if [ -d /a/boot/grub2 ]
+    then
+        GRUB2_INSTALL=grub2-install
+        GRUB2_MKCONFIG=grub2-mkconfig
+        GRUB2_CONFIG=/boot/grub2/grub.cfg
+    fi
+
     logmsg "Using GRUB2 install method! :: $target"
 
-    logmsg "chroot /a grub-install --no-floppy $target"
-    chroot /a grub-install --no-floppy $target
+    logmsg "chroot /a $GRUB2_INSTALL --no-floppy $target"
+    chroot /a $GRUB2_INSTALL --no-floppy $target
 
-    logmsg " /a grub-mkconfig -o /boot/grub/grub.cfg"
-    chroot /a grub-mkconfig -o /boot/grub/grub.cfg
+    logmsg " /a $GRUB2_MKCONFIG -o $GRUB2_CONFIG"
+    chroot /a $GRUB2_MKCONFIG -o $GRUB2_CONFIG
 }
