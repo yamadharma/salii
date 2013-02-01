@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# A wrapper scrip which uses ISOLINUX to
+# create a bootable SALI cd/usb
+#
+
+CDROOT=$(pwd)
+GENISOIMAGE=$(which genisoimage)
+ISOHYBRID=$(which isohybrid)
+
+if [ -z "${GENISOIMAGE}" ]; then echo "Could not locate command genisoimage"; exit 1; fi
+if [ -z "${ISOHYBRID}" ]; then echo "Could not locate command genisoimage"; exit 1; fi
+
+SALI_VERSION="$(file ${CDROOT}/kernel/kernel |awk '{print $9}' | awk -F "v" '{print $2}')" 
+
+## Step 1: Copy the kernel and initrd
+printf "Creating iso image\n"
+$GENISOIMAGE -o "$(pwd)/../sali-${SALI_VERSION}-hybrid.iso" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table $CDROOT
+
+## Step 2: Make hybrid iso
+printf "\n\nConverting iso to hybrid"
+$ISOHYBRID "$(pwd)/../sali-${SALI_VERSION}-hybrid.iso"
+printf " done\n"
