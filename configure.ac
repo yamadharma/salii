@@ -80,6 +80,7 @@ AC_SUBST(SALI_VERSION,"$(cat VERSION)")
 AC_CONFIG_FILES([
 	Makefile
 	initrd/sali/bin/sali_functions
+	bootdisk/sali_create_bootdisk
 ])
 
 AC_OUTPUT

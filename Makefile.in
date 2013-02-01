@@ -108,6 +108,13 @@ endif
 	cp -a $(ROOT_DIR)/$(CONTRIB_DIR) $(TAR_DIR)/sali-$(VERSION)
 	rm -rf $(TAR_DIR)/sali-$(VERSION)/$(CONTRIB_DIR)/.svn
 
+	mkdir -p $(TAR_DIR)/sali-$(VERSION)/bootdisk
+	mkdir -p $(TAR_DIR)/sali-$(VERSION)/bootdisk/kernel
+	mkdir -p $(TAR_DIR)/sali-$(VERSION)/bootdisk/images
+	cp -a $(ROOT_DIR)/bootdisk/isolinux $(TAR_DIR)/sali-$(VERSION)/bootdisk/isolinux
+	cp -a $(ROOT_DIR)/bootdisk/sali_create_bootdisk $(TAR_DIR)/sali-$(VERSION)/bootdisk
+	chmod +x $(TAR_DIR)/sali-$(VERSION)/bootdisk/sali_create_bootdisk
+
 	touch $@
 
 tarball: build

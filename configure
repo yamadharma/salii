@@ -3168,6 +3168,11 @@ $as_echo "found ${OS} release ${OS_RELEASE}" >&6; }
 			OS_RELEASE=$(cat /etc/SuSE-release|awk '/VERSION =/ {print $3}')
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: found ${OS} release ${OS_RELEASE}" >&5
 $as_echo "found ${OS} release ${OS_RELEASE}" >&6; }
+		elif  test -e /etc/redhat-release ; then
+			OS=rhel
+			OS_RELEASE=$(cat /etc/redhat-release|awk '{print $3}')
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: found ${OS} release ${OS_RELEASE}" >&5
+$as_echo "found ${OS} release ${OS_RELEASE}" >&6; }
 		else
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -3222,7 +3227,7 @@ OS_RELEASE=$OS_RELEASE
 SALI_VERSION="$(cat VERSION)"
 
 
-ac_config_files="$ac_config_files Makefile initrd/sali/bin/sali_functions"
+ac_config_files="$ac_config_files Makefile initrd/sali/bin/sali_functions bootdisk/sali_create_bootdisk"
 
 
 cat >confcache <<\_ACEOF
@@ -3933,6 +3938,7 @@ do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "initrd/sali/bin/sali_functions") CONFIG_FILES="$CONFIG_FILES initrd/sali/bin/sali_functions" ;;
+    "bootdisk/sali_create_bootdisk") CONFIG_FILES="$CONFIG_FILES bootdisk/sali_create_bootdisk" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5 ;;
   esac

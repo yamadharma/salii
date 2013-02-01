@@ -1,0 +1,48 @@
+
+REQUIREMENTS
+------------
+ - genisoimage (on most distributions available as genisoimage package)
+ - isohybrid (on most distribution available in the syslinux package)
+
+QUICKSTART
+----------
+Just run command ./sali_create_bootdisk from the bootdisk dir to
+generate a default iso image wich allows you to start SALI in
+rescue mode with or without sshd support.
+
+
+ADD YOUR CUSTOM ENTRIES
+------------------------
+Adjust the file isolinux/isolinux.cfg to your needs to
+start installation via rsync or bittorrent. Some examples
+herebelow to generate a custom bootable SALI cd/dvd/usb.
+
+If you open the isolinux/isolinux.cfg you can add your custom entries
+between the comment lines 'BEGIN HERE' and 'END HERE'
+
+As an example we choose for the image amd64_squeeze_lisa
+
+label install_lisa_squeeze
+  menu label Install LISA squeeze via rsync
+  kernel /kernel/kernel
+  append /images/initrd.img PROTOCOL=rsync GRUB2=yes SCRIPTNAME=amd64_squeeze_lisa VERBOSE_LEVEL=2 rw
+
+or via bittorrent
+
+label install_lisa_squeeze_torrent
+  menu label Install LISA squeeze via bittorrent
+  kernel /kernel/kernel
+  append /images/initrd.img PROTOCOL=bittorrent GRUB2=yes SCRIPTNAME=amd64_squeeze_lisa VERBOSE_LEVEL=2 rw
+
+
+NOTE 1: If you dont have your dhcp configured with sali-imageserver option, you
+must add IMAGESERVER=<ip of your image server> on the append line.
+
+NOTE 2: If the name of the image is different from the scriptname add variable
+IMAGENAME=<name of your image> to the append line
+
+Finally run the command sali_create_bootdisk from the bootdisk directory.
+
+
+This is also documented online at:
+    https://oss.trac.surfsara.nl/sali/wiki/SaliRequirements#CreatingabootableCDDVDusb
