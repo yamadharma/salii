@@ -1,3 +1,9 @@
+1.5.7
+  * Added some files and a schell script which allows you create an ISO which can
+    be burned to a cd or can be used to create an bootable USB drive, #56
+    Reported by: Katherine Nakazono <katherine dot nakazono add dot nasa dot gov>
+    Author: Dennis Stam
+
 1.5.6
   * Fedora distribution uses different commands for grub2 installation adjusted
     the grub2_install function to check if we must use other grub2 commands, #51
