@@ -89,7 +89,7 @@ $(ROOT_DIR)/build:
 	#
 	strip $(INITRD_BINARIES)
 
-	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet -o -H newc > "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/initrd" )
+	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet --create --format newc > "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/initrd" )
 	( cd "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img )
 	( cp "$(LINUX_IMAGE)" "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/kernel" )
 
