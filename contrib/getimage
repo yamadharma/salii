@@ -10,7 +10,7 @@ SALI_IMAGE_DIR=$SALI_DIR/images
 
 if [ -z "$1" -o -z "$2" ]		#True if either EXPR1 or EXPR2 is true.
 then 
-	echo "usage: `basename $0` < node_name> <image_name>"
+	echo "usage: `basename $0` <node_name> <image_name>"
 	exit
 fi
 
