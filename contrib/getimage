@@ -11,7 +11,7 @@ SALI_IMAGE_DIR=$SALI_DIR/images
 if [ -z "$1" -o -z "$2" ]		#True if either EXPR1 or EXPR2 is true.
 then 
 	echo "usage: `basename $0` <node_name> <image_name>"
-	exit
+	exit 1
 fi
 
 if [ -f /etc/sali/exclude/$2.path ];
@@ -19,6 +19,11 @@ then
 	imagename="$2.path"	
 else 
 	imagename="default.path"
+    if [ ! -f /etc/sali/exclude/${imagename} ]
+    then
+        echo "Exclude file:/etc/sali/exclude/${imagename} does not exists"
+        exit 1
+    fi
 fi
 
 #sali command is used with the userinput
