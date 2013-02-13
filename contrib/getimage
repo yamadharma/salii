@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Author: Danny Steenman
+#
+# SVN info:
+#	$https://subtrac.sara.nl/users/dannys/svn/trunk/
+#
+SALI_DIR=/data/sali
+SALI_IMAGE_DIR=$SALI_DIR/images
+
+if [ -z "$1" -o -z "$2" ]		#True if either EXPR1 or EXPR2 is true.
+then 
+	echo "usage: `basename $0` < node_name> <image_name>"
+	exit
+fi
+
+if [ -f /etc/sali/exclude/$2.path ];
+then	
+	imagename="$2.path"	
+else 
+	imagename="default.path"
+fi
+
+#sali command is used with the userinput
+echo "sali getimage --host $1 --image $2 --exclude /etc/sali/exclude/${imagename}"
+sali getimage --host $1 --image $2 --exclude /etc/sali/exclude/${imagename}"
+
+echo "sali rsync"
+sali rsync
