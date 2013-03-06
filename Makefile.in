@@ -66,6 +66,7 @@ INITRD_BUILD_SBIN_DIR=$(INITRD_BUILD_DIR)/sbin
 #
 GETSOURCE=$(ROOT_DIR)/tools/getsource
 COPYLIBS=$(ROOT_DIR)/tools/copy_libs
+COPYFIRMWARES=$(ROOT_DIR)/tools/copy_firmwares
 #
 ## END utilities
 
@@ -84,6 +85,7 @@ $(ROOT_DIR)/build:
 	( mkdir -p -m 0755 $(TAR_DIR)/sali-$(VERSION)/$(ARCH) )
 
 	( make INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_DIR) modules_install )
+	$(COPYFIRMWARES) $(SRC_DIR) $(INITRD_BUILD_DIR)
 
 	## make the binaries smaller
 	#

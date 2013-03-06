@@ -77,6 +77,7 @@ $(INITRD_DIR)/prep:  $(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/etc/network/if-up.d
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/dev
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib
+	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib/firmware
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/proc
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/bin
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/tmp

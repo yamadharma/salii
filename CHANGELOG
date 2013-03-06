@@ -3,8 +3,13 @@
     Reported by: Walter de Jong <walter dot dejong at surfsara dot nl>
     Author: Dennis Stam
 
-  * As of 1 January 2013, SARA has a new name: SURFsara
-  * Change URL of documentation to https://oss.trac.surfsara.nl/sali
+  * Added a script copy_firmwares (much like copy_libs). This script wil check 
+    all kernel modules if they have a firmware dependicy. Then checks if the 
+    firmware is already available in the kernel-source. The missing firmwares will be
+    copied from the linux-firmware git repository.
+
+  * Changed the company name from SARA to SURFsara and updated the urls to the
+    documentation
 
   * Updated kernel to 3.8.2
 
