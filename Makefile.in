@@ -115,6 +115,9 @@ endif
 	cp -a $(ROOT_DIR)/bootdisk/sali_create_bootdisk $(TAR_DIR)/sali-$(VERSION)/bootdisk
 	chmod +x $(TAR_DIR)/sali-$(VERSION)/bootdisk/sali_create_bootdisk
 
+	cp -a $(ROOT_DIR)/server $(TAR_DIR)/sali-$(VERSION)
+	find $(TAR_DIR) -type d -name .svn | xargs rm -r
+
 	touch $@
 
 tarball: build
@@ -135,7 +138,7 @@ distclean: initrd_clean clean
 
 	@echo "Removing all generated and downloaded files"
 	rm -rf $(ROOT_DIR)/src
-	rm -f Makefile config.log config.status initrd/sali/bin/sali_functions initrd/functions/functions.mbm bootdisk/sali_create_bootdisk
+	rm -f Makefile config.log config.status initrd/sali/bin/sali_functions initrd/functions/functions.mbm bootdisk/sali_create_bootdisk server/setup.py
 
 .PHONY:	show_targets
 show_targets:

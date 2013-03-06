@@ -1,3 +1,13 @@
+1.5.8
+  * Added the server tools to the tarball
+    Reported by: Walter de Jong <walter dot dejong at surfsara dot nl>
+    Author: Dennis Stam
+
+  * As of 1 January 2013, SARA has a new name: SURFsara
+  * Change URL of documentation to https://oss.trac.surfsara.nl/sali
+
+  * Updated kernel to 3.8.2
+
 1.5.7
   * Added some files and a schell script which allows you create an ISO which can
     be burned to a cd or can be used to create an bootable USB drive, #56
@@ -446,4 +456,4 @@
   Authors: Bas van der Vlies and Dennis Stam
 
 systemimager changelog can be found in the SVN:
-  https://subtrac.sara.nl/oss/sali/browser/trunk/CHANGE.LOG?rev=4
+  https://oss.trac/surfsara.nl/sali/browser/trunk/CHANGE.LOG?rev=4

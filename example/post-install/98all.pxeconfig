@@ -12,8 +12,8 @@
 # To be used with the pxeconfig tool.
 # Remove the <hex_ipaddr> file from the pxelinux.cfg directory
 # so the client will boot from disk.
-# Get pxeconfig from ftp://ftp.sara.nl/pub/outgoing/pxeconfig.tar.gz
-#  Documentation at: https://subtrac.sara.nl/oss/pxeconfig
+# Get pxeconfig from ftp://ftp.surfsara.nl/pub/outgoing/pxeconfig.tar.gz
+#  Documentation at: https://oss.trac.surfsara.nl/pxeconfig
 
 # Get the Systemimager variables
 . /tmp/post-install/variables.txt

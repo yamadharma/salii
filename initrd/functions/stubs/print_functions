@@ -49,7 +49,7 @@ p_section(){
 p_header(){
 	printf "\n"
 	p_section "Welcome to SALI $(cat /etc/sali_version)"
-	p_section "https://subtrac.sara.nl/oss/sali"
+	p_section "https://oss.trac.surfsara.nl/sali"
 }
 
 p_separator(){

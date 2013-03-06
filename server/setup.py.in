@@ -9,7 +9,7 @@ from distutils.core import setup
 
 setup(
         name = 'SALI',
-        version = '@VERSION@',
+        version = '@SALI_VERSION@',
 
         description = 'sali server and utilities',
         long_description = 'sali server and utilities',

@@ -3227,7 +3227,7 @@ OS_RELEASE=$OS_RELEASE
 SALI_VERSION="$(cat VERSION)"
 
 
-ac_config_files="$ac_config_files Makefile initrd/sali/bin/sali_functions bootdisk/sali_create_bootdisk"
+ac_config_files="$ac_config_files Makefile initrd/sali/bin/sali_functions bootdisk/sali_create_bootdisk server/setup.py"
 
 
 cat >confcache <<\_ACEOF
@@ -3939,6 +3939,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "initrd/sali/bin/sali_functions") CONFIG_FILES="$CONFIG_FILES initrd/sali/bin/sali_functions" ;;
     "bootdisk/sali_create_bootdisk") CONFIG_FILES="$CONFIG_FILES bootdisk/sali_create_bootdisk" ;;
+    "server/setup.py") CONFIG_FILES="$CONFIG_FILES server/setup.py" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5 ;;
   esac

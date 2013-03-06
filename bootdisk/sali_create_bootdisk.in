@@ -4,7 +4,7 @@
 # create a bootable SALI cd/usb
 #
 
-SALI_VERSION="@VERSION@"
+SALI_VERSION="@SALI_VERSION@"
 ARCH="@ARCH@"
 CDROOT=$(dirname $(readlink -f $0))
 SALIROOT=$(readlink -e "${CDROOT}/..")
