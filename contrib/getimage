@@ -8,7 +8,7 @@
 SALI_DIR=/data/sali
 SALI_IMAGE_DIR=$SALI_DIR/images
 
-if [ -z "$1" -o -z "$2" ]		#True if either EXPR1 or EXPR2 is true.
+if [ $# -lt 2 ]
 then 
 	echo "usage: `basename $0` <node_name> <image_name>"
 	exit 1
@@ -28,7 +28,7 @@ fi
 
 #sali command is used with the userinput
 echo "sali getimage --host $1 --image $2 --exclude /etc/sali/exclude/${imagename}"
-sali getimage --host $1 --image $2 --exclude /etc/sali/exclude/${imagename}"
+sali getimage --host $1 --image $2 --exclude /etc/sali/exclude/${imagename}
 
 echo "sali rsync"
 sali rsync
