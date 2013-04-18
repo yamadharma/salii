@@ -9,13 +9,13 @@ from distutils.core import setup
 
 setup(
         name = 'SALI',
-        version = '1.5.0',
+        version = '@SALI_VERSION@',
 
         description = 'sali server and utilities',
         long_description = 'sali server and utilities',
         author = 'Dennis Stam',
         author_email = 'sali@sara.nl',
-        url = 'https://subtrac.sara.nl/oss/sali',
+        url = 'https://oss.trac.surfsara.nl/sali',
         license = 'GPL',
         
         classifiers = [

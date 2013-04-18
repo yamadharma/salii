@@ -66,6 +66,7 @@ INITRD_BUILD_SBIN_DIR=$(INITRD_BUILD_DIR)/sbin
 #
 GETSOURCE=$(ROOT_DIR)/tools/getsource
 COPYLIBS=$(ROOT_DIR)/tools/copy_libs
+COPYFIRMWARES=$(ROOT_DIR)/tools/copy_firmwares
 #
 ## END utilities
 
@@ -84,12 +85,13 @@ $(ROOT_DIR)/build:
 	( mkdir -p -m 0755 $(TAR_DIR)/sali-$(VERSION)/$(ARCH) )
 
 	( make INSTALL_MOD_PATH=$(INITRD_BUILD_DIR) -C $(LINUX_DIR) modules_install )
+	$(COPYFIRMWARES) $(SRC_DIR) $(INITRD_BUILD_DIR)
 
 	## make the binaries smaller
 	#
 	strip $(INITRD_BINARIES)
 
-	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet --create --format newc > "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/initrd" )
+	( cd "$(INITRD_BUILD_DIR)" && find . | cpio --quiet -o -H newc > "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/initrd" )
 	( cd "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)" && bzip2 --best --force initrd && mv initrd.bz2 initrd.img )
 	( cp "$(LINUX_IMAGE)" "$(TAR_DIR)/sali-$(VERSION)/$(ARCH)/kernel" )
 
@@ -107,6 +109,16 @@ endif
 
 	cp -a $(ROOT_DIR)/$(CONTRIB_DIR) $(TAR_DIR)/sali-$(VERSION)
 	rm -rf $(TAR_DIR)/sali-$(VERSION)/$(CONTRIB_DIR)/.svn
+
+	mkdir -p $(TAR_DIR)/sali-$(VERSION)/bootdisk
+	mkdir -p $(TAR_DIR)/sali-$(VERSION)/bootdisk/kernel
+	mkdir -p $(TAR_DIR)/sali-$(VERSION)/bootdisk/images
+	cp -a $(ROOT_DIR)/bootdisk/isolinux $(TAR_DIR)/sali-$(VERSION)/bootdisk/isolinux
+	cp -a $(ROOT_DIR)/bootdisk/sali_create_bootdisk $(TAR_DIR)/sali-$(VERSION)/bootdisk
+	chmod +x $(TAR_DIR)/sali-$(VERSION)/bootdisk/sali_create_bootdisk
+
+	cp -a $(ROOT_DIR)/server $(TAR_DIR)/sali-$(VERSION)
+	find $(TAR_DIR) -type d -name .svn | xargs rm -r
 
 	touch $@
 
@@ -128,7 +140,7 @@ distclean: initrd_clean clean
 
 	@echo "Removing all generated and downloaded files"
 	rm -rf $(ROOT_DIR)/src
-	rm -f Makefile config.log config.status initrd/sali/bin/sali_functions initrd/functions/functions.mbm
+	rm -f Makefile config.log config.status initrd/sali/bin/sali_functions initrd/functions/functions.mbm bootdisk/sali_create_bootdisk server/setup.py
 
 .PHONY:	show_targets
 show_targets:

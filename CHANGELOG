@@ -1,9 +1,48 @@
-1.6.X
-  * Trunk is broken and does not work
+1.5.8
+  * Added the server tools to the tarball
+    Reported by: Walter de Jong <walter dot dejong at surfsara dot nl>
+    Author: Dennis Stam
 
-  * contrib/getimage fixed, did not work
-    Reported by: Walter de Jong
+  * Added a script copy_firmwares (much like copy_libs). This script wil check 
+    all kernel modules if they have a firmware dependicy. Then checks if the 
+    firmware is already available in the kernel-source. The missing firmwares will be
+    copied from the linux-firmware git repository.
 
+  * Changed the company name from SARA to SURFsara and updated the urls to the
+    documentation
+
+  * Updated kernel to 3.8.2
+
+1.5.7
+  * Added some files and a schell script which allows you create an ISO which can
+    be burned to a cd or can be used to create an bootable USB drive, #56
+    Reported by: Katherine Nakazono <katherine dot nakazono add dot nasa dot gov>
+    Author: Dennis Stam
+
+1.5.6
+  * Fedora distribution uses different commands for grub2 installation adjusted
+    the grub2_install function to check if we must use other grub2 commands, #51
+    Reported by: Isaac <triguero add decsai dot ugr dot es>
+    Fixed by: Bas van der Vlies
+
+1.5.5
+  * Enabled more network drivers 10/100 MBIT for embedded systems, #50
+    Requested by: lodeiroja add gmail dot com
+    Author Bas van der Vlies
+
+  * In the SALI i386/i686 build a lot of options are disabled. So this can
+    be used for embedded systems. Use x86_64 SALI build to install modern
+    i386/i686 systems. 
+    Author Bas van der Vlies
+  
+  * The sshd private keys had wrong permission. So sshd failed to start, #51
+    Reported by: Isaac <triguero add decsai dot ugr dot es>
+    Fixed by: Bas van der Vlies
+
+  * Include 'sali-<version>' in the generated tarball. So we extract the contents 
+    to a newly created directory instead of the current one.
+    Author: Bas van der Vlies
+    
 1.5.4
   * make initrd, did not work anymore
     Author Bas van der Vlies
@@ -422,4 +461,4 @@
   Authors: Bas van der Vlies and Dennis Stam
 
 systemimager changelog can be found in the SVN:
-  https://subtrac.sara.nl/oss/sali/browser/trunk/CHANGE.LOG?rev=4
+  https://oss.trac/surfsara.nl/sali/browser/trunk/CHANGE.LOG?rev=4

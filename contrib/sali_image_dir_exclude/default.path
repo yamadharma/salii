@@ -1,0 +1,8 @@
+/var/tmp/*
+/tmp/*
+/usr/src/*
+/var/log/*.gz
+/var/log/ntpstats/*.gz
+/var/log/atsar/*
+/var/log/ksymoops/*
+/home/*
