@@ -3,7 +3,7 @@
 #   vi: set filetype=make:
 #
 
-KERNELTOOLS_VERSION		= 13
+KERNELTOOLS_VERSION	= 13
 KERNELTOOLS_TARBALL 	= kmod-$(KERNELTOOLS_VERSION).tar.gz
 KERNELTOOLS_DIR 	= $(SRC_DIR)/kmod-$(KERNELTOOLS_VERSION)
 
@@ -21,7 +21,7 @@ kerneltools_install: $(KERNELTOOLS_DIR).install
 kerneltools_clean: $(KERNELTOOLS_DIR).clean
 
 $(KERNELTOOLS_DIR).build:    $(KERNELTOOLS_DIR).get
-	cd $(KERNELTOOLS_DIR) && ./configure --bindir=/bin --sbindir=/sbin --disable-manpages --enable-static
+	cd $(KERNELTOOLS_DIR) && ./configure --bindir=/bin --disable-manpages
 	$(MAKE) -j $(NCPUS) -C $(KERNELTOOLS_DIR)
 	touch $@
 
