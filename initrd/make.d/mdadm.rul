@@ -5,7 +5,7 @@
 #   2005.12.18 Erich Focht
 #
 
-MDADM_VERSION 	= 3.2.5
+MDADM_VERSION 	= 3.2.6
 MDADM_DIR 			= $(SRC_DIR)/mdadm-$(MDADM_VERSION)
 MDADM_TARBALL 	= mdadm-$(MDADM_VERSION).tar.gz
 

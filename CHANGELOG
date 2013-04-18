@@ -1,3 +1,18 @@
+1.6.0
+  * Rewrote /init script as a lot has changed with udev since version 166
+ 
+  * Added some options in the kernel config to make it work with udev 182
+
+  * Replaced module-init-tools with kmod as module-init-tools is deprecated.
+    lsmod/rmmod/insmod/modprobe are now symlinks for /bin/kmod
+
+  * Added kmod version 13
+  * Updated udev to 182
+  * Updated aria2 to 1.15.1
+  * Updated curl to 7.27.0
+  * Updated lvm to 2.2.02.96
+  * Updated mdadm to 3.2.6
+
 1.5.8
   * Added the server tools to the tarball
     Reported by: Walter de Jong <walter dot dejong at surfsara dot nl>

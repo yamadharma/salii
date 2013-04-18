@@ -3,7 +3,7 @@
 #   vi: set filetype=make:
 #
 
-CURL_VERSION	= 7.23.1
+CURL_VERSION	= 7.27.0
 CURL_TARBALL	= curl-$(CURL_VERSION).tar.bz2
 
 ### download = http://curl.haxx.se/download.html 

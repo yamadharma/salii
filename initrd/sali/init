@@ -1,106 +1,147 @@
-#!/bin/sh
+#/!/bin/sh
+#
+# This file is part of SALI
+# 
+# SALI is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# SALI is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with SALI.  If not, see <http://www.gnu.org/licenses/>.
+#
+# 2013 SURFsara
 
+## For init we don't want to rely on $PATH
+_PRINTF="/usr/bin/printf"
+_MOUNT="/bin/mount"
+_CAT="/bin/cat"
+_MKDIR="/bin/mkdir"
+_GREP="/bin/grep"
+_UDEVD="/lib/udev/udevd"
+_UDEVADM="/usr/bin/udevadm"
+_LS="/bin/ls"
+_MKNOD="/bin/mknod"
+_DMESG="/bin/dmesg"
 
-## Mounting some important filesystems
-mkdir -p /proc
-mount proc /proc -t proc
+## Are we allowed to run?
+if [ -n "$($_MOUNT | $_GREP "/dev")" ]
+then
+    $_PRINTF "Looks like /dev is already mounted, this script can only be used for initialization of SALI\n"
+    exit 1
+fi
 
-mkdir -p /sys
-mount sysfs /sys -t sysfs
-## End
-
+## Default value for init
 init="/sbin/init"
-udev=y
 
-for i in $(cat /proc/cmdline); do
-    case $i in
+## Checking of these directories exists
+for directory in "/proc" "/sys" "/dev" "/run"
+do
+    if [ ! -d "${directory}" ]
+    then
+        $_MKDIR -p "${directory}"
+    fi
+done
+
+## Mount /proc, /sys and /dev 
+# -o == Which options must be use when mounting
+$_MOUNT -t proc proc /proc
+$_MOUNT -t sysfs sysfs /sys
+$_MOUNT -t devtmpfs -o mode=0755 tmpfs /dev
+$_MOUNT -t tmpfs -o mode=0755 tmpfs /run
+
+## Fast scan of the kernel paramaters
+for option in $(cat /proc/cmdline)
+do
+    case "${option}" in
         init=*)
-            init=${i#init=}
-            ;;  
-		BLACKLIST=*)
-			blacklist=${i#BLACKLIST=}
-		;;
-        MDEV=y)
-            udev=n
+            init=${option#init=}
+        ;;
+        BLACKLIST=*)
+            blacklist=${option#BLACKLIST=}
         ;;
     esac
 done
 
-# Filling the blacklist with modules from de 
-# kernel cmdline
+## Creating blacklist file
 if [ -n "${blacklist}" ]
 then
-	cat /dev/null > /etc/modprobe.d/pxe_blacklist.conf
-	for module in $(echo $blacklist | tr ';' ' ')
-	do
-		echo "blacklist ${module}" >> /etc/modprobe.d/pxe_blacklist.conf
-	done
+    # Make sure the file exists and is empty
+    $_CAT /dev/null /etc/modprobe.d/pxe_blacklist.conf
+    for module in $(echo $blacklist | sed 's/;/ /g')
+    do
+        $_PRINTF "blacklist ${module}\n" >> /etc/modprobe.d/pxe_blacklist.conf
+    done
 fi
 
+####
+## Now the real initialization of SALI
+$_PRINTF "Initializing SALI...\n"
 
-make_extra_nodes() {
-  [ -e /etc/udev/links.conf ] || return 0
-  grep '^[^#]' /etc/udev/links.conf | \
-  while read type name arg1; do
-    [ "$type" -a "$name" -a ! -e "/dev/$name" -a ! -L "/dev/$name" ] ||continue
-    case "$type" in
-      L) ln -s $arg1 /dev/$name ;;
-      D) mkdir -p /dev/$name ;;
-      M) mknod -m 600 /dev/$name $arg1 ;;
-      *) echo "links.conf: unparseable line ($type $name $arg1)" ;;
-    esac
-  done
-}
+## Make sure /sys/kernel/uevent_helper has just a empty line
+$_PRINTF "\n" > /sys/kernel/uevent_helper
 
-mount_dev_pts(){
-    mkdir -p /dev/pts
-    mount devpts /dev/pts -t devpts
-}
+## Make some extra nodes that have been configured in
+## /etc/udev/links.conf
+if [ -e "/etc/udev/links.conf" ]
+then
+    # make sure we don't have any comments or empty lines
+    $_GREP '^[^#]' /etc/udev/links.conf | while read type name args
+    do
+        if [ "${type}" -a "${name}" -a ! -e "/dev/${name}" -a ! -L "/dev/${name}" ]
+        then
+            continue
+        fi
+        case "${type}" in
+            L)
+                $_LS -s "${args}" "/dev/${name}"
+            ;;
+            D)
+                $_MKDIR -p "/dev/${name}"
+            ;;
+            M)
+                $_MKNOD -m 600 "/dev/${name}" $args
+            ;;
+            *)
+                $_PRINTF "/etc/udev/links/conf; unparseable line (${type} ${name} ${args})\n"
+            ;;
+        esac
+    done
+fi
 
 ## Starting udev
-start_udev() {
+$_PRINTF "Starting udev...\n"
+if $_UDEVD --daemon
+then
+    $_PRINTF "Started udevd\n"
+else
+    $_PRINTF "Waiting for 15 seconds an try to continue anyway!\n"
+    sleep 15
+fi
 
-    echo -e "Starting udev...\n"
-    echo > /sys/kernel/uevent_helper
+# Wait for udev to process the events in the queue
+$_UDEVADM trigger --action=add
 
-    mount -n -o mode=0755 -t tmpfs tmpfs /dev
-    make_extra_nodes
+sleep 2
 
-    /sbin/udevd --daemon
+$_UDEVADM settle
 
-    udevadm trigger
-    udevadm settle
+# Now mount /dev/pts as devpts
+if [ ! -e "/dev/pts" ]
+then
+    $_MKDIR -p /dev/pts
+fi
+$_MOUNT devpts /dev/pts -t devpts -n
 
-    mount_dev_pts
+$_PRINTF "Done with udev initalization, continue booting into SALI...\n"
 
-    if [ -d /sys/bus/scsi ]; then
-        modprobe -q scsi_wait_scan && modprobe -r scsi_wait_scan || true
-        udevadm settle || true
-    fi
+# Change console-level to 6
+$_DMESG -n 6
 
-    echo -e "Done with udev initialization, starting sali...\n"
-}
-
-start_mdev() {
-    echo -e "Starting mdev...\n"
-
-    mount_dev_pts
-
-    echo /sbin/mdev > /proc/sys/kernel/hotplug
-    /sbin/mdev -s
-
-    echo -e "Done with mdev initialization, starting sali...\n"
-}
-
-case "${udev}" in
-    n)
-        start_mdev
-    ;;
-    *)
-        start_udev
-    ;;
-esac
-    
-dmesg -n 6
-
+## Now start SALI
 exec $init

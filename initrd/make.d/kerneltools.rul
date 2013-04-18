@@ -3,13 +3,13 @@
 #   vi: set filetype=make:
 #
 
-KERNELTOOLS_VERSION		= 3.12
-KERNELTOOLS_TARBALL 	= module-init-tools-$(KERNELTOOLS_VERSION).tar.gz
-KERNELTOOLS_DIR 			= $(SRC_DIR)/module-init-tools-$(KERNELTOOLS_VERSION)
+KERNELTOOLS_VERSION		= 13
+KERNELTOOLS_TARBALL 	= kmod-$(KERNELTOOLS_VERSION).tar.gz
+KERNELTOOLS_DIR 	= $(SRC_DIR)/kmod-$(KERNELTOOLS_VERSION)
 
 ### http://www.kernel.org/pub/linux/utils/kernel/module-init-tools #####
 KERNELTOOLS_URL		:= ftp://ftp.sara.nl/pub/sali/sources/$(KERNELTOOLS_TARBALL)
-KERNELTOOLS_INFO	:= https://modules.wiki.kernel.org/index.php/Main_Page
+KERNELTOOLS_INFO	:= https://https://www.kernel.org/pub/linux/utils/kernel/kmod
 
 .PHONY: kerneltools
 kerneltools: $(KERNELTOOLS_DIR).build
@@ -21,12 +21,19 @@ kerneltools_install: $(KERNELTOOLS_DIR).install
 kerneltools_clean: $(KERNELTOOLS_DIR).clean
 
 $(KERNELTOOLS_DIR).build:    $(KERNELTOOLS_DIR).get
-	cd $(KERNELTOOLS_DIR) && ./configure --bindir=/bin --sbindir=/sbin
+	cd $(KERNELTOOLS_DIR) && ./configure --bindir=/bin --sbindir=/sbin --disable-manpages --enable-static
 	$(MAKE) -j $(NCPUS) -C $(KERNELTOOLS_DIR)
 	touch $@
 
 $(KERNELTOOLS_DIR).install: $(KERNELTOOLS_DIR).build
-	$(MAKE) -j $(NCPUS) -C $(KERNELTOOLS_DIR) DESTDIR=$(INITRD_BUILD_DIR) install
+	cd $(KERNELTOOLS_DIR) && DESTDIR=$(INITRD_BUILD_DIR) make install
+	cd $(INITRD_BUILD_DIR)/sbin && ln -fs ../bin/kmod modprobe
+	cd $(INITRD_BUILD_DIR)/sbin && ln -fs ../bin/kmod depmod
+	cd $(INITRD_BUILD_DIR)/sbin && ln -fs ../bin/kmod insmod
+	cd $(INITRD_BUILD_DIR)/sbin && ln -fs ../bin/kmod lsmod
+	cd $(INITRD_BUILD_DIR)/sbin && ln -fs ../bin/kmod modinfo
+	cd $(INITRD_BUILD_DIR)/sbin && ln -fs ../bin/kmod rmmod
+	cd $(INITRD_BUILD_DIR)/sbin && ln -fs ../bin/kmod lsmod
 	touch $@
 
 $(KERNELTOOLS_DIR).get:

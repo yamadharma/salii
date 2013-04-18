@@ -17,7 +17,7 @@ OS=@OS@
 OS_RELEASE=@OS_RELEASE@
 
 ifeq ($(ARCH_BIT),64)
-	LIBDIR=lib64
+	LIBDIR=/lib/x86_64-linux-gnu
 else
 	LIBDIR=lib
 endif
