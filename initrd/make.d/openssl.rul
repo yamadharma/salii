@@ -9,7 +9,7 @@
 #   - don't always rebuild
 #
 
-OPENSSL_VERSION         := 0.9.8r
+OPENSSL_VERSION         := 1.0.1e
 OPENSSL_DIR             := $(SRC_DIR)/openssl-$(OPENSSL_VERSION)
 OPENSSL_TARBALL         := openssl-$(OPENSSL_VERSION).tar.gz
 OPENSSL_MD5SUM          := 40b6ea380cc8a5bf9734c2f8bf7e701e
@@ -40,9 +40,9 @@ $(OPENSSL_DIR).build: $(OPENSSL_DIR).verify_stamp $(ZLIB_LIBRARY)
 	  ./Configure --prefix=/usr \
 	  -I$(SRC_DIR)/$(ZLIB_DIR) -L$(SRC_DIR)/$(ZLIB_DIR) \
 	  no-idea no-mdc2 no-rc5 no-krb5 zlib $(OPENSSL_SYSTEM)
-	$(MAKE) -j $(NCPUS) -C $(OPENSSL_DIR) RPM_OPT_FLAGS="$(RPM_OPT_FLAGS) \
+	$(MAKE) -C $(OPENSSL_DIR) RPM_OPT_FLAGS="$(RPM_OPT_FLAGS) \
 	  -Wa,--noexecstack" depend
-	$(MAKE) -j $(NCPUS) -C $(OPENSSL_DIR) RPM_OPT_FLAGS="$(RPM_OPT_FLAGS) \
+	$(MAKE) -C $(OPENSSL_DIR) RPM_OPT_FLAGS="$(RPM_OPT_FLAGS) \
 	  -Wa,--noexecstack"
 
 	touch $@

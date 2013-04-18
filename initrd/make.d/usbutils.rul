@@ -2,11 +2,11 @@
 #   $Id$
 #    vi: set filetype=make:
 #
-USBUTILS_VERSION 	= 0.91
+USBUTILS_VERSION 	= 006
 USBUTILS_DIR 		= $(SRC_DIR)/usbutils-$(USBUTILS_VERSION)
 USBUTILS_TARBALL 	= usbutils-$(USBUTILS_VERSION).tar.bz2
 
-#### http://ftp.gnu.org/gnu/usbutils/ ####
+#### https://www.kernel.org/pub/linux/utils/usb/usbutils ####
 USBUTILS_URL 		= ftp://ftp.sara.nl/pub/sali/sources/$(USBUTILS_TARBALL)
 USBUTILS_INFO 	= http://www.linux-usb.org
 
