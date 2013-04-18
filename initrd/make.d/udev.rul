@@ -2,7 +2,7 @@
 #  vi: set filetype=make:
 #
 
-UDEV_VERSION	= 175
+UDEV_VERSION	= 182
 UDEV_TARBALL	= udev-$(UDEV_VERSION).tar.bz2
 UDEV_DIR	= $(SRC_DIR)/udev-$(UDEV_VERSION)
 
@@ -10,7 +10,7 @@ UDEV_DIR	= $(SRC_DIR)/udev-$(UDEV_VERSION)
 UDEV_URL	= ftp://ftp.sara.nl/pub/sali/sources/
 UDEV_INFO	= http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 
-UDEV_CONFIGURE_DEFAULT	= --prefix=/usr --sysconfdir=/etc --sbindir=/sbin --libdir=/lib --with-rootlibdir=/lib --libexecdir=/lib/udev --disable-introspection
+UDEV_CONFIGURE_DEFAULT	= --prefix=/usr --sysconfdir=/etc --sbindir=/sbin --libdir=/lib --with-rootlibdir=/lib --libexecdir=/lib --disable-introspection
 UDEV_CONFIGURE 		= $(UDEV_CONFIGURE_DEFAULT)
 
 ifeq ($(ARCH),ppc64)

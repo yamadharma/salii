@@ -8,7 +8,7 @@ SALI_VERSION="@SALI_VERSION@"
 ARCH="@ARCH@"
 CDROOT=$(dirname $(readlink -f $0))
 SALIROOT=$(readlink -e "${CDROOT}/..")
-SALIISO="${SALIROOT}/sali-${ARCH}-${VERSION}-hybrid.iso"
+SALIISO="${SALIROOT}/sali-${ARCH}-${SALI_VERSION}-hybrid.iso"
 GENISOIMAGE=$(which genisoimage)
 ISOHYBRID=$(which isohybrid)
 

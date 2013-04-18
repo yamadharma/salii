@@ -35,7 +35,7 @@ include $(INITRD_MAKED_DIR)/kexec.rul
 include $(INITRD_MAKED_DIR)/lvm.rul
 include $(INITRD_MAKED_DIR)/parted.rul
 include $(INITRD_MAKED_DIR)/mdadm.rul
-include $(INITRD_MAKED_DIR)/reiserfsprogs.rul
+#include $(INITRD_MAKED_DIR)/reiserfsprogs.rul
 include $(INITRD_MAKED_DIR)/jfsutils.rul
 include $(INITRD_MAKED_DIR)/xfsprogs.rul
 include $(INITRD_MAKED_DIR)/xmlrpc-c.rul
@@ -137,7 +137,6 @@ $(INITRD_DIR)/build: initrd_prepare $(SRC_DIR)/modules_build-stamp \
 	lvm_install \
 	parted_install \
 	mdadm_install \
-	reiserfsprogs_install \
 	jfsutils_install \
 	xfsprogs_install \
 	xmlrpc_install

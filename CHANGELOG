@@ -7,11 +7,19 @@
     lsmod/rmmod/insmod/modprobe are now symlinks for /bin/kmod
 
   * Added kmod version 13
-  * Updated udev to 182
-  * Updated aria2 to 1.15.1
-  * Updated curl to 7.27.0
-  * Updated lvm to 2.2.02.96
-  * Updated mdadm to 3.2.6
+  * Updated kernel to 3.8.8
+  * Updated software packages:
+    - aria2 to 1.15.1
+    - busybox to 1.21.0
+    - curl to 7.30.0
+    - e2fsporgs to 1.42.7
+    - kexec to 2.0.4
+    - openssh 6.2p1
+    - openssl 1.0.01e
+    - udev to 182
+    - usbutils to 006
+    - xfsprogs to 3.1.10
+    - xmlrpc to 1.25.23
 
 1.5.8
   * Added the server tools to the tarball

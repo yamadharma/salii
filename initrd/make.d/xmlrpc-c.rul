@@ -10,7 +10,7 @@ XMLRPC_TARBALL	= xmlrpc-c-$(XMLRPC_VERSION).tgz
 XMLRPC_URL 	= ftp://ftp.sara.nl/pub/sali/sources/xmlrpc-c-$(XMLRPC_VERSION).tgz
 XMLRPC_INFO	= http://xmlrpc-c.sourceforge.net
 
-XMLRPC_DIR	= $(SRC_DIR)/xmlrpc-c_$(XMLRPC_VERSION)
+XMLRPC_DIR	= $(SRC_DIR)/xmlrpc-c-$(XMLRPC_VERSION)
 
 .PHONY: xmlrpc
 xmlrpc: $(XMLRPC_DIR).build
