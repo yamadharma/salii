@@ -10,8 +10,10 @@ import getpass
 
 WIKI_URL = 'https://%s:%s@oss.trac.surfsara.nl/sali/login/xmlrpc'
 WIKI_PAGE = 'SaliUsedPrograms'
+
+## The following versions are supported by us
 SHOW_VERSIONS = [
-	'1.5.0', '1.5.2', '1.5.3', '1.5.4', '1.5.7', '1.5.8',
+	'1.5.8',
 ]
 
 ### TAKEN FROM http://code.activestate.com/recipes/135435-sort-a-string-using-numeric-order
