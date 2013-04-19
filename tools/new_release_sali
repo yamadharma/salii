@@ -1,6 +1,6 @@
 #!/bin/sh
 
-SERVER=https://oss.trac.surfsara.nl/svn/sali
+SERVER=https://oss.trac.surfsara.nl/sali/svn
 
 if [ $# -lt 1 ]
 then
