@@ -26,9 +26,9 @@ OS=@OS@
 OS_RELEASE=@OS_RELEASE@
 
 ifeq ($(ARCH_BIT),64)
-	LIBDIR=/lib/x86_64-linux-gnu
+	LIBDIR=lib/x86_64-linux-gnu
 else
-	LIBDIR=lib
+	LIBDIR=lib/i386-linux-gnu
 endif
 
 RELEASE_DOCS = CHANGELOG LICENSE CREDITS README VERSION AUTHORS
