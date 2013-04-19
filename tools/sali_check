@@ -187,7 +187,7 @@ if __name__ == '__main__':
     append_to_dict(path,'trunk')
     append_main_maked(path,'trunk')
 
-    ftp = ftplib.FTP('ftp.sara.nl')
+    ftp = ftplib.FTP('ftp.surfsara.nl')
     ftp.login()
     try:
         ftp_data = ftp.nlst('pub/sali/sources')
