@@ -16,7 +16,7 @@ OPENSSL_MD5SUM          := 40b6ea380cc8a5bf9734c2f8bf7e701e
 OPENSSL_TARBALL_TARGET  := $(SRC_DIR)/$(OPENSSL_TARBALL)
 
 #### http://www.openssl.org/source/ ####
-OPENSSL_URL             := ftp://ftp.sara.nl/pub/sali/sources/$(OPENSSL_TARBALL)
+OPENSSL_URL             := ftp://ftp.surfsara.nl/pub/sali/sources/$(OPENSSL_TARBALL)
 OPENSSL_INFO			:= http://www.openssl.org/
 
 OPENSSL_BINARIES        := $(OPENSSL_DIR)/apps/openssl

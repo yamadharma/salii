@@ -8,7 +8,7 @@ LIBUSB_DIR 		= $(SRC_DIR)/libusb-$(LIBUSB_VERSION)
 LIBUSB_TARBALL 	= libusb-$(LIBUSB_VERSION).tar.bz2
 
 #### http://sourceforge.net/projects/libusb/develop ####
-LIBUSB_URL 		= ftp://ftp.sara.nl/pub/sali/sources/$(LIBUSB_TARBALL)
+LIBUSB_URL 		= ftp://ftp.surfsara.nl/pub/sali/sources/$(LIBUSB_TARBALL)
 LIBUSB_INFO 	= http://www.linux-usb.org
 
 export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib"

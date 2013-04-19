@@ -1,5 +1,6 @@
 1.6.0
   * Rewrote /init script as a lot has changed with udev since version 166
+    Author: Dennis Stam
  
   * Added some options in the kernel config to make it work with udev 182
 
@@ -252,7 +253,7 @@
 
 1.4.0
   * Added kernel virtualization support for X86_64 kernel
-    Requested by: Ernst Pijper (SARA)
+    Requested by: Ernst Pijper (SURFsara)
     Author: Bas van der Vlies
 
   * A complete rewrite of the rcS script

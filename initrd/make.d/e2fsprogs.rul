@@ -10,7 +10,7 @@ E2FSPROGS_DIR       = $(SRC_DIR)/e2fsprogs-$(E2FSPROGS_VERSION)
 
 #### http://e2fsprogs.sourceforge.net/ ####
 E2FSPROGS_INFO := http://e2fsprogs.sourceforge.net/
-E2FSPROGS_URL :=  ftp://ftp.sara.nl/pub/sali/sources/$(E2FSPROGS_TARBALL)
+E2FSPROGS_URL :=  ftp://ftp.surfsara.nl/pub/sali/sources/$(E2FSPROGS_TARBALL)
 
 #All architectures need these flags
 E2FSPROGS_CONFIGURE = --disable-fsck --disable-libuuid --disable-uuidd --disable-libblkid

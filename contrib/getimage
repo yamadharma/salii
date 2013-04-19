@@ -4,7 +4,7 @@
 #
 # SVN info:
 #	$https://subtrac.sara.nl/users/dannys/svn/trunk/
-#
+
 SALI_DIR=/data/sali
 SALI_IMAGE_DIR=$SALI_DIR/images
 

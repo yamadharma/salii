@@ -7,7 +7,7 @@ REISERFSPROGS_VERSION = 3.6.21
 REISERFSPROGS_DIR 		= $(SRC_DIR)/reiserfsprogs-$(REISERFSPROGS_VERSION)
 REISERFSPROGS_TARBALL = reiserfsprogs-$(REISERFSPROGS_VERSION).tar.gz
 
-REISERFSPROGS_URL 	= ftp://ftp.sara.nl/pub/sali/sources/$(REISERFSPROGS_TARBALL)
+REISERFSPROGS_URL 	= ftp://ftp.surfsara.nl/pub/sali/sources/$(REISERFSPROGS_TARBALL)
 REISERFSPROGS_INFO 	= https://ftp.kernel.org/pub/linux/utils/fs/reiserfs/
 
 .PHONY: reiserfsprogs

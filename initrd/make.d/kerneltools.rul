@@ -8,7 +8,7 @@ KERNELTOOLS_TARBALL 	= kmod-$(KERNELTOOLS_VERSION).tar.gz
 KERNELTOOLS_DIR 	= $(SRC_DIR)/kmod-$(KERNELTOOLS_VERSION)
 
 ### http://www.kernel.org/pub/linux/utils/kernel/module-init-tools #####
-KERNELTOOLS_URL		:= ftp://ftp.sara.nl/pub/sali/sources/$(KERNELTOOLS_TARBALL)
+KERNELTOOLS_URL		:= ftp://ftp.surfsara.nl/pub/sali/sources/$(KERNELTOOLS_TARBALL)
 KERNELTOOLS_INFO	:= https://https://www.kernel.org/pub/linux/utils/kernel/kmod
 
 .PHONY: kerneltools

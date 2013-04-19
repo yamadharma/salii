@@ -1,4 +1,3 @@
-# SARA 2011 (c)
 #
 # Michel Scheerman: sali xcat plugin beta 0.1
 #
@@ -15,6 +14,8 @@
 # Example noderes: table entry: "p6108-mgmt",,"sali","192.168.86.1","192.168.86.1",,,"eth0","eth0",,,,,,,,
 # Example bootparams: table entry: "p6108-mgmt","sali/ppc64/beta/vmlinuz",,"MONITOR_SERVER=si_monitor MONITOR_CONSOLE=yes PROTOCOL=bittorrent SCRIPTNAME=ppc64_sles11sp1_263245 BLACKLIST=lpfc STAGING=/tmp VERBOSELEVEL=2 SSHD=y rw",,,,,
 # Example nodetype: "p6108-mgmt",,"ppc64",,,,,,
+#
+# Copyright 2010-2013 SURFsara
 #
 
 package xCAT_plugin::sali;

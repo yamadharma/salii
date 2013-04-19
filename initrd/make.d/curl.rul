@@ -7,7 +7,7 @@ CURL_VERSION	= 7.30.0
 CURL_TARBALL	= curl-$(CURL_VERSION).tar.bz2
 
 ### download = http://curl.haxx.se/download.html 
-CURL_URL 	= ftp://ftp.sara.nl/pub/sali/sources/curl-$(CURL_VERSION).tar.bz2
+CURL_URL 	= ftp://ftp.surfsara.nl/pub/sali/sources/curl-$(CURL_VERSION).tar.bz2
 CURL_INFO	= http://curl.haxx.se/
 
 CURL_DIR	= $(SRC_DIR)/curl-$(CURL_VERSION)

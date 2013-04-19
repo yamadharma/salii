@@ -7,7 +7,7 @@ UDEV_TARBALL	= udev-$(UDEV_VERSION).tar.bz2
 UDEV_DIR	= $(SRC_DIR)/udev-$(UDEV_VERSION)
 
 #### http://www.kernel.org/pub/linux/utils/kernel/hotplug/ ####
-UDEV_URL	= ftp://ftp.sara.nl/pub/sali/sources/
+UDEV_URL	= ftp://ftp.surfsara.nl/pub/sali/sources/
 UDEV_INFO	= http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 
 UDEV_CONFIGURE_DEFAULT	= --prefix=/usr --sysconfdir=/etc --sbindir=/sbin --libdir=/lib --with-rootlibdir=/lib --libexecdir=/lib --disable-introspection

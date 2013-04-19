@@ -10,7 +10,7 @@ OPENSSH_MD5SUM          := 86f5e1c23b4c4845f23b9b7b493fb53d
 OPENSSH_TARBALL_TARGET  := $(SRC_DIR)/$(OPENSSH_TARBALL)
 
 #### http://ftp.nluug.nl/pub/OpenBSD/OpenSSH/portable/ ####
-OPENSSH_URL             := ftp://ftp.sara.nl/pub/sali/sources/$(OPENSSH_TARBALL)
+OPENSSH_URL             := ftp://ftp.surfsara.nl/pub/sali/sources/$(OPENSSH_TARBALL)
 OPENSSH_INFO			:= http://www.openssh.com/
 
 ifeq ($(ARCH),i386)

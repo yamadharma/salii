@@ -8,7 +8,7 @@
 ZLIB_VERSION := 1.2.7
 ZLIB_DIR := zlib-$(ZLIB_VERSION)
 ZLIB_TARBALL := zlib-$(ZLIB_VERSION).tar.gz
-ZLIB_URL := ftp://ftp.sara.nl/pub/sali/sources/$(ZLIB_TARBALL)
+ZLIB_URL := ftp://ftp.surfsara.nl/pub/sali/sources/$(ZLIB_TARBALL)
 ZLIB_INFO := http://zlib.net/
 ZLIB_PATCHES := $(shell ls $(PATCH_DIR)/zlib.*.patch 2>/dev/null | sort)
 ZLIB_LIBRARY := $(SRC_DIR)/$(ZLIB_DIR)/libz.a

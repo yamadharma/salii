@@ -9,7 +9,7 @@ MDADM_VERSION 	= 3.2.6
 MDADM_DIR 			= $(SRC_DIR)/mdadm-$(MDADM_VERSION)
 MDADM_TARBALL 	= mdadm-$(MDADM_VERSION).tar.gz
 
-MDADM_URL 	= ftp://ftp.sara.nl/pub/sali/sources/$(MDADM_TARBALL)
+MDADM_URL 	= ftp://ftp.surfsara.nl/pub/sali/sources/$(MDADM_TARBALL)
 MDADM_INFO 	=  http://www.kernel.org/pub/linux/utils/raid/mdadm/
 
 .PHONY: mdadm

@@ -21,7 +21,7 @@ LVM_TARBALL		= LVM$(LVM_VERSION).tgz
 LVM_DIR				= $(SRC_DIR)/LVM$(LVM_VERSION)
 
 #### ftp://sources.redhat.com/pub/lvm2/ ####
-LVM_URL			= ftp://ftp.sara.nl/pub/sali/sources/$(LVM_TARBALL)
+LVM_URL			= ftp://ftp.surfsara.nl/pub/sali/sources/$(LVM_TARBALL)
 LVM_INFO		= http://sources.redhat.com/lvm2/
 
 .PHONY: lvm

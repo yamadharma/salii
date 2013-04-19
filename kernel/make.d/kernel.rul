@@ -11,7 +11,7 @@
 #
 # SVN Info:
 # 	$Id$
-#       $URL: https://subtrac.sara.nl/oss/svn/sali/trunk/make.d/kernel.rul $
+#       $URL$
 
 ifeq ($(ARCH),i386)
 	LINUX_VERSION = 3.1.4
@@ -27,7 +27,7 @@ endif
 
 LINUX_DIR 		:= $(SRC_DIR)/linux-$(LINUX_VERSION)
 LINUX_TARBALL 	:= linux-$(LINUX_VERSION).tar.bz2
-LINUX_URL 		:= ftp://ftp.sara.nl/pub/sali/sources/$(LINUX_TARBALL)
+LINUX_URL 		:= ftp://ftp.surfsara.nl/pub/sali/sources/$(LINUX_TARBALL)
 LINUX_INFO 		:= http://kernel.org
 LINUX_FIRMWARE_GIT := http://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
 

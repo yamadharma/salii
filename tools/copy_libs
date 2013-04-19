@@ -5,8 +5,8 @@
 # Desc. : Copy the needed libraries in the initrd. A simple mklibs replacement
 #
 # SVn Info:
-# 	$Id$
-#       $URL: https://subtrac.sara.nl/oss/svn/sali/trunk/initrd/copy_libs $
+# 	$Id: copy_libs 353 2011-08-11 06:09:35Z dennis $
+#       $URL$
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by

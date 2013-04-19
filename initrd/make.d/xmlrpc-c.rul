@@ -7,7 +7,7 @@ XMLRPC_VERSION	= 1.25.23
 XMLRPC_TARBALL	= xmlrpc-c-$(XMLRPC_VERSION).tgz
 
 ### download = http://xmlrpc-c.sourceforge.net/downloading.php
-XMLRPC_URL 	= ftp://ftp.sara.nl/pub/sali/sources/xmlrpc-c-$(XMLRPC_VERSION).tgz
+XMLRPC_URL 	= ftp://ftp.surfsara.nl/pub/sali/sources/xmlrpc-c-$(XMLRPC_VERSION).tgz
 XMLRPC_INFO	= http://xmlrpc-c.sourceforge.net
 
 XMLRPC_DIR	= $(SRC_DIR)/xmlrpc-c-$(XMLRPC_VERSION)

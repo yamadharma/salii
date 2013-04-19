@@ -11,7 +11,7 @@ PARTED_DIR 			= $(SRC_DIR)/parted-$(PARTED_VERSION)
 PARTED_TARBALL 	= parted-$(PARTED_VERSION).tar.xz
 
 #### http://ftp.gnu.org/gnu/parted/ ####
-PARTED_URL 		= ftp://ftp.sara.nl/pub/sali/sources/$(PARTED_TARBALL)
+PARTED_URL 		= ftp://ftp.surfsara.nl/pub/sali/sources/$(PARTED_TARBALL)
 PARTED_INFO 	= http://www.gnu.org/software/parted/index.shtml
 
 PARTED_CONFIGURE = --disable-Werror --prefix=/usr

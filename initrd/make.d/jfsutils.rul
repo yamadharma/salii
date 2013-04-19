@@ -7,7 +7,7 @@ JFSUTILS_VERSION 	= 1.1.15
 JFSUTILS_DIR 			= $(SRC_DIR)/jfsutils-$(JFSUTILS_VERSION)
 JFSUTILS_TARBALL 	= jfsutils-$(JFSUTILS_VERSION).tar.gz
 
-JFSUTILS_URL 	= ftp://ftp.sara.nl/pub/sali/sources/$(JFSUTILS_TARBALL)
+JFSUTILS_URL 	= ftp://ftp.surfsara.nl/pub/sali/sources/$(JFSUTILS_TARBALL)
 JFSUTILS_INFO = http://jfs.sourceforge.net/
 
 .PHONY: jfsutils

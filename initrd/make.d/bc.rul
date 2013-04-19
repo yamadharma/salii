@@ -7,7 +7,7 @@ BC_VERSION	:= 1.06
 BC_DIR 		:= $(SRC_DIR)/bc-$(BC_VERSION)
 BC_TARBALL 	:= bc-$(BC_VERSION).tar.gz
 BC_INFO		:= http://www.gnu.org/software/bc/
-BC_URL 		:= ftp://ftp.sara.nl/pub/sali/sources/$(BC_TARBALL)
+BC_URL 		:= ftp://ftp.surfsara.nl/pub/sali/sources/$(BC_TARBALL)
 
 .PHONY: bc
 bc:	$(BC_DIR).build

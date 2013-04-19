@@ -7,7 +7,7 @@ RSYNC_VERSION 	= 3.0.9
 RSYNC_TARBALL 	= rsync-$(RSYNC_VERSION).tar.gz
 
 #### http://www.samba.org/rsync/ ####
-RSYNC_URL 		= ftp://ftp.sara.nl/pub/sali/sources/$(RSYNC_TARBALL)
+RSYNC_URL 		= ftp://ftp.surfsara.nl/pub/sali/sources/$(RSYNC_TARBALL)
 RSYNC_INFO		= http://rsync.samba.org/
 
 RSYNC_DIR 		= $(SRC_DIR)/rsync-$(RSYNC_VERSION)
