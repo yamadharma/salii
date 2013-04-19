@@ -14,7 +14,7 @@
 #       $URL$
 
 ifeq ($(ARCH),i386)
-	LINUX_VERSION = 3.1.4
+	LINUX_VERSION = 3.8.8
 	LINUX_IMAGE = $(LINUX_DIR)/arch/i386/boot/bzImage
 	LINUX_TARGET = bzImage
 endif
