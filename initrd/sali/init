@@ -29,13 +29,6 @@ _LS="/bin/ls"
 _MKNOD="/bin/mknod"
 _DMESG="/bin/dmesg"
 
-## Are we allowed to run?
-if [ -n "$($_MOUNT | $_GREP "/dev")" ]
-then
-    $_PRINTF "Looks like /dev is already mounted, this script can only be used for initialization of SALI\n"
-    exit 1
-fi
-
 ## Default value for init
 init="/sbin/init"
 
@@ -52,7 +45,7 @@ done
 # -o == Which options must be use when mounting
 $_MOUNT -t proc proc /proc
 $_MOUNT -t sysfs sysfs /sys
-$_MOUNT -t devtmpfs -o mode=0755 tmpfs /dev
+$_MOUNT -t devtmpfs -o mode=0755 udev /dev
 $_MOUNT -t tmpfs -o mode=0755 tmpfs /run
 
 ## Fast scan of the kernel paramaters
@@ -93,9 +86,12 @@ then
     # make sure we don't have any comments or empty lines
     $_GREP '^[^#]' /etc/udev/links.conf | while read type name args
     do
-        if [ "${type}" -a "${name}" -a ! -e "/dev/${name}" -a ! -L "/dev/${name}" ]
+        if [ "${type}" -a "${name}" ]
         then
-            continue
+            if [ ! -e "/dev/${name}" -o ! -L "/dev/${name}" ]
+            then
+                continue
+            fi
         fi
         case "${type}" in
             L)
