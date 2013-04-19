@@ -15,17 +15,6 @@ logmsg() {
 # Usage: get_arch; echo $ARCH
 get_arch() {
 	ARCH=`uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/`
-
-	if [ "ppc64" = "$ARCH" ]
-	then
-		# This takes a little bit of futzing with due to all the PPC platforms that exist.
-		if [ -d /proc/iSeries ] ; then
-			ARCH=ppc64-iSeries
-		fi
-		if grep -qs PS3 /proc/cpuinfo; then
-			ARCH=ppc64-ps3
-		fi
-	fi
 }
 
 ## adjust_arch

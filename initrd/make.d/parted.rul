@@ -17,10 +17,6 @@ PARTED_INFO 	= http://www.gnu.org/software/parted/index.shtml
 PARTED_CONFIGURE = --disable-Werror --prefix=/usr
 export LD_LIBRARY_PATH="$${LD_LIBRARY_PATH}:$(INITRD_BUILD_DIR)/lib:$(INITRD_BUILD_DIR)/usr/lib"
 
-ifeq ($(ARCH),ppc64)
-	PARTED_CONFIGURE = --disable-Werror --prefix=/usr --build=powerpc-unknown-linux
-endif
-
 .PHONY: parted
 parted:	$(PARTED_DIR).build
 

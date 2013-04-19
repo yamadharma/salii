@@ -15,11 +15,6 @@ E2FSPROGS_URL :=  ftp://ftp.surfsara.nl/pub/sali/sources/$(E2FSPROGS_TARBALL)
 #All architectures need these flags
 E2FSPROGS_CONFIGURE = --disable-fsck --disable-libuuid --disable-uuidd --disable-libblkid
 
-#Only ppc64 needs this flag
-ifeq ($(ARCH),ppc64)
-	E2FSPROGS_CONFIGURE = --disable-fsck --disable-libuuid --disable-uuidd --disable-libblkid --host=ppc-unknown-linux
-endif
-
 .PHONY: e2fsprogs
 e2fsprogs:	$(E2FSPROGS_DIR).build
 

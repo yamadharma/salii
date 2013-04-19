@@ -7,15 +7,7 @@ XFSPROGS_TARBALL := xfsprogs-$(XFSPROGS_VERSION).tar.gz
 XFSPROGS_URL := ftp://ftp.surfsara.nl/pub/sali/sources/$(XFSPROGS_TARBALL)
 XFSPROGS_INFO := http://xfs.org/index.php/Main_Page
 
-## Preparing before build
-ifeq ($(ARCH),ppc64)
-	export OPTIMIZER="-fPIC"
-	export DEBUG=-DNDEBUG
-	export LIBUUID=/usr/%{_lib}/libuuid.a
-	XFSPROGS_CONFIGURE=--with-gnu-ld
-else
-	XFSPROGS_CONFIGURE=--libdir=$(INITRD_BUILD_DIR)/lib/
-endif
+XFSPROGS_CONFIGURE=--libdir=$(INITRD_BUILD_DIR)/lib/
 
 .PHONY: xfsprogs
 xfsprogs:	$(XFSPROGS_DIR).build

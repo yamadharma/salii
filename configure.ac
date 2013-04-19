@@ -54,11 +54,6 @@ case "$(uname -m)" in
 		ARCH_BIT=64
 		AC_MSG_RESULT(found ${ARCH})
 	;;
-	ppc64*)
-		ARCH=ppc64
-		ARCH_BIT=64
-		AC_MSG_RESULT(found ${ARCH})
-	;;
 	i686*|i386*)
 		AC_MSG_RESULT(found ${ARCH})
 		ARCH=i386

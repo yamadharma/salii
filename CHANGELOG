@@ -6,6 +6,12 @@
 
   * Replaced module-init-tools with kmod as module-init-tools is deprecated.
     lsmod/rmmod/insmod/modprobe are now symlinks for /bin/kmod
+ 
+  * Dropped support for ReiserFS, kernel modules and reiserfsprogs have been
+    remove from SALI
+
+  * Dropped support for PPC64 architecture as we are unable to test SALI 
+    in ppc64
 
   * Added kmod version 13
   * Updated kernel to 3.8.8
