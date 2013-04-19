@@ -26,7 +26,7 @@ setup(
         description = 'sali server and utilities',
         long_description = 'sali server and utilities',
         author = 'Dennis Stam',
-        author_email = 'sali@sara.nl',
+        author_email = 'sali@surfsara.nl',
         url = 'https://oss.trac.surfsara.nl/sali',
         license = 'GPL',
         
