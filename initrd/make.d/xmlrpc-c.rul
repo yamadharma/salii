@@ -22,7 +22,9 @@ xmlrpc_install: $(XMLRPC_DIR).install
 xmlrpc_clean: $(XMLRPC_DIR).clean
 
 $(XMLRPC_DIR).build: $(OPENSSL_DIR).build $(XMLRPC_DIR).get
-	cd $(XMLRPC_DIR) && ./configure  --disable-libwww-client --disable-abyss-threads --disable-cplusplus --disable-cgi-server--disable-abyss-server --enable-tools --prefix=/usr && make
+	cd $(XMLRPC_DIR) && PATH="$${PATH}:$(INITRD_BUILD_DIR)/usr/bin" CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include" ./configure  --disable-libwww-client --disable-abyss-threads --disable-cplusplus --disable-cgi-server--disable-abyss-server --enable-tools --prefix=/usr
+
+	cd $(XMLRPC_DIR) && PATH="$${PATH}:$(INITRD_BUILD_DIR)/usr/bin" CFLAGS="-I$(INITRD_BUILD_DIR)/usr/include" LIBRARY_PATH=$(INITRD_BUILD_DIR)/usr/lib make
 
 	touch $@
 

@@ -1,3 +1,8 @@
+1.6.1
+  * Due to strange configure behaviour of xmlrpc-c adjusted the xmlrpc-c.rul
+    to ensure that the correct curl version is used. Closes bug #69.
+    Author: Dennis Stam
+
 1.6.0
   * Rewrote /init script as a lot has changed with udev since version 166
     Author: Dennis Stam
