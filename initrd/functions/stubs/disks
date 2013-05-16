@@ -385,11 +385,11 @@ partition(){
 		logmsg "Create partition $NUMPARTITIONS on disk $DISK"
 
 		case "$SIZE" in
-			0)
+			0|-1)
 				START_MB=$END_OF_LAST
 				END_MB=$(( DISKSIZE - 0 ))
 				logmsg "   parted -s -- $DISK mkpart $PARTITION_TYPE $START_MB $END_MB"
-				parted -s -- $DISK mkpart $PARTITION_TYPE $START_MB $END_MB 
+				parted -s -- $DISK mkpart $PARTITION_TYPE $START_MB -1
 				END_OF_LAST=$END_MB
 				sleep 1
 			;;

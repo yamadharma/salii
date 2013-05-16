@@ -1,3 +1,10 @@
+1.6.2
+  * Fixed a bug when using the partition command with value 0 (use the rest
+    of the disk). Instead of calculating the end value use value -1. Parted
+    will then use the rest of the disk.
+    Reported by: Jaap Dijkshoorn (SURFsara)
+    Author: Dennis Stam
+
 1.6.1
   * Due to strange configure behaviour of xmlrpc-c adjusted the xmlrpc-c.rul
     to ensure that the correct curl version is used. Closes bug #69.
