@@ -14,6 +14,7 @@ WIKI_PAGE = 'SaliUsedPrograms'
 ## The following versions are supported by us
 SHOW_VERSIONS = [
 	'1.5.8',
+	'1.6.2',
 ]
 
 ### TAKEN FROM http://code.activestate.com/recipes/135435-sort-a-string-using-numeric-order
