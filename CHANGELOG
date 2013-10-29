@@ -1,3 +1,10 @@
+1.6.3
+  * Fixed a aria2 rpc bug, since a certain version the tellStatus function
+    expect a gid instead of a index number. Changed this function to use
+    tellActive as we only download 1 image.
+    Reported by: Jaap Dijkshoorn (SURFsara)
+    Author: Dennis Stam
+
 1.6.2
   * Fixed a bug when using the partition command with value 0 (use the rest
     of the disk). Instead of calculating the end value use value -1. Parted

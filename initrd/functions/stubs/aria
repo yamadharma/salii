@@ -68,7 +68,7 @@ aria_get_rpc_progress() {
     fi
 
     #first save some data
-    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellStatus 1 2> $METAFILE.err > $METAFILE.rpc
+    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellActive 2> $METAFILE.err > $METAFILE.rpc
 
     if [ "$?" != 0 ]
     then
@@ -86,7 +86,7 @@ aria_get_rpc_speed() {
     METAFILE=$1
 
     #first save some data
-    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellStatus 1 2> $METAFILE.err > $METAFILE.rpc
+    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellActive 2> $METAFILE.err > $METAFILE.rpc
 
     SPEED=$(cat $METAFILE.rpc | grep "downloadSpeed" -A1 -m1| grep Value | awk -F"'" '{print $2}')
 
