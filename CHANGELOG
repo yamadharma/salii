@@ -1,3 +1,7 @@
+1.6.6
+  * Update kernel to latest stable: 3.10.33
+  * Updated aria2 to 1.18.3
+
 1.6.3
   * Fixed a aria2 rpc bug, since a certain version the tellStatus function
     expect a gid instead of a index number. Changed this function to use

@@ -3,13 +3,13 @@
 #   vi: set filetype=make:
 #
 
-ARIA2_VERSION	= 1.16.5
-ARIA2_TARBALL	= aria2-$(ARIA2_VERSION).tar.bz2
+ARIA2_VERSION	= 1.18.3
+ARIA2_TARBALL	= aria2-$(ARIA2_VERSION).tar.xz
 ARIA2_DIR		= $(SRC_DIR)/aria2-$(ARIA2_VERSION)
 
 #### http://aria2.sourceforge.net ####
 ARIA2_INFO	= http://aria2.sourceforge.net/
-ARIA2_URL 	= ftp://ftp.surfsara.nl/pub/sali/sources/aria2-$(ARIA2_VERSION).tar.bz2
+ARIA2_URL 	= ftp://ftp.surfsara.nl/pub/sali/sources/aria2-$(ARIA2_VERSION).tar.xz
 
 .PHONY: aria2
 aria2:	$(ARIA2_DIR).build
@@ -30,7 +30,7 @@ $(ARIA2_DIR).install:	$(ARIA2_DIR).build
 $(ARIA2_DIR).get: $(INITRD_DIR)/make.d/aria2.rul
 	rm -rf $(ARIA2_DIR)
 	$(GETSOURCE) $(ARIA2_URL) $(SRC_DIR)
-	cd $(SRC_DIR) && tar -xvjf $(ARIA2_TARBALL)
+	cd $(SRC_DIR) && tar -xvJf $(ARIA2_TARBALL)
 	touch $@
 
 .PHONY: aria2_clean
