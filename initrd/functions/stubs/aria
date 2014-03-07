@@ -68,29 +68,39 @@ aria_get_rpc_progress() {
     fi
 
     #first save some data
-    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellActive 2> $METAFILE.err > $METAFILE.rpc
-
-    if [ "$?" != 0 ]
-    then
-        echo 0
-        exit
-    fi
+    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellStatus $ARIA2_GID 2> $METAFILE.err > $METAFILE.rpc
 
     TOTALSIZE=$(cat $METAFILE.rpc | grep "totalLength" -A1 -m1| grep Value | awk -F"'" '{print $2}')
     COMPLETEDSIZE=$(cat $METAFILE.rpc | grep "completedLength" -A1 -m1| grep Value | awk -F "'" '{print $2}')
 
-    echo "$(echo "scale=$SCALE; $COMPLETEDSIZE * 100 / $TOTALSIZE"| bc)"
+    if [ -z "${TOTALSIZE}" -o -z "${COMPLETEDSIZE}" ]
+    then
+        echo 0
+    else
+        echo "$(echo "scale=$SCALE; $COMPLETEDSIZE * 100 / $TOTALSIZE"| bc)"
+    fi
 }
 
 aria_get_rpc_speed() {
     METAFILE=$1
 
     #first save some data
-    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellActive 2> $METAFILE.err > $METAFILE.rpc
+    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellStatus $ARIA2_GID 2> $METAFILE.err > $METAFILE.rpc
 
     SPEED=$(cat $METAFILE.rpc | grep "downloadSpeed" -A1 -m1| grep Value | awk -F"'" '{print $2}')
 
-    echo $SPEED
+    if [ -z "${SPEED}" ]
+    then
+        echo 0
+    else
+        echo $SPEED
+    fi
+}
+
+aria_get_rpc_gid(){
+    /usr/bin/xmlrpc http://localhost:6800/rpc aria2.tellActive 2> $METAFILE.err > $METAFILE.rpc
+    ARIA2_GID=$(cat $METAFILE.rpc | grep "gid" -A1 -m1| grep Value | awk -F"'" '{print $2}')
+    export ARIA2_GID
 }
 
 aria_monitor_log(){
@@ -99,19 +109,31 @@ aria_monitor_log(){
     DONE=0
     while [ $DONE -lt 1 ]
     do              
-        PROGRESS=$(aria_get_rpc_progress $FILE)
-        SPEED=$(aria_get_rpc_speed $FILE)
-        case $PROGRESS in
-                *100*)
-                        p_comment 0  "Done with downloading file"
-                        DONE=1
-                ;;                                                              
+        if [ -z "${ARIA2_GID}" ]
+        then
+            aria_get_rpc_gid $FILE
+            p_comment 0 "Download indentifier is: ${ARIA2_GID}"
+        fi
 
-                *)
-                        p_comment 0 "Downloading: ${PROGRESS} percent at ${SPEED} bytes/sec"
-                        sleep 5
-                ;;
-        esac            
+        if [ -n "${ARIA2_GID}" ]
+        then
+            PROGRESS=$(aria_get_rpc_progress $FILE)
+            SPEED=$(aria_get_rpc_speed $FILE)
+            case $PROGRESS in
+                    *100*)
+                            p_comment 0  "Done with downloading file"
+                            DONE=1
+                    ;;                                                              
+
+                    *)
+                            p_comment 0 "Downloading: ${PROGRESS} percent at ${SPEED} bytes/sec"
+                            sleep 5
+                    ;;
+            esac
+        else
+            p_comment 0 "Unable to determine download progress, sleeping for 10 seconds before retrying"
+            sleep 10
+        fi
     done 
 }
 
