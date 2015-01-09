@@ -14,13 +14,13 @@
 #       $URL$
 
 ifeq ($(ARCH),i386)
-	LINUX_VERSION = 3.10.33
+	LINUX_VERSION = 3.14.28
 	LINUX_IMAGE = $(LINUX_DIR)/arch/i386/boot/bzImage
 	LINUX_TARGET = bzImage
 endif
 
 ifeq ($(ARCH),x86_64)
-	LINUX_VERSION = 3.10.33
+	LINUX_VERSION = 3.14.28
 	LINUX_IMAGE = $(LINUX_DIR)/arch/x86_64/boot/bzImage
 	LINUX_TARGET = bzImage
 endif
