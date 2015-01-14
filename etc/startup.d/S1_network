@@ -1,0 +1,37 @@
+
+## Welcome message for the network stage
+p_stage "Configuring network"
+
+## Let's begin with the loopback interface
+p_service "Configuring loopback device"
+
+
+## Now let's configure the physical devices
+if [ -n "${DEVICE}" ]
+then
+    p_service "Configuring interface ${DEVICE}"
+
+    if [ -n "${IPADDR}" -a -n "${NETMASK}" ]
+    then
+        p_comment 0 "Using static configuration with ip ${IPADDR} and netmask ${NETMASK}"
+
+        add_interface $DEVICE static $IPADDR $NETMASK
+    else
+        p_comment 0 "Using dhcp configuration"
+
+        add_interface $DEVICE dhcp
+        if [ $? -ne 0 ]
+        then
+            p_comment 0 "Unable to add interface to interfaces file"
+        fi
+    fi
+else
+    p_service "Trying to configure all network interfaces with dhcp"
+fi
+
+## Let's save the new variables values
+save_variables
+
+
+## At the end always return 0, when there is an error return 1 or higher
+return 0

@@ -1,0 +1,127 @@
+#
+# This file is part of SALI
+#
+# SALI is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# SALI is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with SALI.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright 2010-2014 SURFsara
+
+###
+# $Id$
+# $URL$
+###
+
+# Just to be sure these are set correctly
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+export LD_LIBRARY_PATH=
+
+REGEX_VARIABLES="^SALI|^DEVICE|^IPADDR|^NETMASK|^NAMESERVER|^DOMAIN|^SEARCH|^IPADDR|^NETMASK"
+
+# Check for variables in the cmdline
+## Must we run this every time, or just at boot time and
+## include it once? or use it to intialize the variables
+## file?
+for LINE in $(cat /var/tmp/dennis/sali/test_files/cmdline)
+do
+    ## Variable must start with SALI to ensure we don't
+    ## clash with the kernel variables
+    if [ -n "$(echo $LINE | egrep $REGEX_VARIABLES)" ]
+    then
+        export "$(echo $LINE)"
+    fi
+done
+
+# Static variables
+static_vars(){
+    SALI_LIB_DIR=/var/tmp/dennis/sali/lib/sali
+    SALI_CACHE_DIR=/var/tmp/dennis/sali/tmp/cache/sali
+    SALI_SCRIPTS_DIR=$SALI_CACHE_DIR/scripts
+    SALI_TORRENTS_DIR=$SALI_CACHE_DIR/torrents
+    SALI_LOG_FILE=/var/log/sali.log
+    SALI_MONITOR_FILE=/var/log/monitor.log
+    SALI_ERROR_FILE=/var/tmp/dennis/sali/etc/sali/error_file
+    SALI_VARIABLES_FILE=$SALI_CACHE_DIR/variables
+    SALI_VERSION=$(cat /var/tmp/dennis/sali/etc/sali_version)
+    SALI_INSTALLER_D_DIR=/var/tmp/dennis/sali/etc/installer.d
+    SALI_STARTUP_D_DIR=/var/tmp/dennis/sali/etc/startup.d
+    SALI_INTERFACES_FILE=/var/tmp/dennis/sali/etc/network/interfaces
+}
+static_vars
+
+# Check if the cacedir exists
+if [ ! -d "${SALI_CACHE_DIR}" ]
+then
+    mkdir -p $SALI_CACHE_DIR
+fi
+
+###
+# Usage: save_variables
+#
+# This function is used to create/store the variables to an file
+#  it depends on the env command (so the variables must be exported!)
+###
+save_variables(){
+    ## Step 1: clear the variables file
+    printf "" > $SALI_VARIABLES_FILE
+
+    ## Step 2: load the static vars (they can't be changed!!)
+    static_vars
+
+    ## Step 2: fetch SALI_* params and store to file
+    set | egrep $REGEX_VARIABLES | while read LINE
+    do
+        echo "${LINE}" >> $SALI_VARIABLES_FILE
+    done
+}
+
+## Always load the default_variables file
+. /var/tmp/dennis/sali/etc/sali/default_variables
+
+## Save the current variables
+save_variables
+
+## Source the variables
+. $SALI_VARIABLES_FILE
+
+###
+# Include the different library files
+
+# First include the general functions
+. $SALI_LIB_DIR/general.sh
+
+# Include the network functions
+. $SALI_LIB_DIR/network.sh
+
+# Include the masterscript functions
+. $SALI_LIB_DIR/master_script.sh
+
+# Include ARIA imaging functions
+#. $SALI_LIB_DIR/aria2.sh
+
+# Include Rsync imaging functions
+#. $SALI_LIB_DIR/rsync.sh
+
+# Include general install imaging functions
+#   This function uses aria2.sh and rsync.sh,
+#   perhaps the includes must be in imaging.sh
+#. $SALI_LIB_DIR/imaging.sh
+
+# Include Partition functions
+#. $SALI_LIB_DIR/disks.sh
+
+# Include Chroot functions
+#. $SALI_LIB_DIR/chroot.sh
+
+# Post installation functions
+#. $SALI_LIB_DIR/post_fstab.sh
+#. $SALI_LIB_DIR/post_network.sh

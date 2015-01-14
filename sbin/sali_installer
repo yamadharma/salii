@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+# This file is part of SALI
+#
+# SALI is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# SALI is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied:ta warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with SALI.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright 2010-2014 SURFsara
+
+###
+# $Id$
+# $URL$
+###
+
+## First include the functions file
+. ../etc/init.d/functions
+
+SALI_IMAGESERVER=test
+
+## Check wether we must open a console instead of installing a new image
+if [ $(is_yes $SALI_RESCUE) -eq 1 -o -z "${SALI_IMAGESERVER}" ]
+then
+    p_service "Opening console"
+    if [ $(is_yes $SALI_RESCUE) -eq 1 ]
+    then
+        p_comment "Reason: SALI_RESCUE is set"
+    else
+        p_comment "Reason: SALI_IMAGESERVER is not set"
+    fi
+
+    #open_console
+
+    exit
+fi
+
+## Let's show what this script does
+p_section "Starting installation process"
+
+## Now loop trough the different scripts
+for file in $(ls -1 $SALI_INSTALLER_D_DIR)
+do
+    . $SALI_INSTALLER_D_DIR/$file
+done

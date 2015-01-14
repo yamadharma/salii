@@ -1,0 +1,4 @@
+
+p_stage "Retrieving installation data"
+
+p_service "Fetching script directory"
