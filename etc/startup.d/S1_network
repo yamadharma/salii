@@ -4,7 +4,9 @@ p_stage "Configuring network"
 
 ## Let's begin with the loopback interface
 p_service "Configuring loopback device"
-
+echo "iface lo inet looback" > $SALI_INTERFACES_FILE
+echo "auto lo" >> $SALI_INTERFACES_FILE
+echo "" >> $SALI_INTERFACES_FILE
 
 ## Now let's configure the physical devices
 if [ -n "${DEVICE}" ]
@@ -27,11 +29,15 @@ then
     fi
 else
     p_service "Trying to configure all network interfaces with dhcp"
+    for interface in $(ls -1 /sys/class/net | grep -v lo)
+    do
+        p_comment 0 "Adding interface ${interface} to configuration"
+        add_interface $interface dhcp
+    done
 fi
 
 ## Let's save the new variables values
 save_variables
-
 
 ## At the end always return 0, when there is an error return 1 or higher
 return 0

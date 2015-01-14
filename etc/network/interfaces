@@ -1,10 +1,27 @@
-
 iface lo inet looback
 auto lo
 
-auto eth0
-iface eth0 inet dhcp
-auto eth0
-iface eth0 inet dhcp
-auto eth0
-iface eth0 inet dhcp
+auto adm_cua
+iface adm_cua inet dhcp
+
+auto adm_iosd
+iface adm_iosd inet dhcp
+
+auto adm_lisa
+iface adm_lisa inet dhcp
+
+auto adm_mona
+iface adm_mona inet dhcp
+
+auto adm_xosd
+iface adm_xosd inet dhcp
+
+auto con_cua
+iface con_cua inet dhcp
+
+auto con_lisa
+iface con_lisa inet dhcp
+
+auto fw_lisa
+iface fw_lisa inet dhcp
+

@@ -62,6 +62,7 @@ add_interface(){
             /bin/cat >> $SALI_INTERFACES_FILE << EOF
 auto ${1}
 iface ${1} inet dhcp
+
 EOF
         ;;
         static)
@@ -75,6 +76,7 @@ auto ${1}
 iface ${1} inet static
     address ${3}
     netmask ${4}
+
 EOF
         ;;
         *)
