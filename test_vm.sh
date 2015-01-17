@@ -7,6 +7,7 @@ BUILD_DIR=$(pwd)/build
 CURL=$(which curl)
 TAR=$(which tar)
 QEMUIMG=$(which qemu-img)
+QEMUSYS=$(which qemu-system-x86_64)
 
 check_commands(){
     for cmd in $@
@@ -42,7 +43,7 @@ case "${1}" in
         fi
     ;;
     run)
-        check_commands $CURL $TAR $QEMUIMG
+        check_commands $CURL $TAR $QEMUIMG $QEMUSYS
         
         if [ ! -d "$BUILD_DIR" ]
         then
@@ -69,6 +70,7 @@ case "${1}" in
             $QEMUIMG create -f qcow2 $BUILD_DIR/test_disk.qcow2 100G >/dev/null 2>&1
         fi
 
+        $QEMUSYS -kernel $BUILD_DIR/kernel -initrd $BUILD_DIR/initrd.img -m 1024 -cpu Haswell -smp "cpus=2" -hda $BUILD_DIR/test_disk.qcow2 &
         
     ;;
     *)
@@ -76,3 +78,5 @@ case "${1}" in
     ;;
 esac
 
+echo "Test"
+wait
