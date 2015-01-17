@@ -65,7 +65,7 @@ done
 if [ -n "${blacklist}" ]
 then
     # Make sure the file exists and is empty
-    $_CAT /dev/null /etc/modprobe.d/pxe_blacklist.conf
+    $_CAT /dev/null > /etc/modprobe.d/pxe_blacklist.conf
     for module in $(echo $blacklist | sed 's/;/ /g')
     do
         $_PRINTF "blacklist ${module}\n" >> /etc/modprobe.d/pxe_blacklist.conf
