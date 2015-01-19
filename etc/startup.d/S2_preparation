@@ -33,5 +33,5 @@ then
     p_service "Initialize SALI with configuration from master_script"
     initialize
 else
-    p_comment 0 "Unable to retreieve master_script, continue to boot"
+    p_comment 0 "Unable to retrieve master_script, continue to boot"
 fi

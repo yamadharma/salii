@@ -113,6 +113,9 @@ case "${1}" in
         echo "Just type ctr+c to exit"
         wait
     ;;
+    webserver)
+        cd "$ROOT_DIR/files" && python -m SimpleHTTPServer 8000
+    ;;
     *)
         echo "Usage: ${0} <run|clean>"
     ;;

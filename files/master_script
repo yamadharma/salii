@@ -8,6 +8,9 @@
 ## Intialize the SALI environment
 # required
 initialize(){
+    ## Set some variables
+    SALI_SSHD=n
+
     ## Where can I find the image (for torrent and rsync), based on the variable PROTOCOL
     ## rsync of bittorrent is used, variables IMAGESERVER and IMAGENAME must be available
     ## via de linux cmd line

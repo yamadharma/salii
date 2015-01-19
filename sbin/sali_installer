@@ -26,19 +26,31 @@
 . /etc/init.d/functions
 
 ## Check wether we must open a console instead of installing a new image
-if [ $(is_yes $SALI_RESCUE) -eq 1 -o -z "${SALI_IMAGESERVER}" ]
+if [ $(is_yes $SALI_RESCUE) -eq 1 ]
 then
     p_stage "Opening console"
-    if [ $(is_yes $SALI_RESCUE) -eq 1 ]
-    then
-        p_service "Reason: SALI_RESCUE is set"
-    else
-        p_service "Reason: SALI_IMAGESERVER is not set"
-    fi
-
     open_console
 
     exit 0
+fi
+
+if [ -z "${SALI_IMAGESERVER}" ]
+then
+    p_stage "Missing value for SALI_IMAGESERVER"
+    p_service "Please add a value for SALI_IMAGESERVER in the console"
+    p_comment 0 "Type: SALI_IMAGESERVER=<ip|hostname>"
+    p_comment 0 "Type: save_variables"
+    p_comment 0 "Type: exit"
+    open_console
+fi
+if [ -z "${SALI_IMAGENAME}" ]
+then
+    p_stage "Missing value for SALI_IMAGENAME"
+    p_service "Please add a value for SALI_IMAGENAME in the console"
+    p_comment 0 "Type: SALI_IMAGENAME=<name>"
+    p_comment 0 "Type: save_variables"
+    p_comment 0 "Type: exit"
+    open_console
 fi
 
 if [ ! -e "$SALI_CACHE_DIR/installer_first_try" ]
@@ -59,3 +71,6 @@ for file in $(ls -1 $SALI_INSTALLER_D_DIR)
 do
     . $SALI_INSTALLER_D_DIR/$file
 done
+
+echo "Dev mode"
+open_console

@@ -1,10 +1,9 @@
 
 ## Skip this step when SSHD is disabled, default is enabled
-case "${SALI_SSHD}" in
-    n|N|no|NO|No)
-        exit 0
-    ;;
-esac
+if [ $(is_yes $SALI_SSHD) -eq 0 ]
+then
+    exit 0
+fi
 
 ## Welcome message for the sshd stage
 p_stage "Starting ssh server"
