@@ -2,6 +2,14 @@
   * This version of SALI is a complete rewrite of the /etc/init.d/functions
     also the old master_script style is not supported anymore.
 
+  * Changes:
+    * The file in /etc/init.d/functions now sources library files in /lib/sali/*.sh
+    * The /bin/startup and /bin/installer have been moved and renamed to 
+      /sbin/sali_startup and /sbin/sali_installer
+    * All variables used by sali starts with SALI_ (except for network configuration)
+    * Added a new directory /etc/sali which contains the error_message file, default values
+      for variables, etc
+
   * PLEASE NOTE that this version of SALI breaks compatibility with systemimager
 
   * Authors: Bas van der Vlies and Dennis Stam
