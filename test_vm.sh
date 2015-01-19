@@ -83,7 +83,7 @@ case "${1}" in
         if [ -d "$ROOT_DIR/build/initrd_test" ]
         then
             echo "Removing previous initrd_test dir"
-            rm -rf "$ROOT_DIR/build/initrd_test"
+            sudo rm -rf "$ROOT_DIR/build/initrd_test"
         fi
 
         echo "Unpacking cpio image"
@@ -93,18 +93,22 @@ case "${1}" in
         echo "Just to be sure, remove all files in the startup.d and installer.d"
         rm $ROOT_DIR/build/initrd_test/etc/startup.d/*
         rm $ROOT_DIR/build/initrd_test/etc/installer.d/*
+        rm $ROOT_DIR/build/initrd_test/etc/ssh/ssh_host*key*
 
         echo "Rsyncing the test files"
         $RSYNC $RSYNC_OPTS $ROOT_DIR/ $ROOT_DIR/build/initrd_test
 
         echo "Creating new initrd"
-        cd "$ROOT_DIR/build/initrd_test" && find . | cpio --quiet -o -H newc > $ROOT_DIR/build/initrd_test.img.out
+        sudo chown -R root:wheel "$ROOT_DIR/build/initrd_test"
+        cd "$ROOT_DIR/build/initrd_test" && sudo find . | sudo cpio --quiet -o -H newc > $ROOT_DIR/build/initrd_test.img.out
 
         echo "Using cmdline from file files/cmdline"
         CMDLINE=$(cat $ROOT_DIR/files/cmdline | egrep -v "^#" | xargs)
 
         echo "Starting VM"
-        $QEMUSYS -kernel $BUILD_DIR/kernel -initrd $BUILD_DIR/initrd_test.img.out -append "$CMDLINE" -m 1024 -cpu Haswell -smp "cpus=2" -hda $BUILD_DIR/test_disk.qcow2 &
+        $QEMUSYS -kernel $BUILD_DIR/kernel -initrd $BUILD_DIR/initrd_test.img.out \
+            -append "$CMDLINE" -m 1024 -cpu Haswell -smp "cpus=2" \
+            -hda $BUILD_DIR/test_disk.qcow2 &
 
         echo "Just type ctr+c to exit"
         wait

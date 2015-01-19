@@ -18,12 +18,6 @@ do
 
     . $SALI_STARTUP_D_DIR/$file
 
-    if [ $? -ne 0 ]
-    then
-        p_stage "An error has occured in stage ${file}"
-        open_console
-    fi
-
     save_variables
 done 
 

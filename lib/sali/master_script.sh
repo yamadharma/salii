@@ -105,12 +105,63 @@ image_torrent(){
     save_variables
 }
 
+###
+# Usage: password <UID> <PWD>
+#
+# This will change the password for a given user
+# if the user does not exist, it will be created
+###
 password(){
     USER=$1
     PASSWORD=$2
 
-    ## Fetch current passwd line use set for easy editing
-    set $(egrep "^${USER}" etc/passwd | sed 's/\:/ /g')
-    set $1 $PASSWORD $3 $4 $5 $6 $7
-    echo $@ | sed 's/ /\:/g'
+    p_comment 0 "REMARK: We recommend to use function authorized_keys instead of using passwords"
+
+    MOD_USER=$(egrep "^${USER}" /etc/passwd)
+    if [ -n "${MOD_USER}" ]
+    then
+        p_comment 0 "Changing password for user ${USER}"
+        ## Fetch current passwd line use set for easy editing
+        set $(egrep "^${USER}" /etc/passwd | sed 's/\:/ /g')
+
+        ## Create a tmp file excluding the user we want to edit
+        egrep -v "^${USER}" /etc/passwd > /tmp/passwd2
+        echo $1 $PASSWORD $3 $4 $5 $6 $7 | sed 's/ /\:/g' >> /tmp/passwd2
+        mv /tmp/passwd2 /etc/passwd
+    else
+        p_comment 0 "Adding user ${USER}"
+        ## Get the latest UID number and add 1
+        NUM=$(cat /etc/passwd | awk -F':' '{print $3}' | sort | tail -n 1)
+        NUM=$(($NUM+1))
+        echo "${USER}:${PASSWORD}:${NUM}:0:root:/tmp:/bin/ash" >> /etc/passwd
+    fi
+}
+
+###
+# Usage: download_masterscript "<MASTERSCRIPT URL>"
+#
+# This function will dowload the master_script to
+# /var/cache/sali/master_script
+###
+download_masterscript(){
+    case "$(echo $1 | awk -F':' '{print $1}')" in
+        http|https|ftp)
+            if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
+            then
+                curl --output $SALI_CACHE_DIR/master_script $1
+            else
+                curl --silent --output $SALI_CACHE_DIR/master_script $1 
+            fi
+        ;;
+        tftp)
+            p_comment 0 "TFTP is not supported yet"
+        ;;
+        rsync)
+            p_comment 0 "RSYNC is not supported yet"
+        ;;
+        *)
+            p_comment 0 "Unsupported protocol found please use http,https,ftp,tftp or rsync"
+            exit 1
+        ;;
+    esac
 }

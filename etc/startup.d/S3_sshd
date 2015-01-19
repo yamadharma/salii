@@ -1,0 +1,12 @@
+
+## Skip this step when SSHD is disabled, default is enabled
+case "${SALI_SSHD}" in
+    n|N|no|NO|No)
+        exit 0
+    ;;
+esac
+
+## Welcome message for the sshd stage
+p_stage "Starting ssh server"
+
+## Checking for keys

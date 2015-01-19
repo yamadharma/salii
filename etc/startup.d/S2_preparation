@@ -1,0 +1,37 @@
+
+## Welcome message for the preparation stage
+p_stage "Preparing SALI"
+
+if [ -z "${SALI_MASTERSCRIPT}" ]
+then
+    ## Default behaviour if you are using the SALI server tools
+    SALI_MASTERSCRIPT="http://${SALI_IMAGESERVER}/master_script"
+fi
+
+p_service "Fetching mastercript via ${SALI_MASTERSCRIPT}"
+
+download_masterscript $SALI_MASTERSCRIPT
+
+if [ ! -e "${SALI_CACHE_DIR}/master_script" ]
+then
+    p_comment 0 "Failed to fetch master_script from ${SALI_MASTERSCRIPT}"
+    open_console
+fi
+
+supported_script "${SALI_CACHE_DIR}/master_script"
+if [ $? -ne 0 ]
+then
+    p_comment 0 "The downloaded master_script is not supported by SALI ${SALI_VERSION}"
+    open_console
+fi
+
+. "${SALI_CACHE_DIR}/master_script"
+check_function_exists initialize partition
+if [ $? -ne 0 ]
+then
+    p_comment 0 "Missing functions initialize and/or partition in the master_script"
+    open_console
+fi
+
+p_service "Initialize SALI with configuration from master_script"
+initialize
