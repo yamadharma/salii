@@ -3,6 +3,7 @@
 . /etc/init.d/functions
 
 ## Let's begin with some nice headers
+echo
 p_header
 echo
 p_separator
@@ -14,11 +15,7 @@ p_section "Intializing SALI environment"
 ## Now loop trought the different files
 for file in $(ls -1 $SALI_STARTUP_D_DIR)
 do
-    . /etc/sali/default_variables
-
     . $SALI_STARTUP_D_DIR/$file
 
     save_variables
 done 
-
-open_console

@@ -23,27 +23,35 @@
 ###
 
 ## First include the functions file
-. ../etc/init.d/functions
-
-SALI_IMAGESERVER=test
+. /etc/init.d/functions
 
 ## Check wether we must open a console instead of installing a new image
 if [ $(is_yes $SALI_RESCUE) -eq 1 -o -z "${SALI_IMAGESERVER}" ]
 then
-    p_service "Opening console"
+    p_stage "Opening console"
     if [ $(is_yes $SALI_RESCUE) -eq 1 ]
     then
-        p_comment "Reason: SALI_RESCUE is set"
+        p_service "Reason: SALI_RESCUE is set"
     else
-        p_comment "Reason: SALI_IMAGESERVER is not set"
+        p_service "Reason: SALI_IMAGESERVER is not set"
     fi
 
-    #open_console
+    open_console
 
-    exit
+    exit 0
+fi
+
+if [ ! -e "$SALI_CACHE_DIR/installer_first_try" ]
+then
+    touch $SALI_CACHE_DIR/installer_first_try
+else
+    p_stage "This process is a respawn, opening console"
+    open_console
+    exit 1
 fi
 
 ## Let's show what this script does
+echo
 p_section "Starting installation process"
 
 ## Now loop trough the different scripts

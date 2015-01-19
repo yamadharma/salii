@@ -8,30 +8,30 @@ then
     SALI_MASTERSCRIPT="http://${SALI_IMAGESERVER}/master_script"
 fi
 
-p_service "Fetching mastercript via ${SALI_MASTERSCRIPT}"
-
+p_service "Trying to fetch master_script"
+p_comment 10 "from ${SALI_MASTERSCRIPT}"
 download_masterscript $SALI_MASTERSCRIPT
 
-if [ ! -e "${SALI_CACHE_DIR}/master_script" ]
+## No panic we don't have the master script
+if [ -e "${SALI_CACHE_DIR}/master_script" ]
 then
-    p_comment 0 "Failed to fetch master_script from ${SALI_MASTERSCRIPT}"
-    open_console
+    supported_script "${SALI_CACHE_DIR}/master_script"
+    if [ $? -ne 0 ]
+    then
+        p_comment 0 "The downloaded master_script is not supported by SALI ${SALI_VERSION}"
+        open_console
+    fi
+    
+    . "${SALI_CACHE_DIR}/master_script"
+    check_function_exists initialize partition
+    if [ $? -ne 0 ]
+    then
+        p_comment 0 "Missing functions initialize and/or partition in the master_script"
+        open_console
+    fi
+    
+    p_service "Initialize SALI with configuration from master_script"
+    initialize
+else
+    p_comment 0 "Unable to retreieve master_script, continue to boot"
 fi
-
-supported_script "${SALI_CACHE_DIR}/master_script"
-if [ $? -ne 0 ]
-then
-    p_comment 0 "The downloaded master_script is not supported by SALI ${SALI_VERSION}"
-    open_console
-fi
-
-. "${SALI_CACHE_DIR}/master_script"
-check_function_exists initialize partition
-if [ $? -ne 0 ]
-then
-    p_comment 0 "Missing functions initialize and/or partition in the master_script"
-    open_console
-fi
-
-p_service "Initialize SALI with configuration from master_script"
-initialize

@@ -169,5 +169,6 @@ is_yes(){
 # Open a login session
 ###
 open_console(){
+    echo
     exec /bin/cttyhack /bin/login -f root 
 }

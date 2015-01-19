@@ -84,14 +84,18 @@ save_variables(){
     done
 }
 
+## Source the variables
+if [ ! -e "${SALI_VARIABLES_FILE}" ]
+then
+    touch $SALI_VARIABLES_FILE
+fi
+. $SALI_VARIABLES_FILE
+
 ## Always load the default_variables file
 . /etc/sali/default_variables
 
 ## Save the current variables
 save_variables
-
-## Source the variables
-. $SALI_VARIABLES_FILE
 
 ###
 # Include the different library files
