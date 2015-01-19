@@ -27,13 +27,19 @@ then
             p_comment 0 "Unable to add interface to interfaces file"
         fi
     fi
+
+    p_comment 0 "Enabling interface"
+    do_ifup $DEVICE
 else
     p_service "Trying to configure all network interfaces with dhcp"
     for interface in $(ls -1 /sys/class/net | grep -v lo)
     do
-        p_comment 0 "Adding interface ${interface} to configuration"
+        p_comment 0 "Enabling interface ${interface}"
         add_interface $interface dhcp
+        do_ifup $interface &
     done
+
+    wait
 fi
 
 ## Let's save the new variables values

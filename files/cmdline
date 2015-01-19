@@ -1,1 +1,3 @@
-BOOT_IMAGE=/vmlinuz-linux root=UUID=32741d4b-c209-4645-b9ce-ad56fd2a9410 ro elevator=noop SALI_MONITOR_CONSOLE=n SALI_VERBOSE_LEVEL=2 SALI_SSHD=y SALI_PROTOCOL=rsync
+## Just add a parameter on each line
+SALI_VERBOSE_LEVEL=2
+DEVICE=eth0

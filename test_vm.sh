@@ -100,8 +100,11 @@ case "${1}" in
         echo "Creating new initrd"
         cd "$ROOT_DIR/build/initrd_test" && find . | cpio --quiet -o -H newc > $ROOT_DIR/build/initrd_test.img.out
 
+        echo "Using cmdline from file files/cmdline"
+        CMDLINE=$(cat $ROOT_DIR/files/cmdline | egrep -v "^#" | xargs)
+
         echo "Starting VM"
-        $QEMUSYS -kernel $BUILD_DIR/kernel -initrd $BUILD_DIR/initrd_test.img.out -m 1024 -cpu Haswell -smp "cpus=2" -hda $BUILD_DIR/test_disk.qcow2 &
+        $QEMUSYS -kernel $BUILD_DIR/kernel -initrd $BUILD_DIR/initrd_test.img.out -append "$CMDLINE" -m 1024 -cpu Haswell -smp "cpus=2" -hda $BUILD_DIR/test_disk.qcow2 &
 
         echo "Just type ctr+c to exit"
         wait
