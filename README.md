@@ -13,7 +13,7 @@ We recommend to use homebrew when you are using OSX for development. Just type `
 ## Running tests
  * First start the webserver `./test_vm.sh webserver`
  * Edit files/cmdline and change your hostname in SALI_MASTERSCRIPT
- * Run `./test_vm.sh run` to start a virtual machine.
+ * Run `./test_vm.sh run` to start a virtual machine. (separate terminal)
 
 ## File stucture
 
