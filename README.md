@@ -10,6 +10,11 @@ Requirements:
 
 We recommend to use homebrew when you are using OSX for development. Just type `brew install qemu`.
 
+## Running tests
+ * First start the webserver `./test_vm.sh webserver`
+ * Edit files/cmdline and change your hostname in SALI_MASTERSCRIPT
+ * Run `./test_vm.sh run` to start a virtual machine.
+
 ## File stucture
 
  * docs : Contains some documentation and ideas for the future
