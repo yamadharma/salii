@@ -4,7 +4,7 @@ p_stage "Configuring network"
 
 ## Let's begin with the loopback interface
 p_service "Configuring loopback device"
-echo "iface lo inet looback" > $SALI_INTERFACES_FILE
+echo "iface lo inet loopback" > $SALI_INTERFACES_FILE
 echo "auto lo" >> $SALI_INTERFACES_FILE
 echo "" >> $SALI_INTERFACES_FILE
 

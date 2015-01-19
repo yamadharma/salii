@@ -26,3 +26,5 @@ do
 
     save_variables
 done 
+
+open_console
