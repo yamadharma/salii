@@ -23,18 +23,6 @@ CPIO=$(which cpio)
 BUNZIP2=$(which bunzip2)
 RSYNC=$(which rsync)
 
-## Stop this script if we are missing a command, error message is a bit cryptic (will be resolved in the future)
-check_commands(){
-    for cmd in $@
-    do
-        if [ ! -x "${cmd}" ]
-        then
-            echo "Could not find command '${cmd}' (or is empty) or is not executable"
-            exit 1
-        fi
-    done
-}
-
 ## Check if it's a supported environment
 case "$(uname -s)" in
     "Darwin"|"Linux")

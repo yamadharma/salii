@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ../etc/init.d/functions
+. /etc/init.d/functions
 
 ## Let's begin with some nice headers
 p_header
@@ -14,14 +14,14 @@ p_section "Intializing SALI environment"
 ## Now loop trought the different files
 for file in $(ls -1 $SALI_STARTUP_D_DIR)
 do
-    . /var/tmp/dennis/sali/etc/sali/default_variables
+    . /etc/sali/default_variables
 
     . $SALI_STARTUP_D_DIR/$file
 
     if [ $? -ne 0 ]
     then
         p_stage "An error has occured in stage ${file}"
-        #open_console
+        open_console
     fi
 
     save_variables
