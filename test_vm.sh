@@ -3,11 +3,17 @@
 LATEST="ftp://ftp.surfsara.nl/pub/sali/sali-x86_64.tar.gz"
 EXTRACT_FILES="sali-1.6.3/x86_64/initrd.img sali-1.6.3/x86_64/kernel"
 BUILD_DIR=$(pwd)/build
+RSYNC_OPTS="-arv --exclude-from=$(pwd)/files/rsync_exclude"
+
+echo $RSYNC_OPTS
+exit 0
 
 CURL=$(which curl)
 TAR=$(which tar)
 QEMUIMG=$(which qemu-img)
 QEMUSYS=$(which qemu-system-x86_64)
+CPIO=$(which cpio)
+BUNZIP2=$(which bunzip2)
 
 check_commands(){
     for cmd in $@
