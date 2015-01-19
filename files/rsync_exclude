@@ -1,0 +1,10 @@
+CHANGELOG
+README.md
+build/
+docs/
+files/
+old/
+test_vm.sh
+.DS_Store
+.git/
+.gitignore
