@@ -9,7 +9,6 @@
 tty2::askfirst:/bin/login -f root
 tty3::askfirst:/bin/login -f root
 tty4::once:/usr/bin/tail -n1000 -f /var/log/sali.log
-
-#cons::respawn:/sbin/getty -L 42 console
+tty5::once:/usr/bin/tail -n1000 -f /var/log/sali_console.log
 
 ::ctrlaltdel:/sbin/reboot

@@ -43,6 +43,7 @@ then
     p_comment 0 "Type: exit"
     open_console
 fi
+
 if [ -z "${SALI_IMAGENAME}" ]
 then
     p_stage "Missing value for SALI_IMAGENAME"
@@ -70,7 +71,11 @@ p_section "Starting installation process"
 for file in $(ls -1 $SALI_INSTALLER_D_DIR)
 do
     . $SALI_INSTALLER_D_DIR/$file
+
+    if [ $? -ne 0 ]
+    then
+        open_console error
+    fi
 done
 
-echo "Dev mode"
 open_console

@@ -68,10 +68,10 @@ p_section(){
         RIGHT=$(($COLS - $LEFT))
         LINE="[$(printf "%*s%s%*s" $LEFT "" "${TEXT}" $RIGHT "")]"
     else
-        printf "[ %s ]" "${TEXT}"
+        printf "[ %s ]" "${TEXT}" | tee -a $SALI_CONSOLE_LOG_FILE
     fi
     
-    printf "${LINE}\n"
+    printf "${LINE}\n" | tee -a $SALI_CONSOLE_LOG_FILE
 }
 
 ###
@@ -98,11 +98,12 @@ p_separator(){
     fi
 
     COLS=$(stty size | awk '{print $2}')
+    SEP_STR=""
     for char in $(seq 1 $COLS)
     do
-        printf "${SEP}"
+        SEP_STR="${SEP_STR}${SEP}"
     done
-    printf "\n"
+    printf "%s\n" "${SEP_STR}" | tee -a $SALI_CONSOLE_LOG_FILE
 }
 
 ###
@@ -111,7 +112,7 @@ p_separator(){
 # Print a line of text to indicate a stage
 ###
 p_stage(){
-    printf "\n> %s\n" "${1}"
+    printf "\n> %s\n" "${1}" | tee -a $SALI_CONSOLE_LOG_FILE
 }
 
 ###
@@ -120,13 +121,13 @@ p_stage(){
 # Print a line of text to show the progress within a stage
 ###
 p_service(){
-    printf "  :: %s\n" "${1}"
+    printf "  :: %s\n" "${1}" | tee -a $SALI_CONSOLE_LOG_FILE
 }
 
 p_comment(){
     if [ $SALI_VERBOSE_LEVEL -ge $1 ]
     then
-        printf "    . %s\n" "${2}"
+        printf "    . %s\n" "${2}" | tee -a $SALI_CONSOLE_LOG_FILE
     fi
 }
 
@@ -138,11 +139,9 @@ p_comment(){
 supported_script(){
     FIRSTLINE=$(head -n 1 $1)
 
-    if [ -z "$(echo $FIRSTLINE | awk '/(SALI\:)(2|2\.0)$/ {print $2}')" ]
+    if [ -z "$(echo $FIRSTLINE | awk '/(SALI\:)(1\.7|2|2\.0)$/ {print $2}')" ]
     then
-        echo "Supplied masterscript is not supported by this version of SALI!"
-        echo "  this SALI version supports script versions: SALI:2, SALI:2.0"
-        exit 1
+        return 1
     fi
 }
 
@@ -164,11 +163,34 @@ is_yes(){
 }
 
 ###
-# Usage: open_console
+# Usage: open_console <error|error_startup>
 #
 # Open a login session
 ###
 open_console(){
+
+    ## Check if we must supply additional info
+    case "${1}" in
+        error_startup)
+            echo
+            p_section "Startup error"
+            echo
+            cat $SALI_ERROR_STARTUP_FILE
+        ;;
+        error)
+            echo
+            p_section "Installation error"
+            echo
+            cat $SALI_ERROR_FILE
+        ;;
+        *)
+            echo
+            p_section "Console mode"
+            echo
+            cat $SALI_CONSOLE_FILE
+        ;;
+    esac
+
     echo
     exec /bin/cttyhack /bin/login -f root 
 }

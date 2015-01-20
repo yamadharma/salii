@@ -42,8 +42,5 @@ else
     wait
 fi
 
-## Let's save the new variables values
-save_variables
-
 ## At the end always return 0, when there is an error return 1 or higher
 return 0

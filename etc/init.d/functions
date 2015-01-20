@@ -48,8 +48,11 @@ static_vars(){
     SALI_SCRIPTS_DIR=$SALI_CACHE_DIR/scripts
     SALI_TORRENTS_DIR=$SALI_CACHE_DIR/torrents
     SALI_LOG_FILE=/var/log/sali.log
+    SALI_CONSOLE_LOG_FILE=/var/log/sali_console.log
     SALI_MONITOR_FILE=/var/log/monitor.log
     SALI_ERROR_FILE=/etc/sali/error_file
+    SALI_ERROR_STARTUP_FILE=/etc/sali/error_startup_file
+    SALI_CONSOLE_FILE=/etc/sali/console_file
     SALI_VARIABLES_FILE=$SALI_CACHE_DIR/variables
     SALI_VERSION=$(cat /etc/sali_version)
     SALI_INSTALLER_D_DIR=/etc/installer.d
