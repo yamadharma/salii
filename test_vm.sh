@@ -43,7 +43,7 @@ case "${1}" in
         echo "Removing $BUILD_DIR dir"
         if [ -d "$BUILD_DIR" ]
         then
-            rm -rf $BUILD_DIR
+            sudo rm -rf $BUILD_DIR
         fi
     ;;
     run)
