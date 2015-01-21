@@ -108,6 +108,7 @@ case "${1}" in
         echo "Starting VM"
         $QEMUSYS -kernel $BUILD_DIR/kernel -initrd $BUILD_DIR/initrd_test.img.out \
             -append "$CMDLINE" -m 1024 -cpu Haswell -smp "cpus=2" \
+            -redir :8022::22 -redir :8514::514
             -hda $BUILD_DIR/test_disk.qcow2 &
 
         echo "Just type ctr+c to exit"
