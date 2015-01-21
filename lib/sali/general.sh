@@ -210,9 +210,9 @@ download_file(){
         http|https|ftp)
             if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
             then
-                curl --output $SALI_CACHE_DIR/$FILENAME $1
+                curl --connect-timeout 10 --output $SALI_CACHE_DIR/$FILENAME $1
             else
-                curl --silent --output $SALI_CACHE_DIR/$FILENAME $1
+                curl --connect-timeout 10 --silent --output $SALI_CACHE_DIR/$FILENAME $1
             fi
         ;;
         tftp)
