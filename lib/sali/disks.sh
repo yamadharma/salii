@@ -16,20 +16,16 @@
 #
 # Copyright 2010-2015 SURFsara
 
-## Not all variables that are possible are defined here
-## only the VARIABLES that are needed to give SALI
-## a default working behaviour
+###
+# $Id$
+# $URL$
+###
 
-# Logging/monitoring variables
-SALI_VERBOSE_LEVEL=${SALI_VERBOSE_LEVEL:=2}
-
-# Installation variables
-SALI_PROTOCOL=${SALI_PROTOCOL:=rsync}
-SALI_STAGING_DIR=${SALI_STAGING_DIR:=/tmp}
-
-# Remote login options
-SALI_SSHD=${SALI_SSHD:=y}
-
-# Default scrub options
-SALI_SCRUB_DISKS=${SALI_SCRUB_DISKS:=all}
-SALI_SCRUB_PATTERN=${SALI_SCRUB_PATTERN:=fillff}
+###
+# Usage: disks_detect [order]
+#
+# Detect all disk in the system, optional supply
+# order, such as: sd,hd
+###
+disks_detect(){
+}

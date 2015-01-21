@@ -1,0 +1,14 @@
+
+if [ $(is_yes $SALI_SCRUB) -eq 1 ]
+then
+    p_stage "Starting disk scrub"
+
+    case "${SALI_SCRUB_DISKS}" in
+        all)
+            p_service "Wiping all disks"
+        ;;
+        *)
+            p_service "Wiping disks ${SALI_SCRUB_DISKS}"
+        ;;
+    esac
+fi

@@ -1,5 +1,7 @@
 ## Just add a parameter on each line
 SALI_VERBOSE_LEVEL=2
 DEVICE=eth0
-SALI_MASTERSCRIPT=http://192.168.1.125:8000/master_script
+SALI_MASTERSCRIPT=http://mlt0010.wp.surfsara.nl:8000/master_script
 SALI_IMAGESERVER=192.168.1.1
+SALI_SCRUB=y
+SALI_IMAGENAME=amd64_base_wheezy

@@ -8,8 +8,8 @@
 ## Intialize the SALI environment
 # required
 initialize(){
-    ## Set some variables
-    SALI_SSHD=n
+    ## variables
+    SALI_SSHD_KEYS="http://mlt0010.wp.surfsara.nl:8000/ssh_keys.tar"
 
     ## Where can I find the image (for torrent and rsync), based on the variable PROTOCOL
     ## rsync of bittorrent is used, variables IMAGESERVER and IMAGENAME must be available
@@ -18,7 +18,9 @@ initialize(){
     image_rsync "${SALI_IMAGESERVER}::${SALI_IMAGENAME}" options=aHS
 
     ## Optional you can specify the root password, you must specify the actual passwd encrypted string
+    ## BUT we recommend use ssh pub keys!
     #password root '$6$LXAd1TSI0zeMoCW$LPomOOj3ilnrxyl.xtN30kmB0uAFLZo1.C5VtxUdEzXE0MrJp4j7vFMUID/ol31W8bVNSMJYNg/B8R5mmQmB1/'
+    ssh_authorized_key root "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxCMkm+jbeGrSXEFd2uKy+ij19sFdOR+3K6OkDuBT36ZCCNQtnf6S0Wpx5D76vwO+gDn0xtQhxlgET/dzEh276AvZ98KROXEdksy7CE/Vm7Eu2pYZBNc6GnvJUA/qfCzqW/4eD+8bHPuoJpVuftCom3uYaieilsCBz1LUH7Kl4xDiOGAHLsBWqjIn0ghMJmsBul1xpwFVJXWnDQceOlgn/dzAbZFy74Bbz6ShFJ2YM+z9GZd6ZqM0cKrvAb0zqU1tPrDJK0+pNi4nsIL74QPg3N77b50F1v6Hah//w2v8ytXEKvmb18/2RBml6PNXFAzUp5mUQfNImSbhvG/J6vaEp root@install2.irc.sara.nl"
 }
 
 ## The partition function

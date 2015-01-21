@@ -56,6 +56,7 @@ args(){
 ###
 p_section(){
     TEXT=$1
+    logger -t section "${TEXT}" 
 
     ## Fetch the width of the console, minus 2 and minus the TEXT length
     TEXT_LEN=$(printf "$TEXT" | wc -L)
@@ -68,10 +69,10 @@ p_section(){
         RIGHT=$(($COLS - $LEFT))
         LINE="[$(printf "%*s%s%*s" $LEFT "" "${TEXT}" $RIGHT "")]"
     else
-        printf "[ %s ]" "${TEXT}" | tee -a $SALI_CONSOLE_LOG_FILE
+        printf "[ %s ]" "${TEXT}"
     fi
-    
-    printf "${LINE}\n" | tee -a $SALI_CONSOLE_LOG_FILE
+   
+    printf "${LINE}\n"
 }
 
 ###
@@ -103,7 +104,7 @@ p_separator(){
     do
         SEP_STR="${SEP_STR}${SEP}"
     done
-    printf "%s\n" "${SEP_STR}" | tee -a $SALI_CONSOLE_LOG_FILE
+    printf "%s\n" "${SEP_STR}"
 }
 
 ###
@@ -112,7 +113,8 @@ p_separator(){
 # Print a line of text to indicate a stage
 ###
 p_stage(){
-    printf "\n> %s\n" "${1}" | tee -a $SALI_CONSOLE_LOG_FILE
+    logger -t stage "${1}" 
+    printf "\n> %s\n" "${1}"
 }
 
 ###
@@ -121,13 +123,15 @@ p_stage(){
 # Print a line of text to show the progress within a stage
 ###
 p_service(){
-    printf "  :: %s\n" "${1}" | tee -a $SALI_CONSOLE_LOG_FILE
+    logger -t service "${1}"
+    printf "  :: %s\n" "${1}"
 }
 
 p_comment(){
+    logger -t comment "${2}"
     if [ $SALI_VERBOSE_LEVEL -ge $1 ]
     then
-        printf "    . %s\n" "${2}" | tee -a $SALI_CONSOLE_LOG_FILE
+        printf "    . %s\n" "${2}"
     fi
 }
 
@@ -193,4 +197,40 @@ open_console(){
 
     echo
     exec /bin/cttyhack /bin/login -f root 
+}
+
+###
+# Usage: download_file "<URL>"
+#
+# This function downloads the file to the cache dir
+###
+download_file(){
+    FILENAME=$(basename "${1}")
+    case "$(echo $1 | awk -F':' '{print $1}')" in
+        http|https|ftp)
+            if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
+            then
+                curl --output $SALI_CACHE_DIR/$FILENAME $1
+            else
+                curl --silent --output $SALI_CACHE_DIR/$FILENAME $1
+            fi
+        ;;
+        tftp)
+            p_comment 0 "TFTP is not supported yet"
+        ;;
+        rsync)
+            p_comment 0 "RSYNC is not supported yet"
+        ;;
+        *)
+            p_comment 0 "Unsupported protocol found please use http,https,ftp,tftp or rsync"
+            return 1
+        ;;
+    esac
+
+    if [ -e "${SALI_CACHE_DIR}/${FILENAME}" ]
+    then
+        echo "${SALI_CACHE_DIR}/${FILENAME}"
+    else
+        return 1
+    fi
 }

@@ -47,8 +47,7 @@ static_vars(){
     SALI_CACHE_DIR=/var/cache/sali
     SALI_SCRIPTS_DIR=$SALI_CACHE_DIR/scripts
     SALI_TORRENTS_DIR=$SALI_CACHE_DIR/torrents
-    SALI_LOG_FILE=/var/log/sali.log
-    SALI_CONSOLE_LOG_FILE=/var/log/sali_console.log
+    SALI_LOG_FILE=/var/log/messages
     SALI_MONITOR_FILE=/var/log/monitor.log
     SALI_ERROR_FILE=/etc/sali/error_file
     SALI_ERROR_STARTUP_FILE=/etc/sali/error_startup_file
@@ -100,8 +99,8 @@ fi
 ## Save the current variables
 save_variables
 
-###
-# Include the different library files
+###INCLUDE
+# Include the different library files, please do not remove ###INCLUDE
 
 # First include the general functions
 . $SALI_LIB_DIR/general.sh
@@ -109,8 +108,11 @@ save_variables
 # Include the network functions
 . $SALI_LIB_DIR/network.sh
 
-# Include the masterscript functions
-. $SALI_LIB_DIR/master_script.sh
+# Include the ssh functions
+.  $SALI_LIB_DIR/ssh.sh
+
+# Include the initialize functions
+. $SALI_LIB_DIR/initialize.sh
 
 # Include ARIA imaging functions
 #. $SALI_LIB_DIR/aria2.sh
