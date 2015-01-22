@@ -1,3 +1,6 @@
+1.6.7
+  * Updated kernel to latest lts: 3.14.28
+
 1.6.6
   * Update kernel to latest stable: 3.10.33
   * Updated aria2 to 1.18.3
