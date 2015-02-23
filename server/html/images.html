@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block page_title %}Images{% end %}
+
+{% block page_content %}
+<div class="row">
+	<div class="col-lg-12">
+		<h1>Images</h1>
+    	<ol class="breadcrumb">
+        	<li><a href="index.html"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+        	<li class="active"><i class="fa fa-picture-o"></i> Images</li>
+    	</ol>
+	</div>
+</div>
+
+<!-- Top statistics -->
+<div class="row">
+    <div class="col-xs-6">
+    	<p>On this page you can view all images that are available for installation, also some basic information is shown. Check the legend on the right for the explanation.</p>
+    	<p>When you want to create/update an image, you must use the cli tool. Run <code>sali getimage --help</code> for more information.</p>
+    </div>
+    <div class="col-xs-6">
+    </div>
+</div>
+                
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>imagename</th>
+                    <th>torrent</th>
+                    <th>modified</th>
+                    <th>state</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for image in images %}
+                    {% if image['is_locked'] %}
+                    <tr class="danger"><td>{{ image['imagename'] }}</td><td>{{ image['tarball'] }}</td><td>{{ image['mtime'] }}</td><td>locked by {{ image['is_locked_by'] }}</td></tr>
+                    {% else %}
+                    <tr class="success"><td>{{ image['imagename'] }}</td><td>{{ image['tarball'] }}</td><td>{{ image['mtime'] }}</td><td>available</td></tr>
+                    {% end %}
+                {% end %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% end %}

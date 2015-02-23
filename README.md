@@ -31,3 +31,11 @@ Recommendations:
  * CHANGELOG : What has changed since version 1.0.0
  * README.md : This file
  * `test_client.sh` : Allows you to test the client code in the SALI embedded environment
+
+## Server
+
+### Features
+ * Create an image with rsync (uses ssh to start rsync on the golden-client)
+ * Create a tar.gz image for bittorrent distribution
+ * Generate a rsync daemon config
+ * Bittorrent tracker

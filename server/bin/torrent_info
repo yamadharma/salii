@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+#
+# This file is part of SALI
+#
+# SALI is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# SALI is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with SALI.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright 2010-2014 SURFsara
+
+#
+# A Quick and dirty written Python script to check the contents of a .torrent file
+#
+
+import sys
+sys.path.insert(0, '../')
+
+from sali import bencode
+
+with open(sys.argv[1], 'r') as fi:
+    data = bencode.bdecode(fi.read())
+
+for key, value in data.items():
+    if type(value) is type({}):
+        print key
+        for k,v in value.items():
+            if k == 'pieces' and not 'all' in sys.argv:
+                print '    %s: %s' % (k, len(v))
+            else:
+                print '    %s: %s' % (k, v)
+    else:
+        print '%s: %s' % (key, str(value))

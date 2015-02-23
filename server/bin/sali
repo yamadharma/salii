@@ -1,0 +1,150 @@
+#!/usr/bin/env python
+#
+# This file is part of SALI
+#
+# SALI is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# SALI is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with SALI.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright 2010-2014 SURFsara
+
+from __future__ import print_function
+
+import os
+import sys
+import platform
+
+# Stop SALI if the system is  not Linux
+if platform.system() not in ['linux', 'Linux', 'LINUX']:
+    print('SALI can only be used on a Linux machine', file=sys.stderr)
+    sys.exit(1)
+
+import argparse
+
+##
+# Check if SALI is run on a supported version of Python
+if sys.hexversion < 34013424:
+    print('This version of Python is not supported, needs at least version 2.7', file=sys.stderr)
+    sys.exit(1)
+
+## When environment variable SALI_DEV is set (the value of the variable is not important)
+##  then add the development sources
+if os.environ.get('SALI_DEV', None):
+    ROOT_DIR=os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../'))
+    sys.path.insert(0, ROOT_DIR)
+
+try:
+    from sali import common
+    from sali import tools
+    from sali import release
+except ImportError as err:
+    print('Error unable to import all/some SALI modules:', file=sys.stderr)
+    print(' -', str(err), file=sys.stderr)
+    sys.exit(1)
+
+## Wrapper function around the classes
+def server(cmn):
+    if cmn.arguments.daemon:
+        tools.create_daemon('/', 0)
+    from sali import server
+    server.Server(cmn)
+
+def getimage(cmn):
+    from sali import getimage
+    getimage.GetImage(cmn)
+
+def rsync(cmn):
+    from sali import rsync
+    rsync.Rsync(cmn)
+
+def args():
+    ## The argumentparser object
+    parser = argparse.ArgumentParser(
+        description='The SALI server tool',
+    )
+    subparsers = parser.add_subparsers(dest='command', help='the SALI server modes')
+
+    ## The main arguments for all sub-arguments
+    parser.add_argument(
+        '-c', '--config', type=str, metavar='CONFIG',
+        default='/etc/sali/sali.cfg',
+        help='specify the main configuration file'
+    )
+    parser.add_argument(
+        '-v', '--verbose', action='store_true',
+        help='enable verbose mode for SALI',
+    )
+    parser.add_argument(
+        '--version', action='version', version='%s %s - %s' % (
+            release.name,
+            release.version,
+            release.copyright
+        )
+    )
+
+    ## The SERVER argument options
+    parser_server = subparsers.add_parser('server', help='the server for SALI')
+    parser_server.add_argument(
+        '-d', '--daemon', action='store_true', default=False,
+        help='start the server as daemon'
+    )
+    parser_server.set_defaults(func=server)
+
+    ## The GETIMAGE argument options
+    parser_getimage = subparsers.add_parser('getimage', help='fetch an image from a golden client')
+    parser_getimage.add_argument(
+        '-g', '--golden-client', type=str, metavar='GOLDEN-CLIENT',
+        help='from which host we must fetch/create an image'
+    )
+    parser_getimage.add_argument(
+        '-i', '--image', type=str, metavar='IMAGENAME',
+        help='the name of the image we are updating/creating'
+    )
+    parser_getimage.add_argument(
+        '-e', '--exclude', type=str, metavar='EXCLUDE',
+        help='specify the rsync exclude file'
+    )
+    parser_getimage.add_argument(
+        '-s', '-y', '--yes', '--scriGpt', action='store_true', default=False,
+        help='do not ask for confirmation'
+    )
+    parser_getimage.set_defaults(func=getimage)
+
+    ## The RSYNC argument options
+    parser_rsync = subparsers.add_parser('rsync', help='generates the rsync file for SALI')
+    parser_rsync.set_defaults(func=rsync)
+
+    return parser.parse_args()
+
+if __name__ == '__main__':
+
+    ## Parse the arguments
+    arguments = args()
+
+    ## Initialize the common class
+    cmn = common.Common(arguments)
+    logger = cmn.get_logger(__name__)
+
+    ## Hello from SALI
+    logger.info('Welcome to SALI %s' % release.version)
+
+    ## Check if we have a tar command, and set the value in our cmn.cfg class
+    cmn.cfg.set('commands', 'rsync', tools.find_command(cmn.cfg.get('commands', 'rsync')))
+    cmn.cfg.set('commands', 'tar', tools.find_command(cmn.cfg.get('commands', 'tar')))
+    cmn.cfg.set('commands', 'ssh', tools.find_command(cmn.cfg.get('commands', 'ssh')))
+
+    if arguments.command in ['server', 'getimage']:
+        tools.tar_gnu(cmn.cfg.get('commands', 'tar'))
+
+    ## Load the function
+    logger.debug('loading function %s' % cmn.arguments.func.__name__)
+    cmn.arguments.func(cmn)

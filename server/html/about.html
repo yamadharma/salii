@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block page_title %}About{% end %}
+
+{% block page_content %}
+<div class="row">
+	<div class="col-lg-12">
+		<h1>About <small>Statistics of the running instance</small></h1>
+    	<ol class="breadcrumb">
+        	<li><a href="index.html"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+        	<li class="active"><i class="fa fa-gears"></i> About</li>
+    	</ol>
+	</div>
+</div>
+
+<div class="row">
+    <div class="col-xs-6">
+        <h3>System information</h3>
+       	<table class="table table-condensed">
+            <tbody>
+                <tr><td>OS Type</td><td>{{ os_type }}</td></tr>
+                <tr><td>OS Release</td><td>{{ os_release }}</td></tr>
+                <tr><td>OS Distribution</td><td>{{ os_distro }}</td></tr>
+                <tr><td>System uptime</td><td>{{ os_uptime }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% end %}
