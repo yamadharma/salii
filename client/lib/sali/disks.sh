@@ -22,10 +22,45 @@
 ###
 
 ###
+# Usage: disks_detect_lscsi
+#
+# Detect all disks using the lsscsi command
+###
+disks_detect_lscsi(){
+    ##
+    return 0
+}
+
+###
+# Usage: disks_detect_dev
+#
+# Detect all disks by looking at the /dev/disk/*
+# method (failback for lscsci)
+###
+disks_detect_dev(){
+    ##
+    return 0
+}
+
+###
 # Usage: disks_detect [order]
 #
 # Detect all disk in the system, optional supply
 # order, such as: sd,hd
 ###
 disks_detect(){
+
+    ALLDISKS=$(disks_detect_lscsi)
+
+    if [ -z "${ALLDISKS}" ]
+    then
+        ALLDISKS=$(disks_detect_dev)
+    fi
+
+    if [ -z "${ALLDISKS}" ]
+    then
+        return 1
+    fi
+
+    echo $ALLDISKS
 }

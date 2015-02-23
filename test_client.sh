@@ -11,7 +11,7 @@ fi
 LATEST="ftp://ftp.surfsara.nl/pub/sali/sali-x86_64.tar.gz"
 EXTRACT_FILES="sali-1.6.3/x86_64/initrd.img sali-1.6.3/x86_64/kernel"
 ROOT_DIR=$(pwd)
-BUILD_DIR=$ROOT_DIR/build
+BUILD_DIR=$ROOT_DIR/client-build
 RSYNC_OPTS="-ar --exclude-from=$ROOT_DIR/files/rsync_exclude"
 
 ## We need the following commands, just make sure your PATH is correct!
@@ -80,30 +80,30 @@ case "${1}" in
         fi
 
         ## Make sure the old test_dir is gone
-        if [ -d "$ROOT_DIR/build/initrd_test" ]
+        if [ -d "$BUILD_DIR/initrd_test" ]
         then
             echo "Removing previous initrd_test dir"
-            sudo rm -rf "$ROOT_DIR/build/initrd_test"
+            sudo rm -rf "$BUILD_DIR/initrd_test"
         fi
 
         echo "Unpacking cpio image"
-        mkdir "$ROOT_DIR/build/initrd_test"
-        cd "$ROOT_DIR/build/initrd_test" && $CPIO -id < ../initrd.img.out >/dev/null 2>&1
+        mkdir "$BUILD_DIR/initrd_test"
+        cd "$BUILD_DIR/initrd_test" && $CPIO -id < ../initrd.img.out >/dev/null 2>&1
 
         echo "Just to be sure, remove all files in the startup.d and installer.d"
-        rm $ROOT_DIR/build/initrd_test/etc/startup.d/*
-        rm $ROOT_DIR/build/initrd_test/etc/installer.d/*
-        rm $ROOT_DIR/build/initrd_test/etc/ssh/ssh_host*key*
+        rm $BUILD_DIR/initrd_test/etc/startup.d/*
+        rm $BUILD_DIR/initrd_test/etc/installer.d/*
+        rm $BUILD_DIR/initrd_test/etc/ssh/ssh_host*key*
 
         echo "Rsyncing the test files"
-        $RSYNC $RSYNC_OPTS $ROOT_DIR/ $ROOT_DIR/build/initrd_test
+        $RSYNC $RSYNC_OPTS $ROOT_DIR/client/ $BUILD_DIR/initrd_test
 
         echo "Creating new initrd"
-        sudo chown -R root:wheel "$ROOT_DIR/build/initrd_test"
-        cd "$ROOT_DIR/build/initrd_test" && sudo find . | sudo cpio --quiet -o -H newc > $ROOT_DIR/build/initrd_test.img.out
+        sudo chown -R root:wheel "$BUILD_DIR/initrd_test"
+        cd "$BUILD_DIR/initrd_test" && sudo find . | sudo cpio --quiet -o -H newc > $ROOT_DIR/build/initrd_test.img.out
 
         echo "Using cmdline from file files/cmdline"
-        CMDLINE=$(cat $ROOT_DIR/files/cmdline | egrep -v "^#" | xargs)
+        CMDLINE=$(cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | xargs)
 
         echo "Starting VM"
         $QEMUSYS -kernel $BUILD_DIR/kernel -initrd $BUILD_DIR/initrd_test.img.out \
@@ -115,7 +115,7 @@ case "${1}" in
         wait
     ;;
     webserver)
-        cd "$ROOT_DIR/files" && python -m SimpleHTTPServer 8000
+        cd "$ROOT_DIR/client/files" && python -m SimpleHTTPServer 8000
     ;;
     *)
         echo "Usage: ${0} <run|clean>"

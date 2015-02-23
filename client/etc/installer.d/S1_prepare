@@ -3,6 +3,8 @@ if [ $(is_yes $SALI_SCRUB) -eq 1 ]
 then
     p_stage "Starting disk scrub"
 
+    disks_detect sd hd vd
+
     case "${SALI_SCRUB_DISKS}" in
         all)
             p_service "Wiping all disks"

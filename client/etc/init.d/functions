@@ -126,7 +126,7 @@ save_variables
 #. $SALI_LIB_DIR/imaging.sh
 
 # Include Partition functions
-#. $SALI_LIB_DIR/disks.sh
+. $SALI_LIB_DIR/disks.sh
 
 # Include Chroot functions
 #. $SALI_LIB_DIR/chroot.sh

@@ -1,4 +1,4 @@
 .DS_Store
-build
-files/ssh_keys.tar
+client-build
+client/files/ssh_keys.tar
 *.swp
