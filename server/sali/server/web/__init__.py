@@ -54,8 +54,8 @@ def web_app(cmn):
     }
     httplib.responses.update(RESPONSE_MESSAGES)
 
-    tracker_db = database.Database_old(cmn, 'tracker')
-    tracker_db = tracker_db.get()
+    tracker_db = database.Database(cmn, 'tracker')
+    monitor_db = database.Database(cmn, 'monitor')
 
     application = web.Application([
         (r'/', web.RedirectHandler, {'url': '/dashboard'}),
@@ -72,9 +72,9 @@ def web_app(cmn):
 
     ## Owke, get the loggers and set propagate to False so the
     ## tornado module will not add any handlers!
-    cmn.get_logger('tornado.access').propagate = False
-    cmn.get_logger('tornado.application').propagate = False
-    cmn.get_logger('tornado.general').propagate = False
+    #cmn.get_logger('tornado.access').propagate = False
+    #cmn.get_logger('tornado.application').propagate = False
+    #cmn.get_logger('tornado.general').propagate = False
 
     http_server = httpserver.HTTPServer(application)
     http_server.listen(cmn.cfg.getint('web', 'port'), cmn.cfg.get('web', 'listen'))

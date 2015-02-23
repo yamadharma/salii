@@ -113,7 +113,7 @@ def tar_gnu(tarcmd):
     stdout, stderr = proc.communicate()
     
     if not re.search(r'tar \(GNU tar\)', stdout.strip(), re.MULTILINE):
-        print('Error the tar command \'%s\' does not seem to be GNU tar' % tarpath, file=sys.stderr)
+        print('Error the tar command \'%s\' does not seem to be GNU tar' % tarcmd, file=sys.stderr)
         sys.exit(1)
 
 def tar(cmn, source, destination):

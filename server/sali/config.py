@@ -53,9 +53,9 @@ SALI_CONFIGURATION = {
     'web' : {
         'listen'        : '0.0.0.0',
         'port'          : 8080,
-        'templates'     : '%(data_dir)s/html',
-        'http_static'   : '%(data_dir)s/html/static',
-        'info_hash_len' : 19,
+        'templates'     : '%(config_dir)s/html',
+        'http_static'   : '%(config_dir)s/html/static',
+        'info_hash_len' : 20,
         'peer_id_len'   : 20,
         'max_allowed_peers': 55,
         'default_allowed_peers': 50,

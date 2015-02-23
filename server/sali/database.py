@@ -18,31 +18,28 @@
 
 import os
 import shelve
-import gdbm
+import cPickle
 
-import sqlite3
-
-class Database_old(object):
-
-    __shared_state = dict()
-
-    def __init__(self, cmn, name):
-        self.__dict__ = self.__shared_state
-        self.cmn = cmn
-        self.name = name
-
-    def get(self):
-        if not hasattr(self, '__db'):
-            self.__db = shelve.Shelf(gdbm.open(os.path.join(self.cmn.cfg.get('general', 'cache_dir'), self.name +'.db'), 'n'))
-        return self.__db
-
-    def close(self):
-        if not hasattr(self, '__db'):
-            return 0
-        self.__db.close()
-        del self.__db
+import lmdb
 
 class Database(object):
     
     def __init__(self, cmn, name):
-        pass
+        self.db_path = os.path.join(
+            cmn.cfg.get('general', 'cache_dir'), name
+        )
+        self.env = lmdb.open(self.db_path, max_dbs=2)
+
+    def write(self, key, data):
+        with self.env.begin(write=True) as txn:
+            txn.put(key, cPickle.dumps(data))
+
+    def get(self, key):
+        with self.env.begin(write=False) as txn:
+            try:
+                return cPickle.loads(txn.get(key))
+            except TypeError:
+                return None
+
+    def sync(self):
+        self.env.sync()

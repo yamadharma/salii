@@ -44,38 +44,45 @@ class AnnounceHandler(base.SaliRequestHandler):
 
     def __store_peer_info(self, info_hash, peer_id, ip, port, status):
 
-        if self.db.has_key(info_hash):
-            if (peer_id, ip, port, status) not in self.db[info_hash]:
-                self.db[info_hash].append((peer_id, ip, port, status))
+        peer_info = self.db.get(info_hash)
+        if peer_info:
+            if (peer_id, ip, port, status) not in peer_info:
+                peer_info.append((peer_id, ip, port, status))
         else:
-            self.db[info_hash] = [(peer_id, ip, port, status)]
+            peer_info = [(peer_id, ip, port, status)]
+
+        self.db.write(info_hash, peer_info)
+        self.db.sync()
 
     def __count_clients(self, info_hash, state):
         count = 0
-        if self.db.has_key(info_hash):
-            for peer_info in self.db[info_hash]:
-                if peer_info[3] == state:
+        peer_info = self.db.get(info_hash)
+
+        if peer_info:
+            for pi in peer_info:
+                if pi[3] == state:
                     count += 1
         return count
 
     def __get_peer_list(self, info_hash, numwant, compact, no_peer_id):
 
+        peer_info = self.db.get(info_hash)
         if compact:
             byteswant = numwant * 6
             compact_peers = ''
-
-            if self.db.has_key(info_hash):
-                for peer_info in self.db[info_hash]:
-                    ip = inet_aton(peer_info[1])
-                    port = pack('>H', int(peer_info[2]))
+            
+            if peer_info:
+                for pi in peer_info:
+                    ip = inet_aton(pi[1])
+                    port = pack('>H', int(pi[2]))
                     compact_peers += (ip+port)
             return compact_peers[:byteswant]
         else:
             peers = list()
-            if self.db.has_key(info_hash):
-                for peer_info in self.db[info_hash]:
+            if peer_info:
+                for pi in peer_info:
                     p = dict()
-                    p['peer_id'], p['ip'], p['port'], rest = peer_info
+                    p['peer_id'], p['ip'], p['port'], rest = pi
                     if no_peer_id:
                         del p['peer_id']
                     peers.append(p)
@@ -95,6 +102,7 @@ class AnnounceHandler(base.SaliRequestHandler):
             return self.send_error(MISSING_PEER_ID)
         if not port:
             return self.send_error(MISSING_PORT)
+
         if len(info_hash) != self.cmn.cfg.getint('web', 'info_hash_len'):
             print(len(info_hash))
             return self.send_error(INVALID_INFO_HASH)

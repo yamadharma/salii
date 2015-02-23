@@ -24,8 +24,8 @@ import sys
 import platform
 
 # Stop SALI if the system is  not Linux
-if platform.system() not in ['linux', 'Linux', 'LINUX']:
-    print('SALI can only be used on a Linux machine', file=sys.stderr)
+if platform.system() not in ['linux', 'Linux', 'LINUX', 'Darwin', 'darwin', 'DARWIN']:
+    print('SALI can only be used on a Linux/Darwin machine', file=sys.stderr)
     sys.exit(1)
 
 import argparse
@@ -142,8 +142,8 @@ if __name__ == '__main__':
     cmn.cfg.set('commands', 'tar', tools.find_command(cmn.cfg.get('commands', 'tar')))
     cmn.cfg.set('commands', 'ssh', tools.find_command(cmn.cfg.get('commands', 'ssh')))
 
-    if arguments.command in ['server', 'getimage']:
-        tools.tar_gnu(cmn.cfg.get('commands', 'tar'))
+    #if arguments.command in ['server', 'getimage']:
+    #    tools.tar_gnu(cmn.cfg.get('commands', 'tar'))
 
     ## Load the function
     logger.debug('loading function %s' % cmn.arguments.func.__name__)
