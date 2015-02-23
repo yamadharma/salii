@@ -46,11 +46,12 @@ class AnnounceHandler(base.SaliRequestHandler):
 
         peer_info = self.db.get(info_hash)
         if peer_info:
-            if (peer_id, ip, port, status) not in peer_info:
-                peer_info.append((peer_id, ip, port, status))
-        else:
-            peer_info = [(peer_id, ip, port, status)]
-
+            ## Try to remove old state from the db
+            index = [i for i,v in enumerate(peer_info) if v[0] == peer_id]
+            for i in index:
+                peer_info.pop(i)
+            
+        peer_info = [(peer_id, ip, port, status)]
         self.db.write(info_hash, peer_info)
         self.db.sync()
 
@@ -67,6 +68,7 @@ class AnnounceHandler(base.SaliRequestHandler):
     def __get_peer_list(self, info_hash, numwant, compact, no_peer_id):
 
         peer_info = self.db.get(info_hash)
+        print(peer_info)
         if compact:
             byteswant = numwant * 6
             compact_peers = ''

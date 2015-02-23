@@ -146,7 +146,7 @@ class CreateTorrent(object):
         metainfo['announce']        = self.torrent_announce[0]
         if len(self.torrent_announce) > 1:
             ## A bit confusing, but the it's a list in a list
-            metainfo['announce-list'] = [self.torrent_announce[1:]]
+            metainfo['announce-list'] = [self.torrent_announce]
         metainfo['comment']         = 'This is image %s' % self.torrent_name
 
         if os.path.isfile(self.torrent_file):

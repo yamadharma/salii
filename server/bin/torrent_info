@@ -23,19 +23,12 @@
 
 import sys
 sys.path.insert(0, '../')
+import pprint
 
 from sali import bencode
 
 with open(sys.argv[1], 'r') as fi:
     data = bencode.bdecode(fi.read())
 
-for key, value in data.items():
-    if type(value) is type({}):
-        print key
-        for k,v in value.items():
-            if k == 'pieces' and not 'all' in sys.argv:
-                print '    %s: %s' % (k, len(v))
-            else:
-                print '    %s: %s' % (k, v)
-    else:
-        print '%s: %s' % (key, str(value))
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(data)
