@@ -20,3 +20,9 @@ if __name__ == '__main__':
 
     cmn = common.Common(parser.parse_args())
     db = database.Database(cmn, 'tracker')
+
+    with db.env.begin() as txn:
+        cursor = txn.cursor()
+
+        for data in iter(cursor):
+            print key

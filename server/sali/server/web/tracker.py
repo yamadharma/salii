@@ -27,6 +27,7 @@ from tornado import web
 
 from sali import bencode
 from sali.server.web import base
+from sali import release
 
 INVALID_REQUEST_TYPE = 100
 MISSING_INFO_HASH = 101
@@ -37,8 +38,10 @@ INVALID_PEER_ID = 151
 INVALID_NUMWANT = 152
 GENERIC_ERROR = 900 
 
-class StatsHandler(web.RequestHandler):
-    pass
+class StatsHandler(base.SaliRequestHandler):
+
+    def get(self, args):
+        self.render('torrent-stats.html', **{'sali_version': release.version, 'tracker_data': self.db.getall()})
 
 class AnnounceHandler(base.SaliRequestHandler):
 

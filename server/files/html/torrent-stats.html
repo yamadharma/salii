@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block page_title %}Torrent stats{% end %}
+
+{% block page_content %}
+<div class="row">
+	<div class="col-lg-12">
+		<h1>Images</h1>
+    	<ol class="breadcrumb">
+        	<li><a href="index.html"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+        	<li class="active"><i class="fa fa-picture-o"></i> Torrent stats</li>
+    	</ol>
+	</div>
+</div>
+
+<!-- Top statistics -->
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>info_hash</th>
+                    <th>peers</th>
+                    <th>upload</th>
+                    <th>download</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for torrent in tracker_data %}
+                    <tr class="success"><td>{{ torrent['info_hash'] }}</td><td>{{ len(torrent['peer_info']) }}</td><td>x</td><td>x</td></tr>
+                {% end %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% end %}

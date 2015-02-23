@@ -19,6 +19,7 @@
 import os
 import shelve
 import cPickle
+import binascii
 
 import lmdb
 
@@ -40,6 +41,13 @@ class Database(object):
                 return cPickle.loads(txn.get(key))
             except TypeError:
                 return None
+
+    def getall(self):
+        outlist = list()
+        with self.env.begin(write=False) as txn:
+            for key, data in iter(txn.cursor()):
+                outlist.append({'info_hash': binascii.hexlify(key), 'peer_info': cPickle.loads(data)})
+        return outlist
 
     def sync(self):
         self.env.sync()

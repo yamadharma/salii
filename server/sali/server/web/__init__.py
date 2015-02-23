@@ -62,6 +62,7 @@ def web_app(cmn):
         (r'/dashboard(.*)', dashboard.DashBoardHandler ),
         (r'/images(.*)', images.ImagesHandler, dict(cmn=cmn) ),
         (r'/about(.*)', about.AboutHandler ),
+        (r'/torrent-stats(.*)', tracker.StatsHandler, dict(cmn=cmn, db=tracker_db)),
         (r'/announce.*', tracker.AnnounceHandler, dict(cmn=cmn, db=tracker_db)),
     ],**{
         'template_path': cmn.cfg.get('web', 'templates'),
