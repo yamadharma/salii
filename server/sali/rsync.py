@@ -31,6 +31,7 @@ class Rsync(object):
         self.create()
 
     def __fetch_images(self):
+        self.logger.info('Looking for images to add to the rsync file')
         image_paths = list()
         location = os.path.join(self.cmn.cfg.get('general', 'data_dir'), 'images')
         for path in os.listdir(location):

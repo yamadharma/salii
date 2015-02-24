@@ -16,6 +16,7 @@
 #
 # Copyright 2010-2014 SURFsara
 
+import sys
 from logging import getLogger
 from logging import Formatter
 from logging import StreamHandler
@@ -29,6 +30,10 @@ class Common(object):
     def __init__(self, arguments):
         self.arguments = arguments
         self.cfg = config.Config(self.arguments.config)
+
+        ## Enable verbose mode when dry-run is enabled
+        if self.arguments.dry_run:
+            self.arguments.verbose = True
 
     def get_logger(self, name):
         '''Wrapper for the getLogger function'''
@@ -48,5 +53,13 @@ class Common(object):
             Formatter('sali [%(levelname)s]: %(name)s - %(message)s')
         )
         logger.addHandler(syslog_handler)
+
+        ## Check if the console logging is enabled (enable by the --verbose flag)
+        if self.arguments.verbose:
+            stream_handler = StreamHandler(stream=sys.stderr)
+            stream_handler.setFormatter(
+                Formatter('[%(levelname)s]: %(name)s - %(message)s')
+            )
+            logger.addHandler(stream_handler)
 
         return logger

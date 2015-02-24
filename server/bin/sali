@@ -52,17 +52,20 @@ except ImportError as err:
     sys.exit(1)
 
 ## Wrapper function around the classes
-def server(cmn):
-    if cmn.arguments.daemon:
+def server(cmn, logger):
+    if cmn.arguments.daemon and cmn.arguments.verbose:
+        logger.critical('You cannot run in daemon mode with verbose enabled')
+        sys.exit(1)
+    elif cmn.arguments.daemon:
         tools.create_daemon('/', 0)
     from sali import server
     server.Server(cmn)
 
-def getimage(cmn):
+def getimage(cmn, logger):
     from sali import getimage
     getimage.GetImage(cmn)
 
-def rsync(cmn):
+def rsync(cmn, logger):
     from sali import rsync
     rsync.Rsync(cmn)
 
@@ -82,6 +85,10 @@ def args():
     parser.add_argument(
         '-v', '--verbose', action='store_true',
         help='enable verbose mode for SALI',
+    )
+    parser.add_argument(
+        '-n', '--dry-run', action='store_true',
+        help='enable dry-run mode for SALI',
     )
     parser.add_argument(
         '--version', action='version', version='%s %s - %s' % (
@@ -142,9 +149,9 @@ if __name__ == '__main__':
     cmn.cfg.set('commands', 'tar', tools.find_command(cmn.cfg.get('commands', 'tar')))
     cmn.cfg.set('commands', 'ssh', tools.find_command(cmn.cfg.get('commands', 'ssh')))
 
-    #if arguments.command in ['server', 'getimage']:
-    #    tools.tar_gnu(cmn.cfg.get('commands', 'tar'))
+    if arguments.command in ['server', 'getimage']:
+        tools.tar_gnu(cmn.cfg.get('commands', 'tar'))
 
     ## Load the function
     logger.debug('loading function %s' % cmn.arguments.func.__name__)
-    cmn.arguments.func(cmn)
+    cmn.arguments.func(cmn, logger)

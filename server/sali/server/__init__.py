@@ -81,7 +81,8 @@ class Server(object):
                         self.logger.critical('a child process has stopped working, killing sali')
                         self.exit()
                 time.sleep(0.1)
-        ## Allow control-c interrupt
+        ## Allow control-c interrupt, but this is also a SIGINT
+        ## so signal_handler is used for kill
         except KeyboardInterrupt:
             self.logger.info('caught control-c exiting')
             self.exit(0)
