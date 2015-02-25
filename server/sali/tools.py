@@ -115,9 +115,6 @@ def tar_gnu(tarcmd):
     
     if not re.search(r'tar \(GNU tar\)', stdout.strip(), re.MULTILINE):
         print('Error the tar command \'%s\' does not seem to be GNU tar' % tarcmd, file=sys.stderr)
-        if platform.system() in ['Darwin', 'darwin', 'DARWIN']:
-            print(' it looks like your are running SALI on Mac OS X. Please adjust your', file=sys.stderr)
-            print(' configuration to use gtar (install with brew install gnu-tar)', file=sys.stderr) 
         sys.exit(1)
 
 def tar(cmn, source, destination):
