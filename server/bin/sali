@@ -144,11 +144,12 @@ if __name__ == '__main__':
     ## Hello from SALI
     logger.info('Welcome to SALI %s' % release.version)
 
-    ## Check if we have a tar command, and set the value in our cmn.cfg class
+    ## Check if we have a couple of commands we need, and save their full path in our cmn.cfg class
     cmn.cfg.set('commands', 'rsync', tools.find_command(cmn.cfg.get('commands', 'rsync')))
     cmn.cfg.set('commands', 'tar', tools.find_command(cmn.cfg.get('commands', 'tar')))
     cmn.cfg.set('commands', 'ssh', tools.find_command(cmn.cfg.get('commands', 'ssh')))
 
+    ## We only support GNU tar, this because libarchive and gnu tarballs are not always compatible
     if arguments.command in ['server', 'getimage']:
         tools.tar_gnu(cmn.cfg.get('commands', 'tar'))
 
