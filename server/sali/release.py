@@ -22,9 +22,10 @@ ROOT_DIR=os.path.realpath(os.path.join(os.path.dirname(__file__), '../'))
 from sali.tools import version_info
 
 name            = 'sali-server'
-hexversion, version_info  = version_info(1,0,0,'beta',0)
-if version_info.releaselevel in [ 'alpha', 'beta' ]:
-    version         = '%d.%d.%d-%s' % (version_info.major, version_info.minor, version_info.micro, version_info.releaselevel)
+## See also https://packaging.python.org/en/latest/distributing.html#version
+hexversion, version_info  = version_info(1,7,0,'.dev1',0)
+if version_info.releaselevel:
+    version         = '%d.%d.%d%s' % (version_info.major, version_info.minor, version_info.micro, version_info.releaselevel)
 else:
     version         = '%d.%d.%d' % (version_info.major, version_info.minor, version_info.micro)
 copyright       = 'Copyright (c) 2008-2014 SURFsara'

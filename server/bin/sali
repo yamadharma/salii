@@ -24,7 +24,7 @@ import sys
 import platform
 
 # Stop SALI if the system is  not Linux
-if platform.system() not in ['linux', 'Linux', 'LINUX', 'Darwin', 'darwin', 'DARWIN']:
+if platform.system() not in ['linux', 'Linux', 'LINUX']:
     print('SALI can only be used on a Linux/Darwin machine', file=sys.stderr)
     sys.exit(1)
 
