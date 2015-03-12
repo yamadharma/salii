@@ -1,4 +1,5 @@
 #!/bin/sh
+# test
 
 ## Let's force their location, this makes this script a lot more simpler
 if [ ! -x "$(basename ${0})" ]
