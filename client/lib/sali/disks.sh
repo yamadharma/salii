@@ -26,9 +26,21 @@
 #
 # Detect all disks using the lsscsi command
 ###
-disks_detect_lscsi(){
-    ##
-    return 0
+disks_detect_lsscsi(){
+
+    lsscsi --transport 2>/dev/null | while read line
+    do
+        if [ -n "$(echo $line|grep -i 'cd')" ]
+        then
+            continue
+        fi
+
+        RESULT=$(echo $line | awk '/\/dev/ {print $NF}')
+        if [ -n "${RESULT}" ]
+        then
+            echo $RESULT
+        fi
+    done
 }
 
 ###
@@ -49,8 +61,8 @@ disks_detect_dev(){
 # order, such as: sd,hd
 ###
 disks_detect(){
-
-    ALLDISKS=$(disks_detect_lscsi)
+    DISKORDER=$1
+    ALLDISKS=$(disks_detect_lsscsi)
 
     if [ -z "${ALLDISKS}" ]
     then
@@ -62,5 +74,49 @@ disks_detect(){
         return 1
     fi
 
-    echo $ALLDISKS
+    for disk in $DISKORDER
+    do
+        ## Just to be sure we only have the filename
+        DISKNAME=$(basename $disk)
+        CONTROLLER=false
+
+        ## Assume i'ts a controller
+        if [ ${#DISKNAME} -eq 2 ]
+        then
+            CONTROLLER=true
+        fi
+
+        ## Make sure we order the disks correct based on the length of the string, due to sdaa type of disks
+        for udisk in $(echo $ALLDISKS | tr " " "\n" | awk '{ print length(), $1 | "sort" }' | awk '{print $2}')
+        do
+            ## Check of we already sorted the given udisk
+            DONE=$(echo $SDISKS|grep -w $udisk)
+
+            if [ -z "${DONE}" ]
+            then
+                ## Check if we can find a disk, when it's not a controller match the whole string
+                if [ "${CONTROLLER}" == "true" ]
+                then
+                    found=$(echo $udisk | grep $disk)
+                else
+                    found=$(echo $udisk | grep -w $disk)
+                fi
+
+                ## If found, append to the sorted disk list
+                if [ -n "${found}" ]
+                then
+                    SDISKS="$SDISKS $udisk"
+                fi
+            fi
+        done
+    done
+
+    NUMDISKS=0
+    for disk in $(echo $SDISKS)
+    do
+        eval "export DISK${NUMDISKS}=${disk}"
+        NUMDISKS=$(( $NUMDISKS + 1 ))
+    done
+
+    export NUMDISKS
 }

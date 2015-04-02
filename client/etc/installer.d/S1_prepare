@@ -3,14 +3,29 @@ if [ $(is_yes $SALI_SCRUB) -eq 1 ]
 then
     p_stage "Starting disk scrub"
 
-    disks_detect sd hd vd
-
     case "${SALI_SCRUB_DISKS}" in
         all)
             p_service "Wiping all disks"
+            disks_detect sd hd vd
+            for n in $(seq 0 $(($NUMDISKS-1)))
+            do
+                eval d_name="\${DISK${n}}"
+                p_comment 0 "Starting scrub on disk ${d_name} with pattern ${SALI_SCRUB_PATTERN}"
+
+                scrub -p $SALI_SCRUB_PATTERN $d_name >/dev/null 2>&1 &
+            done
         ;;
         *)
             p_service "Wiping disks ${SALI_SCRUB_DISKS}"
+            for disk in $SALI_SCRUB_DISKS
+            do
+                scrub -p $SALI_SCRUB_PATTERN $disk >/dev/null 2>&1 &
+            done
         ;;
     esac
 fi
+
+p_comment 0 "Waiting for scrub processes to be finished"
+wait
+
+p_service "Finished with disk scrubbing"

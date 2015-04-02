@@ -24,6 +24,10 @@ CPIO=$(which cpio)
 BUNZIP2=$(which bunzip2)
 RSYNC=$(which rsync)
 
+chr(){
+    printf \\$(($1/64*100+$1%64/8*10+$1%8))
+}
+
 ## Check if it's a supported environment
 case "$(uname -s)" in
     "Darwin"|"Linux")
@@ -70,7 +74,10 @@ case "${1}" in
 
         if [ ! -r "$BUILD_DIR/test_disk.qcow2" ]
         then
-            $QEMUIMG create -f qcow2 $BUILD_DIR/test_disk.qcow2 100G >/dev/null 2>&1
+            for n in $(seq 97 100)
+            do
+                $QEMUIMG create -f qcow2 $BUILD_DIR/test_disk_$(chr $n).qcow2 100G >/dev/null 2>&1
+            done
         fi
 
         ## Add initrd.img generator
@@ -105,17 +112,22 @@ case "${1}" in
         echo "Using cmdline from file files/cmdline"
         CMDLINE=$(cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | xargs)
 
+        for n in $(seq 97 100)
+        do
+            DISKLINE="$DISKLINE-hd$(chr $n) $BUILD_DIR/test_disk_$(chr $n).qcow2 "
+        done
+
         echo "Starting VM"
         $QEMUSYS -kernel $BUILD_DIR/kernel -initrd $BUILD_DIR/initrd_test.img.out \
             -append "$CMDLINE" -m 1024 -cpu Haswell -smp "cpus=2" \
             -redir :8022::22 -redir :8514::514 \
-            -hda $BUILD_DIR/test_disk.qcow2 &
+            $DISKLINE &
 
         echo "Just type ctr+c to exit"
         wait
     ;;
     webserver)
-        cd "$ROOT_DIR/client/files" && python -m SimpleHTTPServer 8000
+        cd "$ROOT_DIR/client/files" && python2 -m SimpleHTTPServer 8000
     ;;
     *)
         echo "Usage: ${0} <run|clean>"
