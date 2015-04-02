@@ -13,7 +13,7 @@ LATEST="ftp://ftp.surfsara.nl/pub/sali/sali-x86_64.tar.gz"
 EXTRACT_FILES="sali-1.6.3/x86_64/initrd.img sali-1.6.3/x86_64/kernel"
 ROOT_DIR=$(pwd)
 BUILD_DIR=$ROOT_DIR/client-build
-RSYNC_OPTS="-ar --exclude-from=$ROOT_DIR/files/rsync_exclude"
+RSYNC_OPTS="-ar --exclude-from=$ROOT_DIR/client/files/rsync_exclude"
 
 ## We need the following commands, just make sure your PATH is correct!
 CURL=$(which curl)
@@ -74,13 +74,12 @@ case "${1}" in
         fi
 
         ## Add initrd.img generator
-        if [ ! -e "$ROOT_DIR/build/initrd.img.out" ]
+        if [ ! -e "${BUILD_DIR}/initrd.img.out" ]
         then
-            echo "Bunzipping initrd.img"
-            $BUNZIP2 -sk "$ROOT_DIR/build/initrd.img" >/dev/null 2>&1
+            $BUNZIP2 -sk "${BUILD_DIR}/initrd.img" >/dev/null 2>&1
         fi
 
-        ## Make sure the old test_dir is gone
+        ### Make sure the old test_dir is gone
         if [ -d "$BUILD_DIR/initrd_test" ]
         then
             echo "Removing previous initrd_test dir"
@@ -88,8 +87,8 @@ case "${1}" in
         fi
 
         echo "Unpacking cpio image"
-        mkdir "$BUILD_DIR/initrd_test"
-        cd "$BUILD_DIR/initrd_test" && $CPIO -id < ../initrd.img.out >/dev/null 2>&1
+        mkdir "${BUILD_DIR}/initrd_test"
+        cd "${BUILD_DIR}/initrd_test" && $CPIO -id < ${BUILD_DIR}/initrd.img.out >/dev/null 2>&1
 
         echo "Just to be sure, remove all files in the startup.d and installer.d"
         rm $BUILD_DIR/initrd_test/etc/startup.d/*
@@ -101,7 +100,7 @@ case "${1}" in
 
         echo "Creating new initrd"
         sudo chown -R root:wheel "$BUILD_DIR/initrd_test"
-        cd "$BUILD_DIR/initrd_test" && sudo find . | sudo cpio --quiet -o -H newc > $ROOT_DIR/build/initrd_test.img.out
+        cd "$BUILD_DIR/initrd_test" && sudo find . | sudo cpio --quiet -o -H newc > $ROOT_DIR/client-build/initrd_test.img.out
 
         echo "Using cmdline from file files/cmdline"
         CMDLINE=$(cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | xargs)
