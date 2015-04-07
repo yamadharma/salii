@@ -23,9 +23,9 @@ then
             done
         ;;
     esac
+
+    p_comment 0 "Waiting for scrub processes to be finished"
+    wait
+    p_service "Finished with disk scrubbing"
 fi
 
-p_comment 0 "Waiting for scrub processes to be finished"
-wait
-
-p_service "Finished with disk scrubbing"
