@@ -4,6 +4,7 @@ then
     p_stage "Starting disk scrub"
 
     case "${SALI_SCRUB_DISKS}" in
+        ## Detect all disks and scrub them
         all)
             p_service "Wiping all disks"
             disks_detect sd hd vd
@@ -15,6 +16,7 @@ then
                 scrub -p $SALI_SCRUB_PATTERN $d_name >/dev/null 2>&1 &
             done
         ;;
+        ## Scrub only the specified disks
         *)
             p_service "Wiping disks ${SALI_SCRUB_DISKS}"
             for disk in $SALI_SCRUB_DISKS
@@ -29,3 +31,14 @@ then
     p_service "Finished with disk scrubbing"
 fi
 
+## Now fetch the pre/post scripts
+p_stage "Trying to fetch the pre and post install scripts"
+if [ $(fetch_scripts $SALI_SCRIPTS) -eq 0 ]
+then
+    p_service "Fetched the pre and post install scripts"
+else
+    p_service "No pre and post install scripts found skipping pre and post install hook"
+fi
+
+## At the end always return 0, when there is an error return 1 or higher
+return 0

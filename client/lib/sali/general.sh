@@ -219,7 +219,12 @@ download_file(){
             p_comment 0 "TFTP is not supported yet"
         ;;
         rsync)
-            p_comment 0 "RSYNC is not supported yet"
+            if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
+            then
+                rsync -avz $1 $SALI_CACHE_DIR/$FILENAME
+            else
+                rsync -az $1 $SALI_CACHE_DIR/$FILENAME
+            fi
         ;;
         *)
             p_comment 0 "Unsupported protocol found please use http,https,ftp,tftp or rsync"

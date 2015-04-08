@@ -39,6 +39,7 @@ for file in $(ls -1 $SALI_STARTUP_D_DIR)
 do
     . $SALI_STARTUP_D_DIR/$file
 
+    ## When a stage script exits with greater then 0, open the console
     if [ $? -ne 0 ]
     then
         open_console error_startup

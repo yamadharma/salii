@@ -11,10 +11,13 @@ initialize(){
     ## variables
     #SALI_SSHD_KEYS="http://llt0012.wp.surfsara.nl:8000/ssh_keys.tar"
 
+    ## Currently only rsync supported
+    SALI_SCRIPTS="rsync://llt0012.wp.surfsara.nl/scripts"
+
     ## Where can I find the image (for torrent and rsync), based on the variable PROTOCOL
     ## rsync of bittorrent is used, variables IMAGESERVER and IMAGENAME must be available
     ## via de linux cmd line
-    image_torrent "rsync://${SALI_IMAGESERVER}::torrents/image-${SALI_IMAGENAME}.tar.gz.torrent" staging=/a/tmp
+    image_torrent "rsync://${SALI_IMAGESERVER}/torrents/image-${SALI_IMAGENAME}.tar.gz.torrent" staging=/a/tmp
     image_rsync "${SALI_IMAGESERVER}::${SALI_IMAGENAME}" options=aHS
 
     ## Optional you can specify the root password, you must specify the actual passwd encrypted string
@@ -73,9 +76,16 @@ partition(){
     fi
 }
 
+## A function which is called before the partitioning and installation
+# optional
+pre_installation(){
+    $SALI_SCRIPTS_DIR/my_pre_script
+}
+
 ## A function which is called after fetching the image
 # optional
 post_installation(){
-    # run an shell script in a chrooted environment (by default it looks for scripts in /scripts)
-    salichroot $SCRIPT_ROOT/scripts/my_scriptname
+    ## run an shell script in a chrooted environment (the functions file is NOT available in
+    ## the chroot env)
+    salichroot $SALI_SCRIPTS_DIR/my_scriptname
 }
