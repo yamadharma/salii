@@ -12,16 +12,20 @@ p_service "Trying to fetch master_script"
 p_comment 10 "from ${SALI_MASTERSCRIPT}"
 FILE=$(download_file $SALI_MASTERSCRIPT)
 
-## No panic we don't have the master script
+## Don not panic if there is no master_script
 if [ -e "${SALI_CACHE_DIR}/master_script" ]
 then
+    ## Check if the given master_script is supported
+    ##  TODO: we must do something during the deprecation
+    ##  period
     supported_script "${SALI_CACHE_DIR}/master_script"
     if [ $? -ne 0 ]
     then
         p_comment 0 "The downloaded master_script is not supported by SALI ${SALI_VERSION}"
         return 1
     fi
-    
+   
+    ## Do a health check to see if the master_script is correct (to certain degree) 
     . "${SALI_CACHE_DIR}/master_script"
     check_function_exists initialize partition
     if [ $? -ne 0 ]
@@ -29,14 +33,17 @@ then
         p_comment 0 "Missing functions initialize and/or partition in the master_script"
         return 1
     fi
-    
+   
+    ## Initialize the SALI environment based on the settings in the initialize section of
+    ## the master_script 
     p_service "Initialize SALI with configuration from master_script"
     initialize
 else
     p_comment 0 "Unable to retrieve master_script, continue to boot"
 fi
 
-## Let's start monitoring
+## Let's start monitoring, monitoring is based around the syslog
+## daemon
 p_service "Starting monitor services"
 if [ -n "${SALI_LOG_SERVER}" ]
 then
@@ -52,9 +59,12 @@ else
     syslogd -L -S
 fi
 
+## Also log the kernel messages to syslog
 p_comment 0 "Enabling kernel log service"
 klogd -c 2
 
+## Need to add this type of monitoring. Think of status like booting
+## downloading installing
 p_comment 0 "Need to add monitor services to send status to the server"
 
 ## Just to make sure we return 0 so the error console is not triggered

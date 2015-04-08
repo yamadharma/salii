@@ -8,7 +8,8 @@ fi
 ## Welcome message for the sshd stage
 p_stage "Starting ssh server"
 
-## Checking for keys
+## Check if we must download the ssh_keys, this is set in the initialize section
+## of the master_script
 p_service "Checking sshd_keys"
 if [ -n "${SALI_SSHD_KEYS}" ]
 then
@@ -23,21 +24,25 @@ then
     tar -C /etc/ssh -xf "${FILE}"
 fi
 
+## When we failed to download the ssh_keys, generate them now
 if [ ! -e "/etc/ssh/ssh_host_rsa_key" ]
 then
     p_comment 0 "Generating rsa key"
     ssh_gen_key rsa /etc/ssh/ssh_host_rsa_key
 fi
 
+## When we failed to download the ssh_keys, generate them now
 if [ ! -e "/etc/ssh/ssh_host_dsa_key" ]
 then
     p_comment 0 "Generating dsa key"
     ssh_gen_key dsa /etc/ssh/ssh_host_dsa_key
 fi
 
+## Start the ssh daemon
 p_service "Starting sshd daemon"
 /usr/sbin/sshd
 
+## A simple check to see of sshd is running
 if [ -z "$(pidof sshd)" ]
 then
     p_comment 0 "Failed to start sshd daemon"

@@ -8,11 +8,16 @@ echo "iface lo inet loopback" > $SALI_INTERFACES_FILE
 echo "auto lo" >> $SALI_INTERFACES_FILE
 echo "" >> $SALI_INTERFACES_FILE
 
-## Now let's configure the physical devices
+## Now let's configure the physical devices, first check if
+## there is a DEVICE specifed, if so skip all other interfaces.
+## When DEVICE is not set, try to enable networking on all
+## possible interfaces
 if [ -n "${DEVICE}" ]
 then
     p_service "Configuring interface ${DEVICE}"
 
+    ## When a ip address and netmask are specified then set a static ip
+    ## else use dhcp
     if [ -n "${IPADDR}" -a -n "${NETMASK}" ]
     then
         p_comment 0 "Using static configuration with ip ${IPADDR} and netmask ${NETMASK}"
@@ -31,6 +36,8 @@ then
     p_comment 0 "Enabling interface"
     do_ifup $DEVICE
 else
+    ## When trying to enable networking on all interfaces, only
+    ## dhcp is supported
     p_service "Trying to configure all network interfaces with dhcp"
     for interface in $(ls -1 /sys/class/net | grep -v lo)
     do
