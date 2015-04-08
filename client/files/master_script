@@ -79,7 +79,8 @@ partition(){
 ## A function which is called before the partitioning and installation
 # optional
 pre_installation(){
-    $SALI_SCRIPTS_DIR/my_pre_script
+    run_script my_pre_script
+    run_script my_pre_script args="--verbose /dev/iets --dry-run"
 }
 
 ## A function which is called after fetching the image
@@ -87,5 +88,5 @@ pre_installation(){
 post_installation(){
     ## run an shell script in a chrooted environment (the functions file is NOT available in
     ## the chroot env)
-    salichroot $SALI_SCRIPTS_DIR/my_scriptname
+    run_script my_scriptname
 }

@@ -114,6 +114,9 @@ save_variables
 # Include the initialize functions
 . $SALI_LIB_DIR/initialize.sh
 
+# Include the scripts functions
+. $SALI_LIB_DIR/scripts.sh
+
 # Include ARIA imaging functions
 #. $SALI_LIB_DIR/aria2.sh
 

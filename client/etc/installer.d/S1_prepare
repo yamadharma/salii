@@ -38,6 +38,7 @@ then
     p_service "Fetched the pre and post install scripts"
 else
     p_service "No pre and post install scripts found skipping pre and post install hook"
+    SALI_SKIP_SCRIPTS=y
 fi
 
 ## At the end always return 0, when there is an error return 1 or higher

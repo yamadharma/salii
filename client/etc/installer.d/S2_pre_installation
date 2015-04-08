@@ -1,0 +1,12 @@
+
+. "${SALI_CACHE_DIR}/master_script"
+check_function_exists pre_installation
+if [ $? -eq 0 -a -z "${SALI_SKIP_SCRIPTS}" ]
+then
+    p_stage "Running pre-installation scripts"
+
+    pre_installation
+fi
+
+## At the end always return 0, when there is an error return 1 or higher
+return 0
