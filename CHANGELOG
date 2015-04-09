@@ -1,6 +1,6 @@
 1.7.0
   * This version of SALI is a complete rewrite of the /etc/init.d/functions
-    also the old master_script style is not supported anymore.
+    also the old master_script style is from this version deprecated.
 
   * Changes:
     * The file in /etc/init.d/functions now sources library files in /lib/sali/*.sh
@@ -10,7 +10,8 @@
     * Added a new directory /etc/sali which contains the error_message file, default values
       for variables, etc
 
-  * PLEASE NOTE that this version of SALI breaks compatibility with systemimager
+  * PLEASE NOTE that this version of SALI breaks compatibility with systemimager, it could
+    also be possible that some minor changes must be made in your current master_scripts
 
   * Authors: Bas van der Vlies and Dennis Stam
 
