@@ -1,6 +1,6 @@
 # SALI test project
 
-This repository contains the 1.7.0 client and server code.
+This repository contains the 1.7.0 client and server code. Please note that we are working on the git access to this repository.
 
 ## Development requirements
 
