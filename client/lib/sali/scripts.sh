@@ -23,10 +23,10 @@
 
 
 ###
-# Usage: run_script <command> [args=""] [chroot=<yes|no>]
+# Usage: run_script <command> [chroot=<yes|no>] [args]
 #
 # Run a pre or post install script, by default the script is not run
-# in a chroot env
+# in a chroot env.
 ###
 run_script(){
     ## reset the args
@@ -34,6 +34,8 @@ run_script(){
 
     SCRIPT=$1
     shift 1
+
+    ARGS=""
 
     while [ $# -gt 0 ]
     do
@@ -45,15 +47,14 @@ run_script(){
                 fi
                 shift 2
             ;;
-            args)
-                ARGS=" $2"
-                shift 2
-            ;;
             *)
+                ARGS="${ARGS} ${1}"
                 shift 1
             ;;
         esac
     done
 
-    p_service "Running script ${SALI_SCRIPTS_DIR}/${SCRIPT}${ARGS}"
+    p_service "Running script ${SALI_SCRIPTS_DIR}/${SCRIPT}"
+
+    $SALI_SCRIPTS_DIR/$SCRIPT $ARGS
 }

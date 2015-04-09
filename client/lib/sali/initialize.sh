@@ -150,5 +150,7 @@ fetch_scripts(){
         echo 1
     fi
 
+    chown -R root:root $SALI_SCRIPTS_DIR
+
     echo 0
 }

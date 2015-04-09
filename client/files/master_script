@@ -80,7 +80,6 @@ partition(){
 # optional
 pre_installation(){
     run_script my_pre_script
-    run_script my_pre_script args="--verbose /dev/iets --dry-run"
 }
 
 ## A function which is called after fetching the image
@@ -88,5 +87,5 @@ pre_installation(){
 post_installation(){
     ## run an shell script in a chrooted environment (the functions file is NOT available in
     ## the chroot env)
-    run_script my_scriptname
+    run_script my_post_scrip
 }

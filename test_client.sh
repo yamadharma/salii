@@ -93,7 +93,7 @@ case "${1}" in
         then
             for n in $(seq 97 100)
             do
-                $QEMUIMG create -f qcow2 $BUILD_DIR/test_disk_$(chr $n).qcow2 100G >/dev/null 2>&1
+                $QEMUIMG create -f qcow2 $BUILD_DIR/test_disk_$(chr $n).qcow2 1G >/dev/null 2>&1
             done
         fi
 
