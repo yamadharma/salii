@@ -202,6 +202,8 @@ def run_command_call(*args, **kwargs):
 
     return subprocess.call(args, shell=run_shell)
 
+## We could move this locking/inlocking to a db file, but this
+## can also be used the disable a image for use
 def img_is_locked(cmn, imagename):
     if os.path.exists(os.path.join(cmn.cfg.get('general', 'cache_dir'), 'processing/' + imagename)):
         return True
