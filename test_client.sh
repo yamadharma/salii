@@ -147,7 +147,7 @@ case "${1}" in
         cd "$ROOT_DIR/client/files" && python2 -m SimpleHTTPServer 8000
     ;;
     *)
-        echo "Usage: ${0} <run|clean>"
+        echo "Usage: ${0} <run|clean|webserver>"
     ;;
 esac
 

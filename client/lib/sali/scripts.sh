@@ -21,6 +21,23 @@
 # $URL$
 ###
 
+###
+# Usage: fetch_scripts <url>
+#
+# This will fetch the needed post and pre install scripts
+###
+fetch_scripts(){
+    LOCATION=$(download_file $1)
+
+    if [ ! -d ${SALI_SCRIPTS_DIR} ]
+    then
+        echo 1
+    fi
+
+    chown -R root:root $SALI_SCRIPTS_DIR
+
+    echo 0
+}
 
 ###
 # Usage: run_script <command> [chroot=<yes|no>] [args]

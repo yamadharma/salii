@@ -136,21 +136,3 @@ password(){
         echo "${USER}:${PASSWORD}:${NUM}:0:root:/tmp:/bin/ash" >> /etc/passwd
     fi
 }
-
-###
-# Usage: fetch_scripts <url>
-#
-# This will fetch the needed post and pre install scripts
-###
-fetch_scripts(){
-    LOCATION=$(download_file $1)
-
-    if [ ! -d ${SALI_SCRIPTS_DIR} ]
-    then
-        echo 1
-    fi
-
-    chown -R root:root $SALI_SCRIPTS_DIR
-
-    echo 0
-}
