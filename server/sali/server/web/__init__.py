@@ -54,8 +54,8 @@ def web_app(cmn):
     }
     httplib.responses.update(RESPONSE_MESSAGES)
 
-    tracker_db = database.Database(cmn, 'tracker')
-    monitor_db = database.Database(cmn, 'monitor')
+    tracker_db = database.TrackerDatabase(cmn)
+    monitor_db = database.MonitorDatabase(cmn)
 
     application = web.Application([
         (r'/', web.RedirectHandler, {'url': '/dashboard'}),
