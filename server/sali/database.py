@@ -42,6 +42,14 @@ class Database(object):
             except TypeError:
                 return None
 
+    def sync(self):
+        self.env.sync()
+
+class TrackerDatabase(Database):
+
+    def __init__(self, cmn, name='tracker'):
+        Database.__init__(self, cmn, name)
+
     def getall(self):
         outlist = list()
         with self.env.begin(write=False) as txn:
@@ -49,5 +57,6 @@ class Database(object):
                 outlist.append({'info_hash': binascii.hexlify(key), 'peer_info': cPickle.loads(data)})
         return outlist
 
-    def sync(self):
-        self.env.sync()
+class MonitorDatabase(Database):
+    def __init__(self, cmn, name='monitor'):
+        Database.__init__(self, cmn, name)
