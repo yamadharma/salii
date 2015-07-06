@@ -62,11 +62,11 @@ def server(cmn, logger):
     server.Server(cmn)
 
 def getimage(cmn, logger):
-    from sali import getimage
+    from sali.client import getimage
     getimage.GetImage(cmn)
 
 def rsync(cmn, logger):
-    from sali import rsync
+    from sali.client import rsync
     rsync.Rsync(cmn)
 
 def args():

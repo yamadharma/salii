@@ -60,8 +60,11 @@ class Imager(object):
 
             self.logger.debug('checking condition of image %s' % image)
 
-            self.create_tarfile(image)
-            self.create_torrentfile(image)
+            if os.path.exists(os.path.join(self.cmn.cfg.get('general', 'data_dir'), 'images') + '/' + image):
+                self.create_tarfile(image)
+                self.create_torrentfile(image)
+            else:
+                self.logger.debug('image %s does not exist' % image)
 
             tools.img_unlock(self.cmn, image)
 
