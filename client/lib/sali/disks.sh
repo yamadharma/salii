@@ -141,9 +141,54 @@ disks_detect(){
     NUMDISKS=0
     for disk in $(echo $SDISKS)
     do
-        eval "export DISK${NUMDISKS}=${disk}"
+        eval "DISK${NUMDISKS}=${disk}"
         NUMDISKS=$(( $NUMDISKS + 1 ))
     done
 
-    export NUMDISKS
+    ## Instead of exporting, use the save_variables fucntion
+    save_variables
+}
+
+###
+# Usage: disks_prep <msdos|gpt> <disk> [disks]
+#
+# Prepare the disks for repartition for msdos or gpt layout
+###
+disks_prep(){
+    LAYOUT=$1
+    shift 1
+    
+    case "${1}" in
+        all)
+            ## We need some global variables
+            . $SALI_VARIABLES_FILE
+            for disknum in $(seq 0 $((NUMDISKS-1)))
+            do
+                eval d_name="\${DISK${disknum}}"
+                DISKS="${DISKS}${d_name} "
+            done
+        ;;
+        *)
+            DISKS=$@
+        ;;
+    esac
+
+    p_service "Preparing disk(s)"
+
+    for disk in $DISKS
+    do
+        if [ $SALI_VERBOSE_LEVEL -ge 10 ]
+        then
+            p_comment 10 "/usr/sbin/parted -s -- ${disk} mklabel ${LAYOUT}"
+        else
+            p_comment 0 "setting disklabel ${LAYOUT} for ${disk}"
+        fi
+
+        if [ $SALI_VERBOSE_LEVEL -ge 256 ]
+        then
+            /usr/sbin/parted -s -- $disk mklabel $LAYOUT
+        else
+            /usr/sbin/parted -s -- $disk mklabel $LAYOUT >/dev/null 2>&1
+        fi
+    done
 }
