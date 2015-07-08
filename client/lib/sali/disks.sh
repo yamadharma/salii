@@ -47,11 +47,38 @@ disks_detect_lsscsi(){
 # Usage: disks_detect_dev
 #
 # Detect all disks by looking at the /dev/disk/*
-# method (failback for lscsci)
+# method (fallback for lscsci)
 ###
 disks_detect_dev(){
-    ##
-    return 0
+
+    DISKS=""
+
+    ## Loop trough all possible /dev/disks/*/*
+    ls -1 /dev/disk/ | while read disk_by
+    do
+        ## Just to be sure the location exists
+        if [ -e "/dev/disk/${disk_by}" ]
+        then
+            ## Then find all disks (not the actual partitions)
+            ls -1 /dev/disk/$disk_by | grep -v part | while read disk
+            do
+                ## Use realpath to find out the /dev/* device
+                real_disk=$(realpath /dev/disk/$disk_by/$disk)
+                
+                ## Is it realy a disk?
+                if [ -n "$(cat /proc/partitions | grep $(basename $real_disk))" ]
+                then
+                    match=$(echo $DISKS | grep -c $real_disk)
+                    case "${match}" in
+                        0)
+                            DISKS="${DISKS}${real_disk} "
+                            echo $real_disk
+                        ;;
+                    esac
+                fi
+            done
+        fi
+    done
 }
 
 ###
