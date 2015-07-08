@@ -40,6 +40,7 @@ QEMUSYS=$(which qemu-system-x86_64)
 CPIO=$(which cpio)
 BUNZIP2=$(which bunzip2)
 RSYNC=$(which rsync)
+TAIL=$(which tail)
 
 chr(){
     printf \\$(($1/64*100+$1%64/8*10+$1%8))
@@ -143,11 +144,16 @@ case "${1}" in
         echo "Just type ctr+c to exit"
         wait
     ;;
-    webserver)
+    server)
+        sudo $RSYNC --daemon --config $ROOT_DIR/client/files/rsyncd.conf        
         cd "$ROOT_DIR/client/files" && python2 -m SimpleHTTPServer 8000
+        
+        RSYNCLOGFILE=$(cat $ROOT_DIR/client/files/rsyncd.conf | awk '/^log file/ {print $NF}')
+        PIDNUMBER=$($TAIL -n 1 $RSYNCLOGFILE | awk '{print $3}' | sed -e 's/\[//g' -e 's/\]//g')
+        sudo kill $PIDNUMBER
     ;;
     *)
-        echo "Usage: ${0} <run|clean|webserver>"
+        echo "Usage: ${0} <run|clean|server>"
     ;;
 esac
 
