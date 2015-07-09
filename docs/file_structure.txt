@@ -5,6 +5,12 @@
     - error_msg                 # moved from /etc/sali_error?
 /etc/init.d
     - functions                 # source files from /lib/sali/functions/*.sh
+/etc/startup.d
+    - S1_network                # configure and start network
+    - S2_preparation            # fetch master_script and start the monitoring
+    - S3_sshd                   # start sshd (if needed)
+    - S98_scrub                 # run scrub funcionality
+    - S99_final                 # final preps before running installer
 /etc/installer.d
     - S1initialize              # fetch installation sources
     - S2partition               # partition the disks
@@ -12,12 +18,6 @@
     - S4post_install            # run post-installation scripts
     - S5finalize                # umount disks
     - S99reboot                 # reboot node
-/etc/startup.d
-    - S1network                 # configure and start network
-    - S2monitoring              # start monitor (if needed)
-    - S3sshd                    # start sshd (if needed)
-    - S98scrub                  # run scrub funcionality
-    - S99final                  # final preps before running installer
 /lib/sali/functions
     - general.sh
     - master_script.sh

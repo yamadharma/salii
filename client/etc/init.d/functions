@@ -137,3 +137,6 @@ save_variables
 # Post installation functions
 #. $SALI_LIB_DIR/post_fstab.sh
 #. $SALI_LIB_DIR/post_network.sh
+
+# Deprecated functions
+. $SALI_LIB_DIR/deprecated.sh

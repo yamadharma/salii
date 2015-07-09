@@ -1,0 +1,19 @@
+This file contains all functions from the current SALI 1.6.x version. Some of these will be rewritten, other functions are deprecated.
+
+Functions that will be replaced, these functions will still work in 1.7.0 but they issue a deprecation warning
+    01general
+        - logmsg                    > replaced by p_comment <level> <message>
+        - shellout                  > replaced by open_console [error|error_startup]
+        - write_variables           > replaced by save_variables
+        - variableize_kernel        > replaced by save_variables
+
+Functions that are not used anymore (they will still work in 1.7.0 but they are deprecated)
+    01general
+        - save_param
+        - load_variables
+        - get_arch
+        - adjust_arch
+        - count_loop
+        - read_kernel_append_parameters
+        - variableize_kernel_append_parameters
+        - read_local_cfg
