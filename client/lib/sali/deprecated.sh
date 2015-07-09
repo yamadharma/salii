@@ -46,6 +46,7 @@ write_variables() {
 
 save_param() {
     ## Just an empty function
+    echo
 }
 
 ###
@@ -59,6 +60,7 @@ load_variables() {
 
 variableize_kernel() {
     ## Just an empty function
+    echo
 }
 
 get_arch() {
@@ -83,26 +85,32 @@ count_loop(){
 
 read_kernel_append_parameters() {
     ## Just an empty function
+    echo
 }
 
 variableize_kernel_append_parameters() {
     ## Just an empty function
+    echo
 }
 
 read_local_cfg() {
     ## Just an empty function
+    echo
 }
 
 p_log() {
     ## Just an empty function
+    echo
 }
 
 p_whitespace() {
     ## Just an empty function
+    echo
 }
 
 start_ssh() {
     ## Just an empty function
+    echo
 }
 
 ping_test() {                                                                             
