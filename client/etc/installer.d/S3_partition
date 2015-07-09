@@ -1,0 +1,14 @@
+
+if [ -r "${SALI_CACHE_DIR}/master_script" ]
+then
+    . "${SALI_CACHE_DIR}/master_script"
+else
+    return 1
+fi
+
+check_function_exists partition
+p_stage "Running partition scripts"
+partition
+
+## At the end always return 0, when there is an error return 1 or higher
+return 0

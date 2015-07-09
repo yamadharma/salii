@@ -12,6 +12,8 @@ then
     p_stage "Running pre-installation scripts"
 
     pre_installation
+else
+    p_stage "Skipping pre-installation scripts not configured in master_script"
 fi
 
 ## At the end always return 0, when there is an error return 1 or higher

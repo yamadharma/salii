@@ -1,5 +1,5 @@
 ## Just add a parameter on each line
-SALI_VERBOSE_LEVEL=2
+SALI_VERBOSE_LEVEL=10
 SALI_MASTERSCRIPT=http://llt0012.wp.surfsara.nl:8000/master_script
 SALI_IMAGESERVER=192.168.1.1
 SALI_IMAGENAME=amd64_base_wheezy

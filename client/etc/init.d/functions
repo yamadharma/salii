@@ -25,7 +25,7 @@
 export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 export LD_LIBRARY_PATH=
 
-REGEX_VARIABLES="^SALI|^DEVICE|^IPADDR|^NETMASK|^NAMESERVER|^DOMAIN|^SEARCH|^IPADDR|^NETMASK"
+REGEX_VARIABLES="^SALI|^DEVICE|^IPADDR|^NETMASK|^NAMESERVER|^DOMAIN|^SEARCH|^IPADDR|^NETMASK|^DISK[0-9]+|^NUMDISKS"
 
 # Check for variables in the cmdline
 ## Must we run this every time, or just at boot time and
@@ -137,3 +137,6 @@ save_variables
 # Post installation functions
 #. $SALI_LIB_DIR/post_fstab.sh
 #. $SALI_LIB_DIR/post_network.sh
+
+# Deprecated functions
+. $SALI_LIB_DIR/deprecated.sh
