@@ -192,3 +192,122 @@ disks_prep(){
         fi
     done
 }
+
+disks_create_partion(){
+    DISK=$1
+    SIZE=$2
+    FLAG=$3
+
+    p_comment 0 "/usr/sbin/parted -s -- ${1} mkpart primary 1 ${2}"
+}
+
+###
+# Usage: disks_part <disk> <mountpoint> <size> [options]
+#
+# Create partitions on specific disks
+#
+# Syntax required options:
+#  disk       : disk0, disk1 or complete path to device
+#  mountpoint : /<path>, swap, none, raid.<id>, pv.<id>
+#  size       : specify size in MB (-1 means rest of disk)
+#
+# Syntax optional options:
+#  type=<ext2|ext3|ext4|xfs|swap>       currently supported filesystems
+#  flag=<bios_grub|lvm|raid>            which flag must be set on the partition
+#                                       when using raid.<id> or lvm.<id> the flag
+#                                       lvm or raid is optional!
+#  label=boot                           the label of the partition
+#  options="-I 128"                     check the man page mkfs.<fstype> for the options
+#  dirperms=1777                        with which permissions must the mount directory be
+#
+###
+disks_part() {
+    set $(args $@)
+
+    unset LABEL OPTIONS DIRPERMS ARGS
+
+    TYPE=none
+    FLAG=none
+   
+    IN_OPTIONS=0 
+    DISK=$1
+    MOUNTPOINT=$2
+    SIZE=$3
+    shift 3
+
+    while [ $# -gt 0 ]
+    do
+        case "${1}" in
+            type)
+                TYPE="${2}"
+                IN_OPTIONS=0
+                shift 2
+            ;;
+            flag)
+                FLAG="${2}"
+                IN_OPTIONS=0
+                shift 2
+            ;;
+            label)
+                LABEL="${2}"
+                IN_OPTIONS=0
+                shift 2
+            ;;
+            options)
+                OPTIONS="${2}"
+                IN_OPTIONS=1
+                shift 2
+            ;;
+            dirperms)
+                DIRPERMS="${2}"
+                IN_OPTIONS=0
+                shift 2
+            ;;
+            *)
+                if [ $IN_OPTIONS -eq 1 ]
+                then
+                    OPTIONS="${OPTIONS} ${1}"
+                else
+                    ARGS="${ARGS}${1} "
+                fi
+                shift 1
+            ;;
+        esac
+    done
+
+    p_service "Creating partition on disk ${DISK}"
+
+    ## Check if given filesystem is supported, else show error
+    case "${TYPE}" in
+        ext2|ext3|ext4|xfs|swap|none)
+            ## Ok let's go
+        ;;
+        *)
+            p_comment 0 "Given filesystem type ${TYPE} is not supported (ext2|ext3|ext4|xfs|swap)"
+            open_console error
+        ;;
+    esac
+
+    ### Check if given label is supported, else show error
+    case "${FLAG}" in
+        bios_grub|lvm|raid|none)
+            ## Ok let's go
+        ;;
+        *)
+            p_comment 0 "Given flag ${FLAG} is not supported (bios_grub|lvm|raid|none)"
+            open_console error
+        ;;
+    esac
+
+    p_comment 0 "size: ${SIZE}, mount: ${MOUNTPOINT}, type: ${TYPE}"
+
+    ## For verbose logging
+    for var in FLAG LABEL OPTIONS DIRPERMS
+    do
+        eval var_value="\${${var}}"
+        if [ -n "${var_value}" ]
+        then
+            p_comment 10 "$(echo $var | tr '[:upper:]' '[:lower:]'): ${var_value}"
+        fi
+    done
+}
