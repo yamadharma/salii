@@ -49,10 +49,7 @@ chr(){
 ## Check if it's a supported environment
 case "$(uname -s)" in
     "Darwin"|"Linux")
-        if [ "$(uname -s)" == "Linux" ]
-        then
-            echo "Linux had not been tested, but should work"
-        fi
+        ## Go ahead
     ;;
     *)
         echo "Os type $(uname -s) is not supported"
