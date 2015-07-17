@@ -41,6 +41,10 @@ do
     fi
 done
 
+## SALI_MASTERSCRIPT could contain variables
+eval "_sali_masterscript=${SALI_MASTERSCRIPT}"
+SALI_MASTERSCRIPT=$_sali_masterscript
+
 # Static variables
 static_vars(){
     SALI_LIB_DIR=/lib/sali
