@@ -127,14 +127,6 @@ case "${1}" in
         echo "Using cmdline from file files/cmdline"
         INTERFACE=$(netstat -rn|awk '/^0.0.0.0|^default/ {print $NF}')
         SALI_IMAGESERVER=$(ifconfig $INTERFACE | awk '/inet / {print $2}')
-        #echo "SALI_IMAGESERVER=${SALI_IMAGESERVER}" > /tmp/sali_cmdline
-        #cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | while read param
-        #do
-        #    P1=$(echo $param | awk -F'=' '{print $1}')
-        #    P2=$(echo $param | awk -F'=' '{print $2}')
-        #    eval "_VALUE=${P2}"
-        #    echo "${P1}=${_VALUE}" >> /tmp/sali_cmdline
-        #done
         CMDLINE="SALI_IMAGESERVER=${SALI_IMAGESERVER} $(cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | xargs)"
 
         for n in $(seq 97 100)
