@@ -9,10 +9,10 @@
 # required
 initialize(){
     ## variables
-    #SALI_SSHD_KEYS="http://llt0012.wp.surfsara.nl:8000/ssh_keys.tar"
+    #SALI_SSHD_KEYS="http://${SALI_IMAGESERVER}:8000/ssh_keys.tar"
 
     ## Currently only rsync supported
-    SALI_SCRIPTS="rsync://llt0012.wp.surfsara.nl/scripts"
+    SALI_SCRIPTS="rsync://${SALI_IMAGESERVER}/scripts"
 
     ## Where can I find the image (for torrent and rsync), based on the variable PROTOCOL
     ## rsync of bittorrent is used, variables IMAGESERVER and IMAGENAME must be available
