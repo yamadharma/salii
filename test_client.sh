@@ -125,7 +125,17 @@ case "${1}" in
         cd "$BUILD_DIR/initrd_test" && sudo find . | sudo cpio --quiet -o -H newc > $ROOT_DIR/client-build/initrd_test.img.out
 
         echo "Using cmdline from file files/cmdline"
-        CMDLINE=$(cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | xargs)
+        INTERFACE=$(netstat -rn|awk '/^0.0.0.0|^default/ {print $NF}')
+        SALI_IMAGESERVER=$(ifconfig $INTERFACE | awk '/inet / {print $2}')
+        #echo "SALI_IMAGESERVER=${SALI_IMAGESERVER}" > /tmp/sali_cmdline
+        #cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | while read param
+        #do
+        #    P1=$(echo $param | awk -F'=' '{print $1}')
+        #    P2=$(echo $param | awk -F'=' '{print $2}')
+        #    eval "_VALUE=${P2}"
+        #    echo "${P1}=${_VALUE}" >> /tmp/sali_cmdline
+        #done
+        CMDLINE="SALI_IMAGESERVER=${SALI_IMAGESERVER} $(cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | xargs)"
 
         for n in $(seq 97 100)
         do
@@ -140,6 +150,8 @@ case "${1}" in
 
         echo "Just type ctr+c to exit"
         wait
+
+        rm -f /tmp/sali_cmdline >/dev/null 2>&1
     ;;
     server)
         sudo $RSYNC --daemon --config $ROOT_DIR/client/files/rsyncd.conf        
