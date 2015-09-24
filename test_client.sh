@@ -89,9 +89,9 @@ case "${1}" in
 
         if [ ! -r "$BUILD_DIR/test_disk.qcow2" ]
         then
-            for n in $(seq 97 100)
+            for n in $(seq 97 98)
             do
-                $QEMUIMG create -f qcow2 $BUILD_DIR/test_disk_$(chr $n).qcow2 1G >/dev/null 2>&1
+                $QEMUIMG create -f qcow2 $BUILD_DIR/test_disk_$(chr $n).qcow2 50G >/dev/null 2>&1
             done
         fi
 
@@ -129,7 +129,7 @@ case "${1}" in
         SALI_IMAGESERVER=$(ifconfig $INTERFACE | awk '/inet / {print $2}')
         CMDLINE="SALI_IMAGESERVER=${SALI_IMAGESERVER} $(cat $ROOT_DIR/client/files/cmdline | egrep -v "^#" | xargs)"
 
-        for n in $(seq 97 100)
+        for n in $(seq 97 98)
         do
             DISKLINE="$DISKLINE-hd$(chr $n) $BUILD_DIR/test_disk_$(chr $n).qcow2 "
         done
