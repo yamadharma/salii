@@ -9,9 +9,10 @@
     * All variables used by sali starts with SALI_ (except for network configuration)
     * Added a new directory /etc/sali which contains the error_message file, default values
       for variables, etc
+    * All temporary files such as variables, master script file will be written to
+      /var/cache/sali
 
-  * PLEASE NOTE that this version of SALI breaks compatibility with systemimager, it could
-    also be possible that some minor changes must be made in your current master_scripts
+  * A lot of functions are deprecated in this version of SALI and shall be removed in 2.0.0
 
   * Authors: Bas van der Vlies and Dennis Stam
 
