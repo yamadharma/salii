@@ -155,7 +155,7 @@ disks_detect(){
 # Prepare the disks for repartition for msdos or gpt layout
 ###
 disks_prep(){
-    LAYOUT=$1
+    LABEL=$1
     shift 1
     
     case "${1}" in
@@ -179,16 +179,16 @@ disks_prep(){
     do
         if [ $SALI_VERBOSE_LEVEL -ge 10 ]
         then
-            p_comment 10 "/usr/sbin/parted -s -- ${disk} mklabel ${LAYOUT}"
+            p_comment 10 "/usr/sbin/parted -s -- ${disk} mklabel ${LABEL}"
         else
-            p_comment 0 "setting disklabel ${LAYOUT} for ${disk}"
+            p_comment 0 "setting disklabel ${LABEL} for ${disk}"
         fi
 
         if [ $SALI_VERBOSE_LEVEL -ge 256 ]
         then
-            /usr/sbin/parted -s -- $disk mklabel $LAYOUT
+            /usr/sbin/parted -s -- $disk mklabel $LABEL
         else
-            /usr/sbin/parted -s -- $disk mklabel $LAYOUT >/dev/null 2>&1
+            /usr/sbin/parted -s -- $disk mklabel $LABEL >/dev/null 2>&1
         fi
     done
 }
@@ -235,7 +235,10 @@ disks_last_size(){
 #
 ###
 disks_create_partition(){
+    ## We need to fetch the DISK label every time, because this could be changes per disk!
+    DISK_LABEL=$(/usr/sbin/parted -s -- "${1}" print 2>/dev/null | awk '/Partition Table/ {print $NF}')
     LAST_SIZE=$(disks_last_size $1)
+
     case "${2}" in
         -1|100%)
             END_SIZE="-1"
@@ -245,13 +248,52 @@ disks_create_partition(){
         ;;
     esac
 
-    p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart primary ${LAST_SIZE} ${END_SIZE}"
-    /usr/sbin/parted -s -- "${1}" mkpart primary "${LAST_SIZE}" "${END_SIZE}"
+
+    case "${DISK_LABEL}" in
+        gpt)
+            p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart primary ${LAST_SIZE}M ${END_SIZE}M"
+            /usr/sbin/parted -s -- "${1}" mkpart primary "${LAST_SIZE}M" "${END_SIZE}M"
+        ;;
+        ## Yes I know there is some redunand code between msdos and gpt, but this make it more readable
+        msdos)
+            PART_NUM=$(/usr/sbin/parted -s -- "${1}" print 2>/dev/null | awk '/^ [0-9].*/ {print $1}' | tail -n1)
+            if [ -z "${PART_NUM}" ]
+            then
+                PART_NUM=0
+            fi
+
+            if [ $PART_NUM -eq 3 ]
+            then
+                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart extended ${LAST_SIZE}M -1"
+                /usr/sbin/parted -s -- "${1}" mkpart extended "${LAST_SIZE}M" -1
+                PART_NUM=$(/usr/sbin/parted -s -- "${1}" print 2>/dev/null | awk '/^ [0-9].*/ {print $1}' | tail -n1)
+                EXTENDED_LAST_SIZE=$LAST_SIZE
+            fi
+
+            if [ $PART_NUM -ge 3 ]
+            then
+                case "${2}" in
+                    -1|100%)
+                        END_SIZE="-1"
+                    ;;
+                    *)
+                        END_SIZE=$(echo "$EXTENDED_LAST_SIZE + $2" | bc )
+                    ;;
+                esac
+                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart logical ${EXTENDED_LAST_SIZE}M ${END_SIZE}M"
+                /usr/sbin/parted -s -- "${1}" mkpart logical "${EXTENDED_LAST_SIZE}M" "${END_SIZE}M"
+                EXTENDED_LAST_SIZE=$END_SIZE
+            else
+                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart primary ${LAST_SIZE}M ${END_SIZE}M"
+                /usr/sbin/parted -s -- "${1}" mkpart primary "${LAST_SIZE}M" "${END_SIZE}M"
+            fi
+        ;;
+    esac
         
 
     if [ "${3}" != "none" ]
     then
-        PART_NUM=$(/usr/sbin/parted -s -- "${1}" print | awk '/^ [0-9].*/ {print $1}' | tail -n1)
+        PART_NUM=$(/usr/sbin/parted -s -- "${1}" print 2>/dev/null | awk '/^ [0-9].*/ {print $1}' | tail -n1)
         p_comment 10 "/usr/sbin/parted -s -- ${1} set ${PART_NUM} $3 on"
         /usr/sbin/parted -s -- "${1}" set "${PART_NUM}" "${3}" on
     fi
