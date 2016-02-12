@@ -2,6 +2,9 @@
 
 This repository contains the 1.7.0 client and server code. Please note that this repository is a work in progress.
 
+Please also check our page on our own website for bugtracking:
+ - https://oss.trac.surfsara.nl/sali
+
 ## Development requirements
 
 Operating systems Mac OSX and Linux are supported. For some dependicies we recommend to use homebrew on Mac OSX.
