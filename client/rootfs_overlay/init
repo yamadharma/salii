@@ -25,33 +25,13 @@
 ## For init we don't want to rely on $PATH
 _PRINTF="/usr/bin/printf"
 _MOUNT="/bin/mount"
-_CAT="/bin/cat"
 _MKDIR="/bin/mkdir"
-_GREP="/bin/grep"
 _UDEVD="/lib/udev/udevd"
 _UDEVADM="/usr/bin/udevadm"
-_LS="/bin/ls"
-_MKNOD="/bin/mknod"
 _DMESG="/bin/dmesg"
 
 ## Default value for init
 init="/sbin/init"
-
-## Checking of these directories exists
-for directory in "/proc" "/sys" "/dev" "/run"
-do
-    if [ ! -d "${directory}" ]
-    then
-        $_MKDIR -p "${directory}"
-    fi
-done
-
-## Mount /proc, /sys and /dev 
-# -o == Which options must be use when mounting
-$_MOUNT -t proc proc /proc
-$_MOUNT -t sysfs sysfs /sys
-$_MOUNT -t devtmpfs -o mode=0755 udev /dev
-$_MOUNT -t tmpfs -o mode=0755 tmpfs /run
 
 ## Fast scan of the kernel paramaters
 for option in $(cat /proc/cmdline)
@@ -69,6 +49,12 @@ done
 ## Creating blacklist file
 if [ -n "${blacklist}" ]
 then
+    # Create modprobe dir when it does not exists
+    if [ ! -d "/etc/modprobe.d" ]
+    then
+        $_MKDIR /etc/modprobe.d
+    fi
+
     # Make sure the file exists and is empty
     $_CAT /dev/null > /etc/modprobe.d/pxe_blacklist.conf
     for module in $(echo $blacklist | sed 's/;/ /g')
@@ -77,67 +63,21 @@ then
     done
 fi
 
+## Some preparations
+_MOUNT -t devtmpfs devtmpfs /dev
+exec 0</dev/console
+exec 1>/dev/console
+exec 2>/dev/console
+
 ####
 ## Now the real initialization of SALI
 $_PRINTF "Initializing SALI...\n"
 
-## Make sure /sys/kernel/uevent_helper has just a empty line
-$_PRINTF "\n" > /sys/kernel/uevent_helper
-
-## Make some extra nodes that have been configured in
-## /etc/udev/links.conf
-if [ -e "/etc/udev/links.conf" ]
-then
-    # make sure we don't have any comments or empty lines
-    $_GREP '^[^#]' /etc/udev/links.conf | while read type name args
-    do
-        if [ "${type}" -a "${name}" ]
-        then
-            if [ ! -e "/dev/${name}" -o ! -L "/dev/${name}" ]
-            then
-                continue
-            fi
-        fi
-        case "${type}" in
-            L)
-                $_LS -s "${args}" "/dev/${name}"
-            ;;
-            D)
-                $_MKDIR -p "/dev/${name}"
-            ;;
-            M)
-                $_MKNOD -m 600 "/dev/${name}" $args
-            ;;
-            *)
-                $_PRINTF "/etc/udev/links/conf; unparseable line (${type} ${name} ${args})\n"
-            ;;
-        esac
-    done
-fi
-
 ## Starting udev
-$_PRINTF "Starting udev...\n"
-if $_UDEVD --daemon
-then
-    $_PRINTF "Started udevd\n"
-else
-    $_PRINTF "Waiting for 15 seconds an try to continue anyway!\n"
-    sleep 15
-fi
-
-# Wait for udev to process the events in the queue
-$_UDEVADM trigger --action=add
-
-sleep 2
-
-$_UDEVADM settle
-
-# Now mount /dev/pts as devpts
-if [ ! -e "/dev/pts" ]
-then
-    $_MKDIR -p /dev/pts
-fi
-$_MOUNT devpts /dev/pts -t devpts -n
+$_UDEVD -d || ($_PRINTF "Failed to start UDEV\n" && exit 1)
+$_UDEVADM trigger --type=subsystems --action=add
+$_UDEVADM trigger --type=devices --action=add
+$_UDEVADM settle --timeout=30 || $_PRINTF "Udevadm settle failed\n"
 
 $_PRINTF "Done with udev initalization, continue booting into SALI...\n"
 
