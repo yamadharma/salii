@@ -133,6 +133,6 @@ password(){
         ## Get the latest UID number and add 1
         NUM=$(cat /etc/passwd | awk -F':' '{print $3}' | sort | tail -n 1)
         NUM=$(($NUM+1))
-        echo "${USER}:${PASSWORD}:${NUM}:0:root:/tmp:/bin/ash" >> /etc/passwd
+        echo "${USER}:${PASSWORD}:${NUM}:0:root:/tmp:/bin/bash" >> /etc/passwd
     fi
 }

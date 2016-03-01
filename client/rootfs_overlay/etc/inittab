@@ -2,12 +2,21 @@
 #	$Id: inittab 439 2011-12-28 14:34:31Z bas $
 #
 
+::sysinit:/bin/mount -t proc proc /proc
+::sysinit:/bin/mount -o remount,rw /
+::sysinit:/bin/mkdir -p /dev/pts
+::sysinit:/bin/mkdir -p /dev/shm
+::sysinit:/bin/mount -a
 ::sysinit:/sbin/sali_startup
 
 ::respawn:/sbin/sali_installer
+
+console::respawn:/sbin/getty -L  console 0 vt100 # GENERIC_SERIAL
 
 tty2::askfirst:/bin/login -f root
 tty3::askfirst:/bin/login -f root
 tty4::once:/usr/bin/tail -n1000 -f /var/log/messages
 
 ::ctrlaltdel:/sbin/reboot
+
+::shutdown:/bin/umount -a -r

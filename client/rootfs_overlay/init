@@ -64,7 +64,11 @@ then
 fi
 
 ## Some preparations
-_MOUNT -t devtmpfs devtmpfs /dev
+if [ ! -d "/dev" ]
+then
+    $_MKDIR /dev
+fi
+$_MOUNT -t devtmpfs devtmpfs /dev
 exec 0</dev/console
 exec 1>/dev/console
 exec 2>/dev/console
