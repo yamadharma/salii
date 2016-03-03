@@ -76,6 +76,10 @@ partition(){
     fi
 }
 
+## Simplify running post/pre scripts. Instead of specify the order number and image
+## name as script name, just specify which scripts you want to use. You can easily
+## change the order per type of install and re-use the same scripts
+
 ## A function which is called before the partitioning and installation
 # optional
 pre_installation(){
