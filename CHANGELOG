@@ -1,4 +1,6 @@
 1.7.0
+  * Replaced our custom busybox with BuildRoot.
+
   * This version of SALI is a complete rewrite of the /etc/init.d/functions
     also the old master_script style is from this version deprecated.
 
@@ -15,6 +17,14 @@
   * A lot of functions are deprecated in this version of SALI and shall be removed in 2.0.0
 
   * Authors: Bas van der Vlies and Dennis Stam
+
+1.6.10
+  * Updated kernel to 4.4.1
+    * Added all i2c modules
+    * Added nvme support
+
+1.6.7
+  * Updated kernel to latest lts: 3.14.28
 
 1.6.6
   * Update kernel to latest stable: 3.10.33
