@@ -26,12 +26,24 @@
 _PRINTF="/usr/bin/printf"
 _MOUNT="/bin/mount"
 _MKDIR="/bin/mkdir"
-_UDEVD="/lib/udev/udevd"
-_UDEVADM="/usr/bin/udevadm"
+_UDEVD="/sbin/udevd"
+_UDEVADM="/sbin/udevadm"
 _DMESG="/bin/dmesg"
 
 ## Default value for init
 init="/sbin/init"
+
+
+## Some preparations
+if [ ! -d "/dev" ]
+then
+    $_MKDIR /dev
+fi
+$_MOUNT -t devtmpfs devtmpfs /dev
+exec 0</dev/console
+exec 1>/dev/console
+exec 2>/dev/console
+$_MOUNT -a
 
 ## Fast scan of the kernel paramaters
 for option in $(cat /proc/cmdline)
@@ -63,16 +75,6 @@ then
     done
 fi
 
-## Some preparations
-if [ ! -d "/dev" ]
-then
-    $_MKDIR /dev
-fi
-$_MOUNT -t devtmpfs devtmpfs /dev
-exec 0</dev/console
-exec 1>/dev/console
-exec 2>/dev/console
-
 ####
 ## Now the real initialization of SALI
 $_PRINTF "Initializing SALI...\n"
@@ -81,12 +83,14 @@ $_PRINTF "Initializing SALI...\n"
 $_UDEVD -d || ($_PRINTF "Failed to start UDEV\n" && exit 1)
 $_UDEVADM trigger --type=subsystems --action=add
 $_UDEVADM trigger --type=devices --action=add
-$_UDEVADM settle --timeout=30 || $_PRINTF "Udevadm settle failed\n"
+
+$_PRINTF "Waiting for udev to settle, please wait a moment...\n"
+$_UDEVADM settle --timeout=60 || $_PRINTF "Udevadm settle failed\n"
 
 $_PRINTF "Done with udev initalization, continue booting into SALI...\n"
 
 # Change console-level to 6
-$_DMESG -n 6
+$_DMESG -n 1
 
 ## Now start SALI
 exec $init

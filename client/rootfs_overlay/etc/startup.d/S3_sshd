@@ -38,6 +38,20 @@ then
     ssh_gen_key dsa /etc/ssh/ssh_host_dsa_key
 fi
 
+## When we failed to download the ssh_keys, generate them now
+if [ ! -e "/etc/ssh/ssh_host_ecdsa_key" ]
+then
+    p_comment 0 "Generating ecdsa key"
+    ssh_gen_key ecdsa /etc/ssh/ssh_host_ecdsa_key
+fi
+
+## When we failed to download the ssh_keys, generate them now
+if [ ! -e "/etc/ssh/ssh_host_ed25519_key" ]
+then
+    p_comment 0 "Generating ed25519 key"
+    ssh_gen_key ed25519 /etc/ssh/ssh_host_ed25519_key
+fi
+
 ## Start the ssh daemon
 p_service "Starting sshd daemon"
 /usr/sbin/sshd
