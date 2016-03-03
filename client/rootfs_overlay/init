@@ -43,6 +43,14 @@ $_MOUNT -t devtmpfs devtmpfs /dev
 exec 0</dev/console
 exec 1>/dev/console
 exec 2>/dev/console
+
+cat /etc/fstab | awk '{print $2}' | egrep '^\/.+' | xargs | while read mountpoint
+do
+    if [ ! -d "${mountpoint}" ]
+    then
+        mkdir $mountpoint
+    fi
+done
 $_MOUNT -a
 
 ## Fast scan of the kernel paramaters
