@@ -1,0 +1,18 @@
+
+export PATH="/bin:/sbin:/usr/bin:/usr/sbin"
+export EDITOR=vim
+export PAGER=less
+
+
+export PS1="\h:\w \u\\$ "
+
+for i in /etc/profile.d/*.sh
+do
+    if [ -r "${i}" ]
+    then
+        . $i
+    fi
+    unset i
+done
+
+. /etc/init.d/functions

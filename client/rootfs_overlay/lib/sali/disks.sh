@@ -64,6 +64,7 @@ disks_detect_dev(){
             do
                 ## Use realpath to find out the /dev/* device
                 real_disk=$(realpath /dev/disk/$disk_by/$disk)
+                real_disk=$(echo $real_disk|sed -r 's/[0-9]+$//g')
                 
                 ## Is it realy a disk?
                 if [ -n "$(cat /proc/partitions | grep $(basename $real_disk))" ]
@@ -191,6 +192,8 @@ disks_prep(){
             /usr/sbin/parted -s -- $disk mklabel $LABEL >/dev/null 2>&1
         fi
     done
+
+    sleep 10
 }
 
 ###
@@ -334,16 +337,16 @@ disks_format(){
 
     case "${TYPE}" in
         ext2)
-            p_comment 10 "/sbin/mkfs.ext2 ${DISK} ${LABEL} ${OPTIONS}"
-            /sbin/mkfs.ext2 $DISK $LABEL $OPTIONS $QUIET
+            p_comment 10 "/usr/sbin/mkfs.ext2 ${DISK} ${LABEL} ${OPTIONS}"
+            /usr/sbin/mkfs.ext2 $DISK $LABEL $OPTIONS $QUIET
         ;;
         ext3)
-            p_comment 10 "/sbin/mkfs.ext3 ${DISK} ${LABEL} ${OPTIONS}"
-            /sbin/mkfs.ext3 $DISK $LABEL $OPTIONS $QUIET
+            p_comment 10 "/usr/sbin/mkfs.ext3 ${DISK} ${LABEL} ${OPTIONS}"
+            /usr/sbin/mkfs.ext3 $DISK $LABEL $OPTIONS $QUIET
         ;;
         ext4)
-            p_comment 10 "/sbin/mkfs.ext4 ${DISK} ${LABEL} ${OPTIONS}"
-            /sbin/mkfs.ext4 $DISK $LABEL $OPTIONS $QUIET
+            p_comment 10 "/usr/sbin/mkfs.ext4 ${DISK} ${LABEL} ${OPTIONS}"
+            /usr/sbin/mkfs.ext4 $DISK $LABEL $OPTIONS $QUIET
         ;;
         xfs)
             p_comment 10 "/sbin/mkfs.xfs ${DISK} ${LABEL} ${OPTIONS}"
