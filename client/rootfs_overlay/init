@@ -36,9 +36,6 @@ _CAT="/bin/cat"
 ## Default value for init
 init="/sbin/init"
 
-## Rewrite the fstab to exlcude the /dev/root mount
-$_AWK '!/^\/dev\/root/' /etc/fstab > /tmp/fstab && $_MV /tmp/fstab /etc/fstab
-
 ## Some preparations
 if [ ! -d "/dev" ]
 then
