@@ -178,6 +178,9 @@ disks_prep(){
 
     for disk in $DISKS
     do
+        sgdisk --zap-all $disk >/dev/null 2>&1
+        partprobe $disk >/dev/null 2>&1
+
         if [ $SALI_VERBOSE_LEVEL -ge 10 ]
         then
             p_comment 10 "/usr/sbin/parted -s -- ${disk} mklabel ${LABEL}"
@@ -191,9 +194,10 @@ disks_prep(){
         else
             /usr/sbin/parted -s -- $disk mklabel $LABEL >/dev/null 2>&1
         fi
-    done
 
-    sleep 10
+        sleep 2
+        partprobe $disk >/dev/null 2>&1
+    done
 }
 
 ###
@@ -338,19 +342,19 @@ disks_format(){
     case "${TYPE}" in
         ext2)
             p_comment 10 "/usr/sbin/mkfs.ext2 ${DISK} ${LABEL} ${OPTIONS}"
-            /usr/sbin/mkfs.ext2 $DISK $LABEL $OPTIONS $QUIET
+            /usr/sbin/mkfs.ext2 -F $DISK $LABEL $OPTIONS $QUIET
         ;;
         ext3)
             p_comment 10 "/usr/sbin/mkfs.ext3 ${DISK} ${LABEL} ${OPTIONS}"
-            /usr/sbin/mkfs.ext3 $DISK $LABEL $OPTIONS $QUIET
+            /usr/sbin/mkfs.ext3 -F $DISK $LABEL $OPTIONS $QUIET
         ;;
         ext4)
             p_comment 10 "/usr/sbin/mkfs.ext4 ${DISK} ${LABEL} ${OPTIONS}"
-            /usr/sbin/mkfs.ext4 $DISK $LABEL $OPTIONS $QUIET
+            /usr/sbin/mkfs.ext4 -F $DISK $LABEL $OPTIONS $QUIET
         ;;
         xfs)
             p_comment 10 "/sbin/mkfs.xfs ${DISK} ${LABEL} ${OPTIONS}"
-            /sbin/mkfs.xfs $DISK $LABEL $OPTIONS $QUIET
+            /sbin/mkfs.xfs $DISK -f $LABEL $OPTIONS $QUIET
         ;;
         swap)
             p_comment 10 "/sbin/mkswap ${DISK} ${LABEL} ${OPTIONS}"
@@ -456,6 +460,10 @@ disks_part() {
     p_service "Creating partition on disk ${DISK}"
     disks_create_partition $DISK $SIZE $FLAG
     PART_NUM=$(/usr/sbin/parted -s -- "${DISK}" print | awk '/^ [0-9].*/ {print $1}' | tail -n1)
+
+    ## Just wait a couple of sec and also force partprobe
+    sleep 2
+    partprobe $DISK >/dev/null 2>&1
 
     ## Check if given filesystem is supported, else show error
     case "${TYPE}" in
