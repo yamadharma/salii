@@ -1,4 +1,4 @@
-# SALI test project
+# SALI project
 
 This repository contains the 1.7.0 client and server code. Please note that this repository is a work in progress.
 
