@@ -1,4 +1,0 @@
-config BR2_PACKAGE_SCRUB
-	bool "scrub"
-	help
-       Scrub iteratively writes patterns on files or disk devices to make retrieving the data more difficult.
