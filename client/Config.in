@@ -1,4 +1,3 @@
-
-source "$BR2_EXTERNAL/package/aria2/Config.in"
-source "$BR2_EXTERNAL/package/lsscsi/Config.in"
-source "$BR2_EXTERNAL/package/scrub/Config.in"
+source "$BR2_EXTERNAL_SALI_PATH/package/aria2/Config.in"
+#source "$BR2_EXTERNAL_SALI/package/lsscsi/Config.in"
+#source "$BR2_EXTERNAL_SALI/package/scrub/Config.in"
