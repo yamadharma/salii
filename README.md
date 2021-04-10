@@ -1,6 +1,6 @@
 # SALI project
 
-This repository contains the 1.7.0 client and server code. Please note that this repository is a work in progress.
+This repository contains the 2.0.0 client and server code. Please note that this repository is a work in progress.
 
 Please also check our page on our own website for bugtracking:
  - https://oss.trac.surfsara.nl/sali
@@ -11,7 +11,7 @@ Operating systems Mac OSX and Linux are supported. For some dependicies we recom
 
 Requirements:
  * QEMU (client testing)
- * Python 2.7 (server tools)
+ * Python 3 (server tools)
 
 Recommendations:
  * Virtualenv and virtualenvwrapper
@@ -19,25 +19,51 @@ Recommendations:
 ## File stucture
 
  * docs : Contains some documentation and ideas for the future
- * client : Contains the shell script code for the embbedded Linux environment
+ * buildroot : Contains the shell script code for the embbedded Linux environment
  * server : Contains the SALI server tools
  * CHANGELOG : What has changed since version 1.0.0
  * README.md : This file
- * `test_client.sh` : Allows you to test the client code in the SALI embedded environment
+ * tools : Some tools for testing purposes
 
 ## Client
 
+### Building the buildroot for SALI
+ 1. Download buildroot and unpack it separate from this repository. In this example we will take `/tmp`
+ 2. `cd /tmp && wget https://buildroot.org/downloads/buildroot-2021.02.1.tar.gz`
+ 3. Unpack buildroot: `tar xvf buildroot-2021.02.1.tar.gz` and change directory to `cd buildroot-2021.02.1`
+ 4. Configure buildroot with the `sali_x86_64_defconfig` via the `BR2_EXTERNAL` method
+    * `make BR2_EXTERNAL=/home/dennis/sali/buildroot sali_x86_64_defconfig`
+ 5. Now run `make`
+
+After building the images are available in the `output/images` directory in the buildroot dir.
+
+### Updating buildroot/linux/busybox config
+We assume you have already downloaded, extract en configured the buildroot from the building instructions. Buildroot will update the corresnpoding files in the sali repository, so don't forget to commit them.
+
+#### Updating buildroot configuration
+ 1. `make menuconfig`
+ 2. After modifying options, run `make savedefconfig`
+
+#### Updating Linux configuration
+ 1. `make linux-menuconfig`
+ 2. After modifying options, run `make linux-update-defconfig`
+
+ #### Updating Busybox configuration
+ 1. `make busybox-menuconfig`
+ 2. After modifying options, run `make busybox-update-config`
+
 ### Running tests
- * First start the server `./test_vm.sh server`
- * Edit client/files/cmdline and change your hostname in `SALI_MASTERSCRIPT`
- * Run `./test_vm.sh run` to start a virtual machine. (separate terminal)
+ * First start the server `./tool/test_client.sh server`
+ * Run `./tool/test_client.sh run` to start a virtual machine. (separate terminal)
 
 #### Mapped ports
  * SSH 8022
  * SYSLOG 8514
 
 #### Client file structure
-These are the SALI specific files
+
+These files are located in the rootfs_overlay in `buildroot/board/sali/common/rootfs_overlay`
+
 ```
 /etc/sali
     - console_file              # The motd when we just open the console
@@ -79,9 +105,6 @@ Also during runtime some SALI specific files are created:
     - master_script             # The actual master_script that has been downloaded
     - scripts/                  # A directory which contains the post and pre install scripts
     - variables                 # All variables of SALI are written here
-    - disks/                    # Will contain information about the disks
-        - sda                   # Will be created during the partition phase to keep track
-                                # of which partitions are created
 ```
 
 ## Server
@@ -90,4 +113,3 @@ Also during runtime some SALI specific files are created:
  * Create an image with rsync (uses ssh to start rsync on the golden-client)
  * Create a tar.gz image for bittorrent distribution
  * Generate a rsync daemon config
- * Bittorrent tracker

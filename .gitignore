@@ -1,5 +1,9 @@
 .DS_Store
-client-build
-client/files/ssh_keys.tar
 *.swp
 *.pyc
+devel/bzImage
+devel/rootfs.cpio
+devel/rootfs.cpio.bz2
+devel/client-build
+devel/*.qcow2
+
