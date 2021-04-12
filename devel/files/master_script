@@ -57,9 +57,8 @@ partition(){
     ##  dirperms=1777                        with which permissions must the mount directory be
     ##
     ##         <disk> <mountpoint> <size> <options>
-    disks_part $DISK0 /boot        256    type=ext2 label=boot options="-I 128"
+    disks_part  $DISK0 /boot/efi    512   type=vfat label=EFI
     disks_part $DISK0 swap         4096   type=swap label=swap
-    disks_part $DISK0 none         1      flag=bios_grub
 
     ## Reason for seperate option label= and type= is that not all partitions need this information
     ## such as the bios_grub partition, it only needs a flag, therfore we call it a flag instead
