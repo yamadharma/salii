@@ -4,6 +4,7 @@
 devel/bzImage
 devel/rootfs.cpio
 devel/rootfs.cpio.bz2
+devel/rootfs.cpio.xz
 devel/client-build
 devel/*.qcow2
-
+devel/files/*.torrent

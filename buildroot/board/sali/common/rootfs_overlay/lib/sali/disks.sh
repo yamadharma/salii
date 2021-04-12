@@ -324,7 +324,14 @@ disks_format(){
 
     if [ -n "${LABEL}" ]
     then
-        LABEL="-L ${LABEL}"
+        case "${TYPE}" in
+            vfat)
+                LABEL="-n ${LABEL}"
+            ;;
+            *)
+                LABEL="-L ${LABEL}"
+            ;;
+        esac
     fi
 
     if [ "$SALI_VERBOSE_LEVEL" -ne 256 ]
@@ -350,6 +357,17 @@ disks_format(){
         xfs)
             p_comment 10 "/sbin/mkfs.xfs ${DISK} ${LABEL} ${OPTIONS}"
             /sbin/mkfs.xfs $DISK -f $LABEL $OPTIONS $QUIET
+        ;;
+        vfat)
+            # Note: We only allow creation of Fat32, should already be the default size
+            # but just to make it more explicit
+            p_comment 10 "/sbin/mkfs.vfat -F32 ${DISK} ${LABEL} ${OPTIONS}"
+            if [ "$SALI_VERBOSE_LEVEL" -ne 256 ]
+            then
+                /sbin/mkfs.vfat ${DISK} -F32 ${LABEL} ${OPTIONS} >/dev/null 2>&1
+            else
+                /sbin/mkfs.vfat ${DISK} -F32 ${LABEL} ${OPTIONS}
+            fi
         ;;
         swap)
             p_comment 10 "/sbin/mkswap ${DISK} ${LABEL} ${OPTIONS}"
@@ -452,7 +470,7 @@ disks_part() {
         ;;
     esac
 
-    p_service "Creating partition on disk ${DISK}"
+    p_service "Creating partition on disk ${DISK} with size ${SIZE}, type ${TYPE}, mountpoint ${MOUNTPOINT}"
     disks_create_partition $DISK $SIZE $FLAG
     PART_NUM=$(/usr/sbin/parted -s -- "${DISK}" print | awk '/^ [0-9].*/ {print $1}' | tail -n1)
 
@@ -462,7 +480,7 @@ disks_part() {
 
     ## Check if given filesystem is supported, else show error
     case "${TYPE}" in
-        ext2|ext3|ext4|xfs|swap|none)
+        ext2|ext3|ext4|xfs|swap|vfat|none)
             disks_format "${DISK}${PART_NUM}" "${TYPE}" "label=${LABEL}" "options=${OPTIONS}"
         ;;
         *)
@@ -470,8 +488,6 @@ disks_part() {
             open_console error
         ;;
     esac
-
-    p_comment 0 "size: ${SIZE}, mount: ${MOUNTPOINT}, type: ${TYPE}, disk: ${DISK}"
 
     ## For verbose logging
     for var in FLAG LABEL OPTIONS DIRPERMS
@@ -483,5 +499,40 @@ disks_part() {
         fi
     done
 
-    echo "$MOUNTPOINT ${DISK} $TYPE" >> /var/cache/mounts
+    echo "$MOUNTPOINT ${DISK} $TYPE" >> $SALI_CACHE_DIR/mounts
+}
+
+###
+# Usage: disks_mount
+#
+# Mount the partitioned disks on a specific target (default /target)
+#
+# Syntax optional options:
+#  target=/target           Specify on which root directory the partitions must be mounted     
+###
+disks_mount() {
+    TARGET=$1
+
+    ## Make sure we have a default value
+    if [ -z "${TARGET}" ]
+    then
+        TARGET=/target
+    fi
+
+    ## Loop trough the supported file-systems
+    cat $SALI_CACHE_DIR/mounts | egrep 'ext[0-9]|xfs|vfat' | sort | while read path disk type
+    do
+        mount_path="${TARGET}${path}"
+        p_service "Mounting ${disk} with type ${type} on ${mount_path}"
+
+        ## Check if target exists, if not run mkdir
+        if [ ! -d "${mount_path}" ]
+        then
+            p_comment 10 "Creating folder ${mount_path}"
+            mkdir -p $mount_path
+        fi
+
+        p_comment 10 "/bin/mount $disk -t $type $mount_path"
+        /bin/mount $disk -t $type $mount_path
+    done
 }

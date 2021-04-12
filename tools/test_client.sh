@@ -63,38 +63,50 @@ case "$(uname -s)" in
     ;;
 esac
 
+do_run() {
+    if [ ! -r "$DEVEL_DIR/test_disk.qcow2" ]
+    then
+        for n in $(seq 97 98)
+        do
+            $QEMUIMG create -f qcow2 $DEVEL_DIR/test_disk_$(chr $n).qcow2 50G >/dev/null 2>&1
+        done
+    fi
+
+    echo "Using cmdline from file files/cmdline"
+    INTERFACE=$(ip route show | awk '/^default/ {print $5}')
+    SALI_IMAGESERVER=$(ip -4 -o addr show $INTERFACE | awk '{print $4}' | awk -F'/' '{print $1}')
+    CMDLINE="SALI_IMAGESERVER=${SALI_IMAGESERVER} $(cat $DEVEL_DIR/files/cmdline | egrep -v "^#" | xargs)"
+
+    for n in $(seq 97 98)
+    do
+        DISKLINE="$DISKLINE-hd$(chr $n) $DEVEL_DIR/test_disk_$(chr $n).qcow2 "
+    done
+
+    echo "Starting VM"
+    $QEMUSYS -kernel $DEVEL_DIR/bzImage -initrd $DEVEL_DIR/rootfs.cpio \
+        -append "$CMDLINE" -m 2048 -smp "cpus=2" \
+        -net user,hostfwd=tcp::8022-:22,hostfwd=tcp::9091-:9091 -net nic \
+        $DISKLINE &
+
+    echo "Just type ctr+c to exit"
+    wait
+
+    rm -f /tmp/sali_cmdline >/dev/null 2>&1
+}
+
 
 ## Very simple argument parser
 case "${1}" in
     run)
-        if [ ! -r "$DEVEL_DIR/test_disk.qcow2" ]
-        then
-            for n in $(seq 97 98)
-            do
-                $QEMUIMG create -f qcow2 $DEVEL_DIR/test_disk_$(chr $n).qcow2 50G >/dev/null 2>&1
-            done
-        fi
+        do_run
+    ;;
+    make-copy-run)
+        cd $2 && make
+        cd $ROOT_DIR
+        cp $2/output/images/bzImage $DEVEL_DIR
+        cp $2/output/images/rootfs.cpio $DEVEL_DIR
 
-        echo "Using cmdline from file files/cmdline"
-        INTERFACE=$(ip route show | awk '/^default/ {print $5}')
-        SALI_IMAGESERVER=$(ip -4 -o addr show $INTERFACE | awk '{print $4}' | awk -F'/' '{print $1}')
-        CMDLINE="SALI_IMAGESERVER=${SALI_IMAGESERVER} $(cat $DEVEL_DIR/files/cmdline | egrep -v "^#" | xargs)"
-
-        for n in $(seq 97 98)
-        do
-            DISKLINE="$DISKLINE-hd$(chr $n) $DEVEL_DIR/test_disk_$(chr $n).qcow2 "
-        done
-
-        echo "Starting VM"
-        $QEMUSYS -kernel $DEVEL_DIR/bzImage -initrd $DEVEL_DIR/rootfs.cpio \
-            -append "$CMDLINE" -m 1024 -smp "cpus=2" \
-            -net user,hostfwd=tcp::8022-:22 -net nic \
-            $DISKLINE &
-
-        echo "Just type ctr+c to exit"
-        wait
-
-        rm -f /tmp/sali_cmdline >/dev/null 2>&1
+        do_run
     ;;
     server)
         sudo $RSYNC --daemon --config $DEVEL_DIR/files/rsyncd.conf        
@@ -105,6 +117,6 @@ case "${1}" in
         sudo kill $PIDNUMBER
     ;;
     *)
-        echo "Usage: ${0} <run|clean|server>"
+        echo "Usage: ${0} <run|clean|server|make-copy-run>"
     ;;
 esac

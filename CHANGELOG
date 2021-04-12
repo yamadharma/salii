@@ -1,5 +1,6 @@
-1.7.0
-  * Replaced our custom busybox with BuildRoot.
+2.0.0
+  * Replaced our custom busybox with BuildRoot
+    * Check README.md for build instructions
 
   * This version of SALI is a complete rewrite of the /etc/init.d/functions
     also the old master_script style is from this version deprecated.
@@ -14,9 +15,53 @@
     * All temporary files such as variables, master script file will be written to
       /var/cache/sali
 
-  * A lot of functions are deprecated in this version of SALI and shall be removed in 2.0.0
+  * Please note that the old master_script is not supported anymore.
+
+  * Updated kernel to 5.10.25
+
+  * Updated openssl to 1.1.k
+  * Updated openssh to 8.5p1
+  * Updated busybox to 1.33.0
+  * Updated libusb to 1.0.24
+  * Updated usbutils to 013
+  * Updated curl to 7.76.0
+  * Updated rsync to 3.1.3
+  * Updated bc to 1.07.1
+  * Updated scrub to 2.6.1
+  * Updated e2fsprogs to 1.45.6
+  * Updated lvm2 to 2.02.185
+  * Updated xfsprogs to 5.10.0
+
+  * Added transmission 3.0
+  * Added tar 1.32 (renoved tar from busybox)
+
+  * Removed aria2
+  * Removed xmlrpc-c
+  * Removed kerneltools
 
   * Authors: Bas van der Vlies and Dennis Stam
+
+1.16.20
+  * updated kernel to 4.19.109 with debian standard condfig for X86_64 
+    - DBBUG_CONFIG must be tunned off else big sizes
+  * Updated xfsprogs to: 
+  * Updated eudev to 3.2.9
+  * Updated e2fsprogs to 1.45.5 
+    - added configure options  '--enable-symlink-install  --enable-symlink-build'
+  * Updated kexec to 2.0.20
+  * Updated lsscsi to 0.31
+  * Updated xfsprogs to 5.4.0
+  * Updated mdadm to 4.1
+  * Updated parted to 3.3
+  * tools/debian_packages.sh switched from aptitude to apt
+  * build system is now Debian 10 (Buster)
+  * Added ld.so.conf setup to sali else libc is not found
+
+1.16.14
+  * Updated kernel to latest lts: 4.14.68
+  * Updated aria2 to: 1.34.0
+  * Updated xfsprogs to: 4.9.0
+  * Changed from udev-182 to eudev 3.2.5
 
 1.6.10
   * Updated kernel to 4.4.1

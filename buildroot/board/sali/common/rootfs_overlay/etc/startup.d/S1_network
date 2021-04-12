@@ -2,11 +2,14 @@
 ## Welcome message for the network stage
 p_stage "Configuring network"
 
+CUR_HOSTNAME=$(cat /etc/hostname)
+
 ## Let's begin with the loopback interface
 p_service "Configuring loopback device"
 echo "iface lo inet loopback" > $SALI_INTERFACES_FILE
 echo "auto lo" >> $SALI_INTERFACES_FILE
 echo "" >> $SALI_INTERFACES_FILE
+do_ifup lo
 
 ## Now let's configure the physical devices, first check if
 ## there is a DEVICE specifed, if so skip all other interfaces.
@@ -47,6 +50,13 @@ else
     done
 
     wait
+fi
+
+NOW_HOSTNAME=$(cat /etc/hostname)
+if [ -z "${NOW_HOSTNAME}" ]
+then
+    echo $CUR_HOSTNAME > /etc/hostname
+    hostname $CUR_HOSTNAME
 fi
 
 ## At the end always return 0, when there is an error return 1 or higher
