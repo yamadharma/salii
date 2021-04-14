@@ -24,15 +24,6 @@ then
     exit 1
 fi
 
-for a_file in bzImage rootfs.cpio
-do
-    if [ ! -f "devel/${a_file}" ]
-    then
-        echo "Unable to locate the ${a_file} in the devel directory"
-        exit 1
-    fi
-done
-
 ## Some static variables
 ROOT_DIR=$(pwd)
 DEVEL_DIR=${ROOT_DIR}/devel

@@ -1,9 +1,9 @@
 
 
 ## Open the console when asked for
-if [ "${SALI_CONSOLE_AFTER_INSTALL}" ]
+if [ "${SALI_CONSOLE_AFTER_INSTALL}" -ne 0 ]
 then
-    p_service "Variable SALI_CONSOLE_AFTER_INSTALL has been set, opening console"
+    p_stage "Variable SALI_CONSOLE_AFTER_INSTALL has been set, opening console"
     return 0
 fi
 
