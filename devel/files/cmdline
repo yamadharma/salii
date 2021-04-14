@@ -1,4 +1,5 @@
 ## Just add a parameter on each line
 SALI_VERBOSE_LEVEL=10
-SALI_MASTERSCRIPT=http://${SALI_IMAGESERVER}:8000/master_script
-SALI_IMAGENAME=amd64_base_wheezy
+SALI_MASTERSCRIPT=http://${SALI_IMAGESERVER}:8000/scripts/master_script
+SALI_IMAGENAME=amd64_buster_base
+SALI_PROTOCOL=rsync

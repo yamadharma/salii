@@ -43,7 +43,7 @@ SALI_MASTERSCRIPT=$_sali_masterscript
 # Static variables
 static_vars(){
     SALI_LIB_DIR=/lib/sali
-    SALI_CACHE_DIR=/var/cache/sali
+    SALI_CACHE_DIR=/tmp/sali
     SALI_SCRIPTS_DIR=$SALI_CACHE_DIR/scripts
     SALI_TORRENTS_DIR=$SALI_CACHE_DIR/torrents
     SALI_LOG_FILE=/var/log/messages
@@ -56,6 +56,8 @@ static_vars(){
     SALI_INSTALLER_D_DIR=/etc/installer.d
     SALI_STARTUP_D_DIR=/etc/startup.d
     SALI_INTERFACES_FILE=/etc/network/interfaces
+    SALI_TARGET=/target
+    SALI_TORRENT_BACKEND=transmission
 }
 static_vars
 
@@ -116,22 +118,14 @@ save_variables
 # Include the scripts functions
 . $SALI_LIB_DIR/scripts.sh
 
-# Include ARIA imaging functions
-#. $SALI_LIB_DIR/aria2.sh
-
-# Include Rsync imaging functions
-#. $SALI_LIB_DIR/rsync.sh
-
-# Include general install imaging functions
-#   This function uses aria2.sh and rsync.sh,
-#   perhaps the includes must be in imaging.sh
-#. $SALI_LIB_DIR/imaging.sh
+# Include rsync/torrent imaging functions
+. $SALI_LIB_DIR/imaging.sh
 
 # Include Partition functions
 . $SALI_LIB_DIR/disks.sh
 
 # Include Chroot functions
-#. $SALI_LIB_DIR/chroot.sh
+. $SALI_LIB_DIR/chroot.sh
 
 # Post installation functions
 #. $SALI_LIB_DIR/post_fstab.sh

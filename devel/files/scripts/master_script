@@ -11,13 +11,14 @@ initialize(){
     ## variables
     #SALI_SSHD_KEYS="http://${SALI_IMAGESERVER}:8000/ssh_keys.tar"
 
-    ## Currently only rsync supported
+    ## Currently only rsync supported, also scripts are always fetched, even wen pre_installation and post_installation
+    ## have not been configured
     SALI_SCRIPTS="rsync://${SALI_IMAGESERVER}/scripts"
 
     ## Where can I find the image (for torrent and rsync), based on the variable PROTOCOL
     ## rsync of bittorrent is used, variables IMAGESERVER and IMAGENAME must be available
     ## via de linux cmd line
-    image_torrent "rsync://${SALI_IMAGESERVER}/torrents/image-${SALI_IMAGENAME}.tar.gz.torrent" staging=/a/tmp
+    image_torrent "rsync://${SALI_IMAGESERVER}/torrents/${SALI_IMAGENAME}.tar.gz.torrent"
     image_rsync "${SALI_IMAGESERVER}::${SALI_IMAGENAME}" options=aHS
 
     ## Optional you can specify the root password, you must specify the actual passwd encrypted string
@@ -57,7 +58,8 @@ partition(){
     ##  dirperms=1777                        with which permissions must the mount directory be
     ##
     ##         <disk> <mountpoint> <size> <options>
-    disks_part  $DISK0 /boot/efi    512   type=vfat label=EFI
+    disks_part $DISK0 /boot        512    type=ext2 label=boot
+    disks_part $DISK0 none         1      flag=bios_grub
     disks_part $DISK0 swap         4096   type=swap label=swap
 
     ## Reason for seperate option label= and type= is that not all partitions need this information
@@ -81,14 +83,14 @@ partition(){
 
 ## A function which is called before the partitioning and installation
 # optional
-pre_installation(){
-    run_script my_pre_script
-}
+#pre_installation(){
+#    run_script my_pre_script
+#}
 
 ## A function which is called after fetching the image
 # optional
-post_installation(){
-    ## run an shell script in a chrooted environment (the functions file is NOT available in
-    ## the chroot env)
-    run_script my_post_scrip
-}
+#post_installation(){
+#    ## run an shell script in a chrooted environment (the functions file is NOT available in
+#    ## the chroot env)
+#    run_script my_post_scrip
+#}

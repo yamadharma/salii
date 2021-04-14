@@ -295,9 +295,12 @@ disks_create_partition(){
 
     if [ "${3}" != "none" ]
     then
-        PART_NUM=$(/usr/sbin/parted -s -- "${1}" print 2>/dev/null | awk '/^ [0-9].*/ {print $1}' | tail -n1)
-        p_comment 10 "/usr/sbin/parted -s -- ${1} set ${PART_NUM} $3 on"
-        /usr/sbin/parted -s -- "${1}" set "${PART_NUM}" "${3}" on
+        echo $3 | sed 's/,/\n/g' | while read disk_flag
+        do
+            PART_NUM=$(/usr/sbin/parted -s -- "${1}" print 2>/dev/null | awk '/^ [0-9].*/ {print $1}' | tail -n1)
+            p_comment 10 "/usr/sbin/parted -s -- ${1} set ${PART_NUM} ${disk_flag} on"
+            /usr/sbin/parted -s -- "${1}" set "${PART_NUM}" "${disk_flag}" on
+        done
     fi
 }
 
@@ -394,9 +397,10 @@ disks_format(){
 #
 # Syntax optional options:
 #  type=<ext2|ext3|ext4|xfs|swap>       currently supported filesystems
-#  flag=<bios_grub|lvm|raid>            which flag must be set on the partition
+#  flag=<bios_grub|lvm|raid|boot|esp>   which flag must be set on the partition
 #                                       when using raid.<id> or lvm.<id> the flag
-#                                       lvm or raid is optional!
+#                                       lvm or raid is optional!, you can specify multiple
+#                                       flags by separating with ,
 #  label=boot                           the label of the partition
 #  options="-I 128"                     check the man page mkfs.<fstype> for the options
 #  dirperms=1777                        with which permissions must the mount directory be
@@ -457,18 +461,21 @@ disks_part() {
     done
 
     ### Check if given label is supported, else show error
-    case "${FLAG}" in
-        bios_grub|none)
-            ## Ok let's go
-        ;;
-        lvm|raid)
-            p_comment 0 "Currently lvm|raid are not supported yet"
-        ;;
-        *)
-            p_comment 0 "Given flag ${FLAG} is not supported (bios_grub|lvm|raid|none)"
-            open_console error
-        ;;
-    esac
+    echo $FLAG | sed 's/,/\n/g' | while read disk_flag
+    do
+        case "${disk_flag}" in
+            boot|swap|bios_grub|esp|none)
+                ## Ok let's go
+            ;;
+            lvm|raid)
+                p_comment 0 "Currently lvm|raid are not supported yet"
+            ;;
+            *)
+                p_comment 0 "Given flag ${FLAG} is not supported (bios_grub|lvm|raid|none)"
+                open_console error
+            ;;
+        esac
+    done
 
     p_service "Creating partition on disk ${DISK} with size ${SIZE}, type ${TYPE}, mountpoint ${MOUNTPOINT}"
     disks_create_partition $DISK $SIZE $FLAG
@@ -499,7 +506,7 @@ disks_part() {
         fi
     done
 
-    echo "$MOUNTPOINT ${DISK} $TYPE" >> $SALI_CACHE_DIR/mounts
+    echo "$MOUNTPOINT ${DISK} $TYPE $DIRPERMS" >> $SALI_CACHE_DIR/mounts
 }
 
 ###
@@ -508,7 +515,8 @@ disks_part() {
 # Mount the partitioned disks on a specific target (default /target)
 #
 # Syntax optional options:
-#  target=/target           Specify on which root directory the partitions must be mounted     
+#  target=/target           Specify on which root directory the partitions must be mounted
+#                           default is $SALI_TARGET     
 ###
 disks_mount() {
     TARGET=$1
@@ -516,11 +524,11 @@ disks_mount() {
     ## Make sure we have a default value
     if [ -z "${TARGET}" ]
     then
-        TARGET=/target
+        TARGET=$SALI_TARGET
     fi
 
     ## Loop trough the supported file-systems
-    cat $SALI_CACHE_DIR/mounts | egrep 'ext[0-9]|xfs|vfat' | sort | while read path disk type
+    cat $SALI_CACHE_DIR/mounts | egrep 'ext[0-9]|xfs|vfat' | sort | while read path disk type dirperms
     do
         mount_path="${TARGET}${path}"
         p_service "Mounting ${disk} with type ${type} on ${mount_path}"
@@ -529,7 +537,12 @@ disks_mount() {
         if [ ! -d "${mount_path}" ]
         then
             p_comment 10 "Creating folder ${mount_path}"
-            mkdir -p $mount_path
+            if [ -n "${dirperms}" ]
+            then
+                mkdir -m $dirperms -p $mount_path
+            else
+                mkdir -p $mount_path
+            fi
         fi
 
         p_comment 10 "/bin/mount $disk -t $type $mount_path"
