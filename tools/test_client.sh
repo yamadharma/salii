@@ -84,8 +84,9 @@ do_run() {
 
     echo "Starting VM"
     $QEMUSYS -kernel $DEVEL_DIR/bzImage -initrd $DEVEL_DIR/rootfs.cpio \
-        -append "$CMDLINE" -m 2048 -smp "cpus=2" \
-        -net user,hostfwd=tcp::8022-:22,hostfwd=tcp::9091-:9091 -net nic \
+        -append "$CMDLINE" -m 2048 -smp "cpus=2" -enable-kvm -cpu host \
+        -netdev tap,ifname=tap0,id=network0,script=no,downscript=no \
+        -device virtio-net,netdev=network0,mac=a0:3e:6b:52:2f:25 \
         $DISKLINE &
 
     echo "Just type ctr+c to exit"
@@ -116,7 +117,12 @@ case "${1}" in
         PIDNUMBER=$($TAIL -n 1 $RSYNCLOGFILE | awk '{print $3}' | sed -e 's/\[//g' -e 's/\]//g')
         sudo kill $PIDNUMBER
     ;;
+    network-prepare)
+        sudo tunctl -t tap0 -u $(id -un)
+        sudo ip link set tap0 up
+        sudo brctl addif bridge0 tap0
+    ;;
     *)
-        echo "Usage: ${0} <run|clean|server|make-copy-run>"
+        echo "Usage: ${0} <run|clean|server|make-copy-run|network-prepare>"
     ;;
 esac

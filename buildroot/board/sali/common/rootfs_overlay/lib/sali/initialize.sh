@@ -45,6 +45,11 @@ image_rsync(){
         esac
     done
 
+    if [ -z $SALI_RSYNC_OPTIONS ]
+    then
+        SALI_RSYNC_OPTIONS=aHS
+    fi
+
     save_variables
 }
 
@@ -91,7 +96,7 @@ image_torrent(){
     do
         case "${1}" in
             staging)
-                SALI_STAGING_DIR=$2
+                SALI_TORRENT_STAGING_DIR=$2
                 shift 2
             ;;
         esac

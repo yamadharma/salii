@@ -1,0 +1,18 @@
+
+if [ "${SALI_PROTOCOL}" != "torrent" ]
+then
+    return 0
+fi
+
+case "${SALI_TORRENT_BACKEND}" in
+    transmission)
+        p_stage "Starting transmission-daemon"
+        /usr/bin/transmission-daemon --log-debug --logfile /var/log/transmission.log --no-auth --pid-file /tmp/transmission.pid
+    ;;
+    *)
+        p_stage "Given backend is not supported: \"${SALI_TORRENT_BACKEND}\""
+        return 1
+    ;;
+esac
+
+return 0

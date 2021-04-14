@@ -5,7 +5,4 @@
 
 . /etc/init.d/functions
 
-
-echo "Hello world from ${0}"
-echo "  args $@"
-echo "  ${SALI_VERSION}"
+echo "Today there will"

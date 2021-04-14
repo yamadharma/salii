@@ -2,7 +2,6 @@
 
 DHCPVARFILE=/tmp/udhcpc.$interface
 
-echo "SALIIMAGESRV=$saliimgsrv" > $DHCPVARFILE
 echo "IPADDR=$ip" >> $DHCPVARFILE
 echo "HOSTNAME=$hostname" >> $DHCPVARFILE
 echo "NETMASK=$subnet" >> $DHCPVARFILE

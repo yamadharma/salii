@@ -6,14 +6,14 @@ else
     return 1
 fi
 
-check_function_exists pre_installation
+check_function_exists post_installation
 if [ $? -eq 0 -a -z "${SALI_SKIP_SCRIPTS}" ]
 then
-    p_stage "Running pre-installation scripts"
+    p_stage "Running post-installation scripts"
 
-    pre_installation
+    post_installation
 else
-    p_stage "Skipping pre-installation scripts not configured in master_script or SALI_SKIP_SCRIPTS is set"
+    p_stage "Skipping post-installation scripts not configured in master_script or SALI_SKIP_SCRIPTS is set"
 fi
 
 ## At the end always return 0, when there is an error return 1 or higher
