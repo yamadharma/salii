@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+#
+# This file is part of SALI
+#
+# SALI is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# SALI is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with SALI.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright 2010-2021 SURFsara
+
+import argparse
+import sys
+import os
+
+from sali.common import Common
+from sali import exceptions
+from sali.tools import find_and_add_command, is_hostname
+from sali.getimage import getimage
+from sali import release
+
+# Check if we see sali-test-client, then assume we are developing
+ROOT_DIR=os.path.abspath(
+    os.path.dirname(__name__)
+)
+if os.path.isfile(os.path.join(ROOT_DIR, 'sali-test-client')):
+    CFG_PATH = os.path.join(ROOT_DIR,'examples')
+else:
+    CFG_PATH = '/etc/sali'
+
+def cmd_getimage(cmn):
+    getimage(cmn)
+
+
+def args_hostname(hostname):
+
+    if is_hostname(hostname):
+        return hostname
+    
+    raise ValueError("Given input is not a valid hostname or not resolvable %s" % hostname)
+
+def args():
+    parser = argparse.ArgumentParser(
+        description='The backend tool for the SALI Linux Imager'
+    )
+    subparsers = parser.add_subparsers(
+        dest='command', description='SALI commands', required=True
+    )
+
+    parser.add_argument(
+        '-c', '--config', type=str, metavar='CONFIG',
+        default=os.path.join(CFG_PATH, 'sali.ini'),
+        help='specify the main configuration file [default:%(default)s'
+    )
+    parser.add_argument(
+        '-v', '--verbose', action='store_true',
+        help='enable verbose mode for SALI',
+    )
+    parser.add_argument(
+        '-n', '--dry-run', action='store_true',
+        help='enable dry-run mode for SALI',
+    )
+    parser.add_argument(
+        '--version', action='version', version='%s %s - %s' % (
+            release.name,
+            release.version,
+            release.copyright
+        )
+    )
+
+    parser_getimage = subparsers.add_parser('getimage', 
+        help='Fetch an image from a golden-host'
+    )
+    parser_getimage.add_argument('hostname', type=args_hostname, help='Specify the host/node golden-client name')
+    parser_getimage.add_argument('imagename', help='Specify the name of the image')
+    parser_getimage.add_argument('-y', '--yes', action='store_true', help='Dont ask, just do')
+    parser_getimage.add_argument('-e', '-exclude', 
+        help='Overule the rsync exclude file based on imagename'
+    )
+    parser_getimage.set_defaults(func=cmd_getimage)
+
+    return parser.parse_args()
+
+if __name__ == '__main__':
+
+    arguments = args()
+    
+    try:
+        cmn = Common(arguments, CFG_PATH)
+        cmn.logger("sali", "debug", "Start of logger, calling function based on module %s" % str(cmn.args.func))
+        cmn.args.func(cmn)
+    except exceptions.SaliConfigurationException as error:
+        print('Configuration Error:', error, file=sys.stderr)
+        sys.exit(1)
+    except exceptions.SaliValidationException as error:
+        print('Validation Error:', error, file=sys.stderr)
+        sys.exit(2)
+    except exceptions.SaliDataException as error:
+        print('Data Error:', error, file=sys.stderr)
+        sys.exit(3)
+    except KeyboardInterrupt:
+        print('\n\n\nBye!, until next time')

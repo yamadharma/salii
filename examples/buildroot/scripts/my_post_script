@@ -2,4 +2,4 @@
 
 
 echo "Hello world from ${0}"
-echo "  args $@"
+cat /etc/os-release

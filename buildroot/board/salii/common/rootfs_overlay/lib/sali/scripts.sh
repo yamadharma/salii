@@ -53,7 +53,7 @@ run_script(){
     do
         case "${1}" in
             chroot)
-                if [ $(is_yes $2) -eq 0 ]
+                if [ $(is_yes $2) -eq 1 ]
                 then
                     CHROOT=yes
                 fi
@@ -68,5 +68,29 @@ run_script(){
 
     p_service "Running script ${SALI_SCRIPTS_DIR}/${SCRIPT}"
 
-    $SALI_SCRIPTS_DIR/$SCRIPT $ARGS
+    if [ $(is_yes $CHROOT) -eq 1 ]
+    then
+        p_comment 10 "Running script in chroot mode"
+
+        ## Copy script and make it executable
+        chroot_setup
+        cp $SALI_SCRIPTS_DIR/$SCRIPT $SALI_TARGET/tmp/$SCRIPT
+        chmod +x $SALI_TARGET/tmp/$SCRIPT
+
+        echo ""
+        /usr/sbin/chroot $SALI_TARGET /tmp/$SCRIPT $SALI_SCRIPTS_DIR/$SCRIPT $ARGS
+    else
+        ## Make sure it's executable
+        chmod +x $SALI_SCRIPTS_DIR/$SCRIPT
+        echo ""
+        $SALI_SCRIPTS_DIR/$SCRIPT $ARGS
+    fi
+
+    if [ $? -ne 0 ]
+    then
+        echo ""
+        p_comment 10 "An error has occured with the script"
+        return 1
+    fi
+    echo ""
 }

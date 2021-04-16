@@ -5,6 +5,8 @@ if [ "${SALI_CONSOLE_AFTER_INSTALL}" -ne 0 ]
 then
     p_stage "Variable SALI_CONSOLE_AFTER_INSTALL has been set, opening console"
     return 0
+else
+    p_stage "Installation has been finished, rebooting host"
 fi
 
 

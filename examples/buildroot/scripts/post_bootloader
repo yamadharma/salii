@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# A simple script to install the bootloader
+#
+
+## Include the os-release file, so we can determine how to configure the bootloader
+source /etc/os-release
+
+## Need support for EFI
+if [ -d "/sys/firmare/efi" ]
+then
+    GRUB_TARGET="$(uname -m)-efi"
+    echo "UEFI is not supported yet"
+    exit 1
+else
+    GRUB_TARGET=i386-pc
+fi
+
+grub2_check_installed(){
+
+    ## Things are different per distro
+    case "${ID}" in
+        debian)
+            grub_lib_dir=/usr/lib/grub
+            grub_install=/usr/sbin/grub-install
+        ;;
+        centos)
+            grub_lib_dir=/usr/lib/grub
+            grub_install=/usr/sbin/grub2-install
+        ;;
+        sles)
+            grub_lib_dir=/usr/lib/grub2
+            grub_install=/usr/sbin/grub2-install
+        ;;
+    esac
+
+    ## Check if we have grub
+    if [ ! -x "${grub_install}" ]
+    then
+        echo "Could not locate grub-install command at \"${grub_install}\""
+        exit 1
+    fi
+
+    ## Check if we have the target
+    if [ ! -d "${grub_lib_dir}/${GRUB_TARGET}" ]
+    then
+        echo "The grub-target is not installed \"${grub_lib_dir}/${GRUB_TARGET}\""
+        exit 1
+    fi
+
+    echo "${grub_install}"
+}
+
+grub2_configure(){
+
+    ## Things are different per distro
+    case "${ID}" in
+        debian)
+            grub_cfg_command="/usr/sbin/update-grub"
+        ;;
+        centos|sles)
+            grub_cfg_command="/usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg"
+        ;;
+    esac
+
+    $grub_cfg_command
+}
+
+
+## Check if target has been installed and then use the given command to install
+grub_bin=$(grub2_check_installed)
+
+$grub_bin --no-floppy --target $GRUB_TARGET $2
+
+
+## We also need to update the configuration
+echo "Updating grub.cfg"
+grub2_configure

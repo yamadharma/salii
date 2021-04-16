@@ -1,4 +1,0 @@
-
-iface lo inet looback
-auto lo
-

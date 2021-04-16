@@ -89,8 +89,11 @@ partition(){
 
 ## A function which is called after fetching the image
 # optional
-#post_installation(){
-#    ## run an shell script in a chrooted environment (the functions file is NOT available in
-#    ## the chroot env)
-#    run_script my_post_scrip
-#}
+post_installation(){
+    # Run a script in the SALI environment
+    run_script my_post_script
+
+    # Run a script in the chroot environment, please note SALI variables
+    # are not available
+    run_script post_bootloader chroot=yes $DISK0
+}

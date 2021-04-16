@@ -18,16 +18,11 @@
 # Copyright 2010-2021 SURF
 #
 
-if [ ! -d "devel" ]
-then
-    echo "Unable to find the \"devel\" directory in the project root"
-    exit 1
-fi
-
 ## Some static variables
 ROOT_DIR=$(pwd)
 DEVEL_DIR=${ROOT_DIR}/devel
-RSYNC_OPTS="-ar --exclude-from=${ROOT_DIR}/devel/files/rsync_exclude"
+EXAMPLES_DIR=${ROOT_DIR}/examples/buildroot
+RSYNC_OPTS="-ar --exclude-from=${EXAMPLES_DIR}/rsync_exclude"
 
 ## We need the following commands, just make sure your PATH is correct!
 CURL=$(which curl)
@@ -38,6 +33,11 @@ CPIO=$(which cpio)
 BUNZIP2=$(which bunzip2)
 RSYNC=$(which rsync)
 TAIL=$(which tail)
+
+if [ ! -d "devel" ]
+then
+    mkdir "${ROOT_DIR}/devel"
+fi
 
 chr(){
     printf \\$(($1/64*100+$1%64/8*10+$1%8))
@@ -55,18 +55,19 @@ case "$(uname -s)" in
 esac
 
 do_run() {
-    if [ ! -r "$DEVEL_DIR/test_disk.qcow2" ]
-    then
-        for n in $(seq 97 98)
-        do
-            $QEMUIMG create -f qcow2 $DEVEL_DIR/test_disk_$(chr $n).qcow2 50G >/dev/null 2>&1
-        done
-    fi
 
-    echo "Using cmdline from file files/cmdline"
+    for n in $(seq 97 98)
+    do
+        if [ ! -r "$DEVEL_DIR/test_disk_$(chr $n).qcow2" ]
+        then
+            $QEMUIMG create -f qcow2 $DEVEL_DIR/test_disk_$(chr $n).qcow2 50G >/dev/null 2>&1
+        fi
+    done
+
+    echo "Using cmdline from file ${EXAMPLES_DIR}/cmdline"
     INTERFACE=$(ip route show | awk '/^default/ {print $5}')
     SALI_IMAGESERVER=$(ip -4 -o addr show $INTERFACE | awk '{print $4}' | awk -F'/' '{print $1}')
-    CMDLINE="SALI_IMAGESERVER=${SALI_IMAGESERVER} $(cat $DEVEL_DIR/files/cmdline | egrep -v "^#" | xargs)"
+    CMDLINE="SALI_IMAGESERVER=${SALI_IMAGESERVER} $(cat $EXAMPLES_DIR/cmdline | egrep -v "^#" | xargs)"
 
     for n in $(seq 97 98)
     do
@@ -101,12 +102,11 @@ case "${1}" in
         do_run
     ;;
     server)
-        sudo $RSYNC --daemon --config $DEVEL_DIR/files/rsyncd.conf        
-        cd "$ROOT_DIR/devel/files" && python3 -m http.server 8000
+        sudo $RSYNC --daemon --config $EXAMPLES_DIR/rsyncd.conf        
+        cd "$EXAMPLES_DIR" && python3 -m http.server 8000
         
-        RSYNCLOGFILE=$(cat $ROOT_DIR/devel/files/rsyncd.conf | awk '/^log file/ {print $NF}')
-        PIDNUMBER=$($TAIL -n 1 $RSYNCLOGFILE | awk '{print $3}' | sed -e 's/\[//g' -e 's/\]//g')
-        sudo kill $PIDNUMBER
+        RSYNCLOGFILE=$(cat $EXAMPLES_DIR/rsyncd.conf | awk '/^log file/ {print $NF}')
+        sudo killall rsync
     ;;
     network-prepare)
         sudo tunctl -t tap0 -u $(id -un)
