@@ -21,6 +21,7 @@ then
             p_service "Wiping disks ${SALI_SCRUB_DISKS}"
             for disk in $SALI_SCRUB_DISKS
             do
+                p_comment 0 "Starting scrub on disk ${disk} with pattern ${SALI_SCRUB_PATTERN}"
                 scrub -p $SALI_SCRUB_PATTERN $disk >/dev/null 2>&1 &
             done
         ;;
@@ -30,7 +31,7 @@ then
     wait
     p_service "Finished with disk scrubbing"
 
-    if [ "$(is_yes $SALI_SCRUB_HALT)" -eq 0 ]
+    if [ $(is_yes $SALI_SCRUB_HALT) -eq 1 ]
     then
         p_service "Halting machine"
         halt

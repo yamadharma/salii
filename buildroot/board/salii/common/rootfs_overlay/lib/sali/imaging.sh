@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with SALI.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2010-2021 SURFsara
+# Copyright 2010-2021 SURF
 
 ###
 # Usage: getimage_rsync
 #
 # Fetch the image via the rsync protocol, is configured by the image_rsync option in
 # the master_script
-#   
+#
 ###
 getimage_rsync(){
 
@@ -29,25 +29,32 @@ getimage_rsync(){
     p_comment 10 "url: ${SALI_RSYNC_URL}"
     p_comment 10 "opt: ${SALI_RSYNC_OPTIONS}"
 
-    if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
+    if [ $(echo "${SALI_RSYNC_OPTIONS}" | head -c 1) != '-' ]
     then
-        SALI_RSYNC_OPTIONS="-${SALI_RSYNC_OPTIONS}v"
+        SALI_RSYNC_OPTIONS_USED="-${SALI_RSYNC_OPTIONS}"
     else
-        SALI_RSYNC_OPTIONS="-${SALI_RSYNC_OPTIONS}"
+        SALI_RSYNC_OPTIONS_USED="${SALI_RSYNC_OPTIONS}"
     fi
 
-    /usr/bin/rsync $SALI_RSYNC_OPTIONS --exclude=lost+found/ --exclude=/proc/* --numeric-ids $SALI_RSYNC_URL/ $SALI_TARGET/
+    if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
+    then
+        SALI_RSYNC_OPTIONS_USED="${SALI_RSYNC_OPTIONS_USED}v"
+    fi
+
+
+    /usr/bin/rsync $SALI_RSYNC_OPTIONS_USED --exclude=lost+found/ --exclude=/proc/* --numeric-ids $SALI_RSYNC_URL/ $SALI_TARGET/
+    return $?
 }
 
 ###
 # Usage: getimage_transmission_getid <torrent-filename>
 #
 # Find the torrent-id from transmission-daemon based on the torrent-filename
-#   
+#
 ###
 getimage_transmission_getid(){
     torrent_name=$(echo $1 | sed 's/.torrent//g')
-    
+
     result=$(/usr/bin/transmission-remote -l |grep $torrent_name | awk '{print $1}')
 
     echo $result
@@ -57,7 +64,7 @@ getimage_transmission_getid(){
 # Usage: getimage_transmission_progress <torrent-id>
 #
 # Based on the torrent-id in transmission-daemon track the progress of the download
-#   
+#
 ###
 getimage_transmission_progress(){
 
@@ -96,7 +103,7 @@ getimage_transmission_progress(){
 # Usage: getimage_transmission <torrent-filename>
 #
 # Download the given torrent file via transmission
-#   
+#
 ###
 getimage_transmission(){
 
@@ -128,7 +135,7 @@ getimage_transmission(){
 #
 # Fetch the image via the torrent protocol, is configured by the image_torrent option in
 # the master_script
-#   
+#
 ###
 getimage_torrent(){
 

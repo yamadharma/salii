@@ -14,7 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with SALI.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2010-2021 SURFsara
+# Copyright 2010-2021 SURF
+
+###
+# Usage: hex2ip <hexip>
+#
+# A simple function which converts a hex ip to decimal ip
+###
+hex2ip(){
+    printf '%d.%d.%d.%d' $(echo $1 | sed 's/../0x& /g')
+}
 
 ###
 # Usage: do_ifup <interface>
@@ -54,9 +63,10 @@ add_interface(){
 
     case "${2}" in 
         dhcp)
-            /bin/cat >> $SALI_INTERFACES_FILE << EOF
+            /bin/cat >> ${SALI_INTERFACES_FILE} << EOF
 auto ${1}
 iface ${1} inet dhcp
+    udhcpc_opts -t ${SALI_UDHCP_RETRY} -O224
 
 EOF
         ;;
@@ -66,7 +76,7 @@ EOF
             then
                 return 1
             fi
-            /bin/cat >> $SALI_INTERFACES_FILE << EOF
+            /bin/cat >> ${SALI_INTERFACES_FILE} << EOF
 auto ${1}
 iface ${1} inet static
     address ${3}

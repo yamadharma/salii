@@ -1,7 +1,7 @@
 
-if [ -r "${SALI_CACHE_DIR}/master_script" ]
+if [ -r "${SALI_MASTERSCRIPT_FILE}" ]
 then
-    . "${SALI_CACHE_DIR}/master_script"
+    . "${SALI_MASTERSCRIPT_FILE}"
 else
     return 1
 fi

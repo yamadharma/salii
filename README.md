@@ -1,29 +1,29 @@
 # SALI project
-
 This repository contains the 2.0.0 client and server code. Please note that this repository is a work in progress.
 
 Please also check our page on our own website for bugtracking:
  - https://oss.trac.surfsara.nl/sali
 
 ## Development requirements
-
-Operating systems Mac OSX and Linux are supported. For some dependicies we recommend to use homebrew on Mac OSX.
+Only Linux is supported as OS for running the SALI tools
 
 Requirements:
  * QEMU (client testing)
+ * wget
  * Python 3 (server tools)
 
 Recommendations:
  * Virtualenv and virtualenvwrapper
 
 ## File stucture
-
- * docs : Contains some documentation and ideas for the future
- * buildroot : Contains the shell script code for the embbedded Linux environment
- * server : Contains the SALI server tools
- * CHANGELOG : What has changed since version 1.0.0
- * README.md : This file
- * tools : Some tools for testing purposes
+ * archive      : Contains the old-new Python code. Only used for reference
+ * buildroot    : Contains the shell script code for the embbedded Linux environment
+ * examples     : Contains examples configuration files for the SALI tools and buildroot env
+ * sali         : Contains the SALI tools
+ * CHANGELOG    : What has changed since version 1.0.0
+ * README.md    : This file
+ * sali-cli     : The main Python script for SALI tools
+ * sali-test-client: A simple shell script for testing the buildroot env in qemu
 
 ## Client
 
@@ -52,13 +52,11 @@ We assume you have already downloaded, extract en configured the buildroot from 
  1. `make busybox-menuconfig`
  2. After modifying options, run `make busybox-update-config`
 
-### Running tests
- * First start the server `./tool/test_client.sh server`
- * Run `./tool/test_client.sh run` to start a virtual machine. (separate terminal)
-
-#### Mapped ports
- * SSH 8022
- * SYSLOG 8514
+#### Running tests
+ * Please not script only works on Linux
+ * First start the server `./sali-test-client server`
+ * Prepare the network (assumes you have a bridge device with name bridge0), `./sali-test-client network-prepare`
+ * Run `./sali-test-client make-copy-run` to make buildroor, copy linux/initrd, start a virtual machine. (separate terminal)
 
 #### Client file structure
 
@@ -100,7 +98,7 @@ These files are located in the rootfs_overlay in `buildroot/board/sali/common/ro
 Also during runtime some SALI specific files are created:
 ```
 /var/log/messages               # The syslog, also contains the output from the stdout
-/var/cache/sali
+/tmp/sali
     - installer_first_try       # To keep track if we already tried to fetch the master_script
     - master_script             # The actual master_script that has been downloaded
     - scripts/                  # A directory which contains the post and pre install scripts
@@ -108,6 +106,11 @@ Also during runtime some SALI specific files are created:
 ```
 
 ## Server
+
+### Requirements
+ * Python 3.7+
+ * Transmission 2.94+
+ * Opentracker (see wiki for buildinstriuctions)
 
 ### Features
  * Create an image with rsync (uses ssh to start rsync on the golden-client)

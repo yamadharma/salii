@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SALI.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2010-2021 SURFsara
+# Copyright 2010-2021 SURF
 
 ###
 # Usage: fetch_scripts <url>
@@ -35,6 +35,27 @@ fetch_scripts(){
 }
 
 ###
+# Usage: copy_script <src> <dst>
+#
+# This will copy the post-install script to the $SALI_TARGET
+###
+copy_script(){
+    SRC=$1
+    DST=$2
+    DIRNAME=$(dirname $DST)
+
+    ## ensure the directory exists on the DST
+    if [ ! -d "${DIRNAME}" ]
+    then
+        mkdir -p $DIRNAME
+    fi
+
+    ## copy the script, and make it executable
+    cp $SRC $DST
+    chmod +x $DST
+}
+
+###
 # Usage: run_script <command> [chroot=<yes|no>] [args]
 #
 # Run a pre or post install script, by default the script is not run
@@ -48,6 +69,7 @@ run_script(){
     shift 1
 
     ARGS=""
+    CHROOT=0
 
     while [ $# -gt 0 ]
     do
@@ -72,13 +94,15 @@ run_script(){
     then
         p_comment 10 "Running script in chroot mode"
 
-        ## Copy script and make it executable
+        ## Setup the chroot environment
         chroot_setup
-        cp $SALI_SCRIPTS_DIR/$SCRIPT $SALI_TARGET/tmp/$SCRIPT
-        chmod +x $SALI_TARGET/tmp/$SCRIPT
 
+        ## Copy the script
+        copy_script $SALI_SCRIPTS_DIR/$SCRIPT $SALI_TARGET/tmp/sali/$SCRIPT
+
+        ## Run the script with chroot
         echo ""
-        /usr/sbin/chroot $SALI_TARGET /tmp/$SCRIPT $SALI_SCRIPTS_DIR/$SCRIPT $ARGS
+        /usr/sbin/chroot $SALI_TARGET /tmp/sali/$SCRIPT $ARGS
     else
         ## Make sure it's executable
         chmod +x $SALI_SCRIPTS_DIR/$SCRIPT

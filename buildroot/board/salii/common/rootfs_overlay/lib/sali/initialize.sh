@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SALI.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2010-2021 SURFsara
+# Copyright 2010-2021 SURF
 
 ###
 # Usage: image_rsync "<RSYNC URL>" [options=""]
@@ -47,7 +47,7 @@ image_rsync(){
 
     if [ -z $SALI_RSYNC_OPTIONS ]
     then
-        SALI_RSYNC_OPTIONS=aHS
+        SALI_RSYNC_OPTIONS=-aHS
     fi
 
     save_variables

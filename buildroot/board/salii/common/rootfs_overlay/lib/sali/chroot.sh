@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SALI.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2010-2021 SURFsara
+# Copyright 2010-2021 SURF
 
 ## Inspired/based on the arch-chroot script
 

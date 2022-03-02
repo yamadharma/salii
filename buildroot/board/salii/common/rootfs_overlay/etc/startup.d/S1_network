@@ -2,6 +2,10 @@
 ## Welcome message for the network stage
 p_stage "Configuring network"
 
+p_comment 0 "Wait $SALI_SPAWINGTREE_WAIT seconds to avoid spanning tree problems"
+sleep $SALI_SPAWINGTREE_WAIT
+
+## We fetch the current hostname (normally it's sali)
 CUR_HOSTNAME=$(cat /etc/hostname)
 
 ## Let's begin with the loopback interface
@@ -52,12 +56,31 @@ else
     wait
 fi
 
+## If the hostname is still not set after DHCP, use the $CUR_HOSTNAME
+##   @todo add hostname via variable in the cmdline
 NOW_HOSTNAME=$(cat /etc/hostname)
 if [ -z "${NOW_HOSTNAME}" ]
 then
     echo $CUR_HOSTNAME > /etc/hostname
     hostname $CUR_HOSTNAME
 fi
+
+## Check if we have a SALI_DHCP_IMAGESERVER which can be used
+## to set the SALI_IMAGESERVER variable
+for intf_file in $(ls -1 /tmp/udhcpc.* | xargs)
+do
+    . $intf_file
+
+    ## If we have a match, save the value in SALI_IMAGESERVER
+    ## and break the loop, first match wins
+    if [ -n "${SALI_DHCP_IMAGESERVER}" ]
+    then
+        SALI_IMAGESERVER=$(hex2ip $SALI_DHCP_IMAGESERVER)
+        break
+    fi
+done
+
+save_variables
 
 ## At the end always return 0, when there is an error return 1 or higher
 return 0

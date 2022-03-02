@@ -1,0 +1,37 @@
+
+if [ -z "$(pidof rsync)" ]
+then
+    cat > %(rsyncd_path)s/%(rsyncd_basename)s.cfg << DELIM
+list = yes
+timeout = 900
+dont compress = *.gz *.tgz *.zip *.Z *.ZIP *.bz2 *.deb *.rpm *.dbf *.tar.gz *.tar *.tar.bz2 *.tar.xz *.txz
+uid = root
+gid = root
+hosts allow = %(server_ip)s
+hosts deny = *
+log file = %(rsyncd_path)s/%(rsyncd_basename)s.log
+[root]
+ path = /
+ exclude = %(rsyncd_path)s/%(rsyncd_basename)s.cfg %(rsyncd_path)s/%(rsyncd_basename)s.log %(rsyncd_path)s/%(rsyncd_basename)s
+DELIM
+    rsync --daemon --config="%(rsyncd_path)s/%(rsyncd_basename)s.cfg"
+    RSYNC_PID=$(pidof rsync)
+    tail -f "%(rsyncd_path)s/%(rsyncd_basename)s.log" | while read line
+    do
+        if [ -n "$(echo $line | grep "__cloning_completed__")" ]
+        then
+            kill $RSYNC_PID
+            break
+        fi
+    done
+    sleep 5
+    rm -rf "%(rsyncd_path)s/%(rsyncd_basename)s"
+    rm -rf "%(rsyncd_path)s/%(rsyncd_basename)s.cfg"
+    rm -rf "%(rsyncd_path)s/%(rsyncd_basename)s.log"
+    echo "STOP"
+else
+    sleep 5
+    rm -rf "%(rsyncd_path)s/%(rsyncd_basename)s"
+    rm -rf "%(rsyncd_path)s/%(rsyncd_basename)s.cfg"
+    exit 1
+fi

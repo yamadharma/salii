@@ -4,21 +4,24 @@ p_stage "Preparing SALI"
 
 if [ -z "${SALI_MASTERSCRIPT}" ]
 then
-    ## Default behaviour if you are using the SALI server tools
-    SALI_MASTERSCRIPT="http://${SALI_IMAGESERVER}/master_script"
+    ## If not set, use the default location for the script
+    SALI_MASTERSCRIPT="https://SALI_IMAGESERVER/sali/scripts/master_script"
 fi
+
+## Check if we have SALI_IMAGESERVER text in the SALI_MASTERSCRIPT and replace
+## it with the value of $SALI_IMAGESERVER
+SALI_MASTERSCRIPT="${SALI_MASTERSCRIPT//SALI_IMAGESERVER/$SALI_IMAGESERVER}"
 
 p_service "Trying to fetch master_script"
 p_comment 10 "from ${SALI_MASTERSCRIPT}"
-FILE=$(download_file $SALI_MASTERSCRIPT)
+SALI_MASTERSCRIPT_FILE=$(download_file $SALI_MASTERSCRIPT)
+save_variables
 
 ## Do not panic if there is no master_script
-if [ -e "${SALI_CACHE_DIR}/master_script" ]
+if [ -e "${SALI_MASTERSCRIPT_FILE}" ]
 then
     ## Check if the given master_script is supported
-    ##  TODO: we must do something during the deprecation
-    ##  period
-    supported_script "${SALI_CACHE_DIR}/master_script"
+    supported_script "${SALI_MASTERSCRIPT_FILE}"
     if [ $? -ne 0 ]
     then
         p_comment 0 "The downloaded master_script is not supported by SALI ${SALI_VERSION}"
@@ -26,7 +29,7 @@ then
     fi
    
     ## Do a health check to see if the master_script is correct (to certain degree) 
-    . "${SALI_CACHE_DIR}/master_script"
+    . "${SALI_MASTERSCRIPT_FILE}"
     check_function_exists initialize partition
     if [ $? -ne 0 ]
     then

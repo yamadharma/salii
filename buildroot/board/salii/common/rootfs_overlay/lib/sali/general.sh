@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SALI.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2010-2021 SURFsara
+# Copyright 2010-2021 SURF
 
 ###
 # Usage: check_function_exists <function1> [<function2>...]
@@ -208,11 +208,18 @@ download_file(){
     FILENAME=$(basename "${1}")
     case "$(echo $1 | awk -F':' '{print $1}')" in
         http|https|ftp)
+            if [ "$(is_yes $SALI_SSL_VALID)" -eq 0 ]
+            then
+                CURL_ARGS="--insecure --connect-timeout 10"
+            else
+                CURL_ARGS="--connect-timeout 10"
+            fi
+
             if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
             then
-                curl --connect-timeout 10 --output $SALI_CACHE_DIR/$FILENAME $1
+                curl $CURL_ARGS --output $SALI_CACHE_DIR/$FILENAME $1
             else
-                curl --connect-timeout 10 --silent --output $SALI_CACHE_DIR/$FILENAME $1
+                curl $CURL_ARGS --silent --output $SALI_CACHE_DIR/$FILENAME $1
             fi
         ;;
         tftp)
@@ -221,9 +228,9 @@ download_file(){
         rsync)
             if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
             then
-                rsync -avz $1 $SALI_CACHE_DIR/$FILENAME
+                rsync -avzz $1 $SALI_CACHE_DIR/$FILENAME
             else
-                rsync -az $1 $SALI_CACHE_DIR/$FILENAME
+                rsync -azz $1 $SALI_CACHE_DIR/$FILENAME
             fi
         ;;
         *)

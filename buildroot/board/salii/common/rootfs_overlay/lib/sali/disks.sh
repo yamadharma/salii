@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SALI.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2010-2021 SURFsara
+# Copyright 2010-2021 SURF
 
 ###
 # Usage: disks_detect_lscsi
@@ -23,7 +23,8 @@
 ###
 disks_detect_lsscsi(){
 
-    lsscsi --transport 2>/dev/null | while read line
+    ## First all the "normal" disks, due to some limitations for some nvme disks
+    lsscsi --transport --no-nvme 2>/dev/null | while read line
     do
         if [ -n "$(echo $line|grep -i 'cd')" ]
         then
@@ -36,6 +37,12 @@ disks_detect_lsscsi(){
             echo $RESULT
         fi
     done
+
+    nvme list --output-format=json 2>/dev/null | jq -r '.Devices[].DevicePath' | while read line
+    do
+        echo $line
+    done
+
 }
 
 ###
@@ -49,18 +56,27 @@ disks_detect_dev(){
     DISKS=""
 
     ## Loop trough all possible /dev/disks/*/*
-    ls -1 /dev/disk/ | while read disk_by
+    for disk_by in $(ls -1 /dev/disk/)
     do
         ## Just to be sure the location exists
         if [ -e "/dev/disk/${disk_by}" ]
         then
             ## Then find all disks (not the actual partitions)
-            ls -1 /dev/disk/$disk_by | grep -v part | while read disk
+            for disk in $(ls -1 /dev/disk/$disk_by | grep -v part)
             do
                 ## Use realpath to find out the /dev/* device
                 real_disk=$(realpath /dev/disk/$disk_by/$disk)
-                real_disk=$(echo $real_disk|sed -r 's/[0-9]+$//g')
-                
+
+                ## Only interested in the disk name, not the partition
+                case "$(basename $real_disk)" in
+                    nvme*)
+                         real_disk=$(echo $real_disk|sed -r 's/p[0-9]+$//g')
+                    ;;
+                    *)
+                         real_disk=$(echo $real_disk|sed -r 's/[0-9]+$//g')
+                    ;;
+                esac
+
                 ## Is it realy a disk?
                 if [ -n "$(cat /proc/partitions | grep $(basename $real_disk))" ]
                 then
@@ -84,7 +100,7 @@ disks_detect_dev(){
 # order, such as: sd,hd
 ###
 disks_detect(){
-    DISKORDER=$1
+    DISKORDER=$@
     ALLDISKS=$(disks_detect_lsscsi)
 
     if [ -z "${ALLDISKS}" ]
@@ -97,17 +113,32 @@ disks_detect(){
         return 1
     fi
 
+    SDISKS=""
     for disk in $DISKORDER
     do
         ## Just to be sure we only have the filename
         DISKNAME=$(basename $disk)
         CONTROLLER=false
 
-        ## Assume i'ts a controller
-        if [ ${#DISKNAME} -eq 2 ]
-        then
-            CONTROLLER=true
-        fi
+	    case "${DISKNAME}" in
+            nvme*)
+                if [ ${#DISKNAME} -eq 4 ]
+                then
+                    CONTROLLER=true
+                fi
+            ;;
+            sd*|hd*)
+                ## Assume i'ts a controller
+                if [ ${#DISKNAME} -eq 2 ]
+                then
+                    CONTROLLER=true
+                fi
+            ;;
+            *)
+                p_comment 10 "Given disk prefix ${DISKNAME} is not supported, skipping"
+                continue
+            ;;
+        esac
 
         ## Make sure we order the disks correct based on the length of the string, due to sdaa type of disks
         for udisk in $(echo $ALLDISKS | tr " " "\n" | awk '{ print length(), $1 | "sort" }' | awk '{print $2}')
@@ -149,6 +180,7 @@ disks_detect(){
 # Usage: disks_prep <msdos|gpt> <disk> [disks]
 #
 # Prepare the disks for repartition for msdos or gpt layout
+
 ###
 disks_prep(){
     LABEL=$1
@@ -198,7 +230,7 @@ disks_prep(){
 ###
 # Usage: disks_last_size <disk>
 #
-# Get the last size in MB of the disk
+# Get the last size in MiB of the disk
 #
 # Syntax required options:
 #  disk       : specify the disk you wan't to edit
@@ -209,7 +241,7 @@ disks_last_size(){
 
     if [ -b "${DISK}" ]
     then
-        LAST_SIZE=$(/usr/sbin/parted -s -- $DISK unit MB print free | tail -n2 | awk '/Free Space/ {print $1}' | sed 's/MB//g' | awk -F. '{print $1}')
+        LAST_SIZE=$(/usr/sbin/parted -s -- $DISK unit MiB print free | tail -n2 | awk '/Free Space/ {print $1}' | sed 's/MiB//g' | awk -F. '{print $1}')
         if [ -n "${LAST_SIZE}" ]
         then
             if [ -n "$(echo $LAST_SIZE|egrep "[0-9\.]+")" ]
@@ -230,7 +262,7 @@ disks_last_size(){
 ###
 # Usage: disks_cerate_partition <disk> <size> <type> [flag]
 #
-# Get the last size in MB of the disk
+# Get the last size in MiB of the disk
 #
 # Syntax required options:
 #  disk       : specify the disk you wan't to edit
@@ -253,8 +285,8 @@ disks_create_partition(){
 
     case "${DISK_LABEL}" in
         gpt)
-            p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart primary ${LAST_SIZE}M ${END_SIZE}M"
-            /usr/sbin/parted -s -- "${1}" mkpart primary "${LAST_SIZE}M" "${END_SIZE}M"
+            p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart primary ${LAST_SIZE}MiB ${END_SIZE}MiB"
+            /usr/sbin/parted -s -- "${1}" mkpart primary "${LAST_SIZE}MiB" "${END_SIZE}MiB"
         ;;
         ## Yes I know there is some redunand code between msdos and gpt, but this make it more readable
         msdos)
@@ -266,8 +298,8 @@ disks_create_partition(){
 
             if [ $PART_NUM -eq 3 ]
             then
-                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart extended ${LAST_SIZE}M -1"
-                /usr/sbin/parted -s -- "${1}" mkpart extended "${LAST_SIZE}M" -1
+                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart extended ${LAST_SIZE}MiB -1"
+                /usr/sbin/parted -s -- "${1}" mkpart extended "${LAST_SIZE}MiB" -1
                 PART_NUM=$(/usr/sbin/parted -s -- "${1}" print 2>/dev/null | awk '/^ [0-9].*/ {print $1}' | tail -n1)
                 EXTENDED_LAST_SIZE=$LAST_SIZE
             fi
@@ -282,12 +314,12 @@ disks_create_partition(){
                         END_SIZE=$(echo "$EXTENDED_LAST_SIZE + $2" | bc )
                     ;;
                 esac
-                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart logical ${EXTENDED_LAST_SIZE}M ${END_SIZE}M"
-                /usr/sbin/parted -s -- "${1}" mkpart logical "${EXTENDED_LAST_SIZE}M" "${END_SIZE}M"
+                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart logical ${EXTENDED_LAST_SIZE}MiB ${END_SIZE}MiB"
+                /usr/sbin/parted -s -- "${1}" mkpart logical "${EXTENDED_LAST_SIZE}MiB" "${END_SIZE}MiB"
                 EXTENDED_LAST_SIZE=$END_SIZE
             else
-                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart primary ${LAST_SIZE}M ${END_SIZE}M"
-                /usr/sbin/parted -s -- "${1}" mkpart primary "${LAST_SIZE}M" "${END_SIZE}M"
+                p_comment 10 "/usr/sbin/parted -s -- ${1} mkpart primary ${LAST_SIZE}MiB ${END_SIZE}MiB"
+                /usr/sbin/parted -s -- "${1}" mkpart primary "${LAST_SIZE}MiB" "${END_SIZE}MiB"
             fi
         ;;
     esac
@@ -393,7 +425,7 @@ disks_format(){
 # Syntax required options:
 #  disk       : specify the disk you wan't to edit
 #  mountpoint : /<path>, swap, none, raid.<id>, pv.<id>
-#  size       : specify size in MB (-1 means rest of disk)
+#  size       : specify size in MiB (-1 means rest of disk)
 #
 # Syntax optional options:
 #  type=<ext2|ext3|ext4|xfs|swap>       currently supported filesystems
@@ -485,10 +517,22 @@ disks_part() {
     sleep 2
     partprobe $DISK >/dev/null 2>&1
 
+    case "$(basename $DISK)" in
+        nvme*)
+            PART_PREFIX="p"
+        ;;
+        *)
+            PART_PREFIX=""
+        ;;
+    esac
+
+    ## And again just wait, don't care about the speed
+    sleep 2
+
     ## Check if given filesystem is supported, else show error
     case "${TYPE}" in
         ext2|ext3|ext4|xfs|swap|vfat|none)
-            disks_format "${DISK}${PART_NUM}" "${TYPE}" "label=${LABEL}" "options=${OPTIONS}"
+            disks_format "${DISK}${PART_PREFIX}${PART_NUM}" "${TYPE}" "label=${LABEL}" "options=${OPTIONS}"
         ;;
         *)
             p_comment 0 "Given filesystem type ${TYPE} is not supported (ext2|ext3|ext4|xfs|swap)"

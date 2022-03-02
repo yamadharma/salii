@@ -1,12 +1,19 @@
 #!/bin/sh
 
-DHCPVARFILE=/tmp/udhcpc.$interface
+cat > /tmp/udhcpc.$interface << EOF
+SALI_DHCP_IMAGESERVER="${opt224}"
+DNS="${dns}"
+DOMAINNAME="${domain}"
+HOSTNAME="${hostname}"
+IPADDR="${ip}"
+MASK="${mask}"
+ROUTER="${router}"
+NETMASK="${subnet}"
+EOF
 
-echo "IPADDR=$ip" >> $DHCPVARFILE
-echo "HOSTNAME=$hostname" >> $DHCPVARFILE
-echo "NETMASK=$subnet" >> $DHCPVARFILE
-echo "BROADCAST=$broadcast" >> $DHCPVARFILE
-echo "DOMAINNAME=$domain" >> $DHCPVARFILE
-
-echo $hostname > /etc/hostname
-/bin/hostname $hostname
+# Only if hostname is set, else keep the default
+if [ -n "${hostname}" ]
+then
+    echo $hostname > /etc/hostname
+    /bin/hostname $hostname
+fi

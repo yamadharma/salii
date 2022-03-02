@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SALI.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2010-2021 SURFsara
+# Copyright 2010-2021 SURF
 
 from configparser import SafeConfigParser
 from configparser import ExtendedInterpolation
@@ -36,37 +36,39 @@ SALI_CONFIGURATION = {
         'torrents_dir'  : '${general:base_dir}/torrents',
         'scripts_dir'   : '${general:base_dir}/scripts',
         'run_dir'       : '${general:base_dir}/run',
-        'logfile_config': '${general:cfg_path}/logging.ini',
+        'logfile_config': '${general:config_dir}/logging.ini',
         'logfile'       : '/var/log/sali.log'
     },
     'rsync' : {
-        'target'        : '%(config_dir)s/rsyncd.conf',
-        'stubs'         : '%(config_dir)s/rsync_stubs',
+        'target'        : '/etc/rsyncd.conf',
+        'template'      : '${general:config_dir}/rsyncd.conf.template'
     },
     'getimage': {
         'exclude_files': '${general:config_dir}/gi_exclude_files',
-        'base_exclude': 'global.excl',
-        'default_exclude': 'default.excl'
+        'default_exclude': 'default',
+        'username': 'root'
     },
     'torrent': {
         'transmission_host': '127.0.0.1',
         'transmission_port': 9091,
         'transmission_user': 'transmission',
         'transmission_password': '',
-        'announcer': 'local-all:6969'
+        'announce_uri': 'local-all:6969'
     },
     'commands': {
         'tar'           : 'tar',
         'rsync'         : 'rsync',
         'ssh'           : 'ssh',
+        'transmission-create': 'transmission-create',
+        'pidof': 'pidof'
     }
 }
 
 class Common():
 
-    def __init__(self, args, cfg_path='/etc/sali'):
+    def __init__(self, args, config_dir='/etc/sali'):
         self.args = args
-        self.config = Configuration(self.args.config, cfg_path)
+        self.config = Configuration(self.args.config, config_dir)
         self.__logger = self.get_logger('sali')
 
     def logger(self, name, type, message):
@@ -98,13 +100,13 @@ class Common():
 
 class Configuration(SafeConfigParser):
 
-    def __init__(self, filename, cfg_path='/etc/sali'):
+    def __init__(self, filename, config_dir='/etc/sali'):
         if not filename or not os.path.isfile(filename):
             raise SaliConfigurationException('Unable to process configurationfile')
 
         super().__init__(default_section='general', interpolation=ExtendedInterpolation())
 
-        self.set('general', 'cfg_path', cfg_path)
+        self.set('general', 'config_dir', config_dir)
         self.read(filename)
         self.__validate_configuration()
 
@@ -127,3 +129,15 @@ class Configuration(SafeConfigParser):
 
         # Check if tar is GNU tar
         tar_gnu(self.get('commands', 'tar'))
+
+    def image_create_torrent(self, imagename):
+        if self.has_section('image_%s' % imagename):
+            create_torrent = self.getboolean(
+                'image_%s' % imagename, 'torrent'
+            )
+        else:
+            create_torrent = self.getboolean(
+                'image_default', 'torrent'
+            )
+
+        return create_torrent

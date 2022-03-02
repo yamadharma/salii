@@ -5,6 +5,11 @@ p_stage "Starting installation process"
 case "${SALI_PROTOCOL}" in
     rsync)
         getimage_rsync
+        if [ $?  -ne 0 ]
+        then
+            p_section "rsync failed with an error"
+            return 1
+        fi
     ;;
     torrent)
         getimage_torrent

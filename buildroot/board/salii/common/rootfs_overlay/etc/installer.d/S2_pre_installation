@@ -1,13 +1,13 @@
 
-if [ -r "${SALI_CACHE_DIR}/master_script" ]
+if [ -r "${SALI_MASTERSCRIPT_FILE}" ]
 then
-    . "${SALI_CACHE_DIR}/master_script"
+    . "${SALI_MASTERSCRIPT_FILE}"
 else
     return 1
 fi
 
 check_function_exists pre_installation
-if [ $? -eq 0 -a -z "${SALI_SKIP_SCRIPTS}" ]
+if [ $? -eq 0 ] && [ $(is_yes $SALI_SKIP_SCRIPTS) -eq 0 ]
 then
     p_stage "Running pre-installation scripts"
 

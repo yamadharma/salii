@@ -13,33 +13,23 @@
     * Added a new directory /etc/sali which contains the error_message file, default values
       for variables, etc
     * All temporary files such as variables, master script file will be written to
-      /var/cache/sali
+      /tmp/sali
 
   * Please note that the old master_script is not supported anymore.
 
   * Updated kernel to 5.10.25
 
-  * Updated openssl to 1.1.k
-  * Updated openssh to 8.5p1
-  * Updated busybox to 1.33.0
-  * Updated libusb to 1.0.24
-  * Updated usbutils to 013
-  * Updated curl to 7.76.0
-  * Updated rsync to 3.1.3
-  * Updated bc to 1.07.1
-  * Updated scrub to 2.6.1
-  * Updated e2fsprogs to 1.45.6
-  * Updated lvm2 to 2.02.185
-  * Updated xfsprogs to 5.10.0
+  * Migrated to buildroot environment, so we will not report which version are changed anymore
 
-  * Added transmission 3.0
-  * Added tar 1.32 (renoved tar from busybox)
+  * Added transmission
+  * Added tar 1.32 (removed tar from busybox)
+  * Added bash
 
   * Removed aria2
   * Removed xmlrpc-c
   * Removed kerneltools
 
-  * Authors: Bas van der Vlies and Dennis Stam
+  * Authors: Bas van der Vlies, Dennis Stam and Gwen D
 
 1.16.20
   * updated kernel to 4.19.109 with debian standard condfig for X86_64 
