@@ -228,9 +228,9 @@ download_file(){
         rsync)
             if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
             then
-                rsync -avzz $1 $SALI_CACHE_DIR/$FILENAME
+                rsync -avz $1 $SALI_CACHE_DIR/$FILENAME
             else
-                rsync -azz $1 $SALI_CACHE_DIR/$FILENAME
+                rsync -az $1 $SALI_CACHE_DIR/$FILENAME
             fi
         ;;
         *)
