@@ -55,5 +55,11 @@ chroot_setup() {
     chroot_mount shm "${SALI_TARGET}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
     chroot_mount /run "${SALI_TARGET}/run" --bind 
     chroot_mount tmp "${SALI_TARGET}/tmp" -t tmpfs -o mode=1777,strictatime,nodev,nosuid
+
+    if [ "$(is_yes $SALI_EFI)" -eq 1 ]
+    then
+        modprobe efivarfs
+	chroot_mount efivarfs "${SALI_TARGET}/sys/firmware/efi/efivars" -t efivarfs -o nosuid
+    fi
 }
 

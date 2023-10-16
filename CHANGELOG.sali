@@ -1,3 +1,19 @@
+2.1.2
+  * sali-cli can now alwo handle ssh keys that are signed by an CA
+  * sali-cli added `sali_base_dir` to template for rsyncd.conf
+
+2.1.0
+  * Updated buildroot version 2022.11.1 and busybox 1.35.0
+  * kernel version 6.0.19
+  * bash is default shell for SALI scripts
+  * bash is default shell for root user so we use command completion
+  * Added support to use EFI in SALI. A variable will be set when the node is booted via EFI
+      Thanks to: Dave LeFevre, see examples/buildroot/scripts/post_bootloader
+  * Added a `SALI_UDHCP_RESTART` option, default: 1.  Needed to get an dhcp lease when first time always fails
+      Thanks to: Gwen D
+  * ipmitool added
+      Thanks to: Gwen D
+
 2.0.0
   * Replaced our custom busybox with BuildRoot
     * Check README.md for build instructions
@@ -29,7 +45,7 @@
   * Removed xmlrpc-c
   * Removed kerneltools
 
-  * Authors: Bas van der Vlies, Dennis Stam and Gwen D
+  * Authors: Bas van der Vlies, Dennis Stam, Gwen D, Dave LeFevre
 
 1.16.20
   * updated kernel to 4.19.109 with debian standard condfig for X86_64 

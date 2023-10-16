@@ -48,3 +48,6 @@ SALI_SPAWINGTREE_WAIT=${SALI_SPAWINGTREE_WAIT:=30}
 
 # How many time the udhcp server will retry a boot/dhcp request
 SALI_UDHCP_RETRY=${SALI_UDHCP_RETRY:=3}
+
+# How many time the udhcp server will restart a boot/dhcp request
+SALI_UDHCP_RESTART=${SALI_UDHCP_RESTART:=1}

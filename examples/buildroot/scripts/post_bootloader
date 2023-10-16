@@ -6,15 +6,58 @@
 ## Include the os-release file, so we can determine how to configure the bootloader
 source /etc/os-release
 
-## Need support for EFI
+## we can detect EFI within the script or we can
+## pass $SALI_EFI to the script to indicate it is
+## an EFI install. 
 if [ -d "/sys/firmare/efi" ]
 then
     GRUB_TARGET="$(uname -m)-efi"
-    echo "UEFI is not supported yet"
-    exit 1
+    GRUB_EFI="1"
 else
     GRUB_TARGET=i386-pc
+    GRUB_EFI="0"
 fi
+
+## unless you know that your image has all the needed packages, I suggest
+## that you use your package mangager within the chroot to make sure 
+## the files you need are there.  You also want to do that when you have
+## on image that might be used both with legacy and with EFI
+grub2_install_packages(){
+
+    ##install needed packages per distro and EFI/legacy
+    case "${ID}" in
+        debian)
+            export DEBIAN_FRONTEND=noninteractive
+            package_mgr="/usr/bin/apt-get -y install"
+	    if [ "$GRUB_EFI" = "1" ]
+            then
+                packages="grub2-common grub-efi grub-efi-amd64 efibootmgr"
+	    else
+		packages="grub2-common grub-pc grub-pc-bin"
+	    fi
+        ;;
+        centos)
+            package_mgr="$(which yum) -y install"
+            if [ "$GRUB_EFI" = "1" ]
+            then
+                packages="grub2-efi-x64 grub2-common grub2-tools"
+            else
+                packages="grub2-pc.x86_64 grub2-common grub2-tools"
+	    fi
+        ;;
+        sles)
+            package_mgr="$(which zypper) -y install"
+            if [ "$GRUB_EFI" = "1" ]
+            then
+                packages="grub2 grub2-x86_64-efi"
+            else
+                packages="grub2 grub2-i386-pc"
+            fi
+        ;;
+    esac
+
+   $package_mgr $packages
+}
 
 grub2_check_installed(){
 
@@ -24,7 +67,7 @@ grub2_check_installed(){
             grub_lib_dir=/usr/lib/grub
             grub_install=/usr/sbin/grub-install
         ;;
-        centos)
+        centos)`
             grub_lib_dir=/usr/lib/grub
             grub_install=/usr/sbin/grub2-install
         ;;
@@ -66,12 +109,13 @@ grub2_configure(){
     $grub_cfg_command
 }
 
+#make sure needed packages are installed
+grub2_install_packages
 
 ## Check if target has been installed and then use the given command to install
 grub_bin=$(grub2_check_installed)
 
 $grub_bin --no-floppy --target $GRUB_TARGET $2
-
 
 ## We also need to update the configuration
 echo "Updating grub.cfg"

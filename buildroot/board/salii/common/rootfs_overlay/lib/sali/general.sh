@@ -215,23 +215,14 @@ download_file(){
                 CURL_ARGS="--connect-timeout 10"
             fi
 
-            if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
-            then
-                curl $CURL_ARGS --output $SALI_CACHE_DIR/$FILENAME $1
-            else
-                curl $CURL_ARGS --silent --output $SALI_CACHE_DIR/$FILENAME $1
-            fi
+            curl $CURL_ARGS --silent --output $SALI_CACHE_DIR/$FILENAME $1 &>/dev/null
+            
         ;;
         tftp)
             p_comment 0 "TFTP is not supported yet"
         ;;
         rsync)
-            if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
-            then
-                rsync -avz $1 $SALI_CACHE_DIR/$FILENAME
-            else
-                rsync -az $1 $SALI_CACHE_DIR/$FILENAME
-            fi
+            rsync -azz $1 $SALI_CACHE_DIR/$FILENAME &>/dev/null
         ;;
         *)
             p_comment 0 "Unsupported protocol found please use http,https,ftp,tftp or rsync"

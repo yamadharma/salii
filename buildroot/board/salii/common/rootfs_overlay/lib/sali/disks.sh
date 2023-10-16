@@ -26,7 +26,7 @@ disks_detect_lsscsi(){
     ## First all the "normal" disks, due to some limitations for some nvme disks
     lsscsi --transport --no-nvme 2>/dev/null | while read line
     do
-        if [ -n "$(echo $line|grep -i 'cd')" ]
+        if [ -n "$(echo $line|grep -i ' cd ')" ]
         then
             continue
         fi

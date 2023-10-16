@@ -61,6 +61,17 @@ static_vars(){
 }
 static_vars
 
+# if no $SALI_EFI variable was purposefully set,
+# detect if we are in an EFI environment and
+# set $SALI_EFI to yes.
+if [ -z "${SALI_EFI}" ]
+then
+    if [ -d "/sys/firmware/efi" ]
+    then
+        export SALI_EFI="y"
+    fi
+fi
+
 # Check if the cacedir exists
 if [ ! -d "${SALI_CACHE_DIR}" ]
 then

@@ -32,12 +32,16 @@ hex2ip(){
 #  level stdout and stderr will be redirected to /dev/null
 ###
 do_ifup(){
-    if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
-    then
-        /sbin/ifup $1
-    else
-        /sbin/ifup $1 2>&1 > /dev/null
-    fi
+    RESTARTS=$SALI_UDHCP_RESTART
+    while [ "$RESTARTS" -ne 0 ] ; do
+        if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
+        then
+            /sbin/ifup $1
+        else
+            /sbin/ifup $1 2>&1 > /dev/null
+        fi
+        RESTARTS=$(( $RESTARTS - 1 ))
+    done
 }
 
 ###

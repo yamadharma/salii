@@ -24,16 +24,17 @@ from sali.tools import run_command
 from sali.exceptions import SaliValidationException
 
 def rsyncconfig(cmn):
-    base_dir = cmn.config.get('general', 'images_dir')
+    image_dir = cmn.config.get('general', 'images_dir')
     template_data = {
+        'sali_base_dir': cmn.config.get('general', 'base_dir'),
         'sali_scripts_dir': cmn.config.get('general', 'scripts_dir'),
         'sali_torrents_dir': cmn.config.get('general', 'torrents_dir'),
         'rsyncd_sali_images': ''
     }
 
-    for item in sorted(os.listdir(base_dir)):
+    for item in sorted(os.listdir(image_dir)):
         template_data['rsyncd_sali_images'] += '[%s]\n   path=%s\n' % (
-            item, os.path.join(base_dir, item)
+            item, os.path.join(image_dir, item)
         )
 
     with open(cmn.config.get('rsync', 'template')) as fi:

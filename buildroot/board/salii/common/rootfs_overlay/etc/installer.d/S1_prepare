@@ -13,16 +13,17 @@ then
                 eval d_name="\${DISK${n}}"
                 p_comment 0 "Starting scrub on disk ${d_name} with pattern ${SALI_SCRUB_PATTERN}"
 
-                scrub -p $SALI_SCRUB_PATTERN $d_name >/dev/null 2>&1 &
+                scrub --force --pattern $SALI_SCRUB_PATTERN $d_name >/dev/null 2>&1 &
             done
         ;;
         ## Scrub only the specified disks
         *)
             p_service "Wiping disks ${SALI_SCRUB_DISKS}"
-            for disk in $SALI_SCRUB_DISKS
+
+            IFS=','; for disk in $SALI_SCRUB_DISKS
             do
                 p_comment 0 "Starting scrub on disk ${disk} with pattern ${SALI_SCRUB_PATTERN}"
-                scrub -p $SALI_SCRUB_PATTERN $disk >/dev/null 2>&1 &
+                scrub --force --pattern $SALI_SCRUB_PATTERN $disk >/dev/null 2>&1 &
             done
         ;;
     esac

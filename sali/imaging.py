@@ -180,6 +180,7 @@ class GetImage():
     def __get_ssh_client(self):
         try:
             ssh_client = paramiko.SSHClient()
+            ssh_client.set_missing_host_key_policy(paramiko.client.WarningPolicy)
             ssh_client.load_system_host_keys()
             ssh_client.connect(
                 hostname=self.cmn.args.hostname, 

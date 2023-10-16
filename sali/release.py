@@ -20,7 +20,7 @@ from sali.tools import version_info
 
 name            = 'sali'
 ## See also https://packaging.python.org/en/latest/distributing.html#version
-hexversion, version_info  = version_info(1,7,0,'.dev1',0)
+hexversion, version_info  = version_info(2,1,1,'',0)
 if version_info.releaselevel:
     version         = '%d.%d.%d%s' % (version_info.major, version_info.minor, version_info.micro, version_info.releaselevel)
 else:
