@@ -89,7 +89,7 @@ getimage_transmission_progress(){
         p_comment 10 "Download: ${download_speed} / Upload: ${upload_speed}"
         echo ""
 
-        if [ $percent_complete == "100%" ]
+        if [ "$percent_complete" == "100%" ]
         then
             DONE=1
         else
