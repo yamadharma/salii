@@ -77,7 +77,7 @@ p_section(){
 ###
 p_header(){
     p_section "Welcome to SALI ${SALI_VERSION}"
-    p_section "https://oss.trac.surfsara.nl/sali"
+    p_section "https://gitlab.com/surfsara/sali"
 }
 
 ###

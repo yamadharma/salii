@@ -6,11 +6,10 @@
  re-read the documentation to see if your problem is described there.
 
  If you absolutely cannot figure it out, visit the SALI support page 
- at https://oss.trac.surfsurfsara.nl/sali. 
+ at https://gitlab.com/surfsara/sali/
 
  If you find the answer and it's not in the documentation, or if you identify 
  a bug, please submit a bug report at the SALI support page: 
-   - mail bug report to: sali@surfsara.nl
-   - or https://oss.trac.surfsara.nl/sali/newticket
+   - https://gitlab.com/surfsara/sali/-/issues
  
- Good Luck!!  https://oss.trac.surfsara.nl/sali
+ Good Luck!!  https://gitlab.com/surfsara/sali/
