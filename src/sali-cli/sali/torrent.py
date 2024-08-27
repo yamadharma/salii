@@ -45,7 +45,7 @@ class Transmission():
         )
 
     def get_torrents(self):
-        
+
         torrents = dict()
         for torrent in self.client.get_torrents():
             torrents[torrent.name] = {
@@ -71,7 +71,9 @@ class Transmission():
             time.sleep(5)
 
         print('\nAdding torrent \'%s\'' % filename)
-        self.client.add_torrent('file://%s' % torrent_file_path, download_dir=download_dir)
+#        self.client.add_torrent('%s' % torrent_file_path, download_dir=download_dir)
+        with open(torrent_file_path, "rb") as f:
+            self.client.add_torrent(f, download_dir=download_dir)
 
 class Torrent():
 
@@ -79,7 +81,7 @@ class Torrent():
         self.cmn = cmn
         self.tarball_file_path = os.path.join(
             self.cmn.config.get('general', 'torrents_dir'),
-            '%s.tar.gz' % self.cmn.args.imagename
+            '%s.tar.%s' % (self.cmn.args.imagename,self.cmn.config.get('torrent', 'compress'))
         )
         self.torrent_file_path = '%s.torrent' % self.tarball_file_path
         self.transmission = Transmission(cmn)
@@ -95,18 +97,18 @@ class Torrent():
         return checksum.hexdigest()
 
     def check_checksum(self):
-        
+
         checksum = self.file_checksum()
 
         if not os.path.isfile('%s.blake2b' % self.tarball_file_path):
             return False
-        
+
         with open('%s.blake2b' % self.tarball_file_path, 'r') as fi:
             file_checksum = fi.read().strip()
 
         if checksum != file_checksum:
             return False
-        
+
         return True
 
     def create_checksum(self):
@@ -116,9 +118,9 @@ class Torrent():
             fo.write(checksum)
 
     def create_update_torrent(self):
-        
+
         if ( not os.path.isfile(self.torrent_file_path) or not self.check_checksum() ) or self.cmn.args.force:
-            
+
             command = [
                 self.cmn.config.get('commands', 'transmission-create'), '--private'
             ]
@@ -135,7 +137,7 @@ class Torrent():
             print('\nTorrent seems to be up2date, if this is not the case delete checksum file or specify --force')
 
         self.transmission.add_torrent(self.torrent_file_path)
-        
+
 
 class TorrentCreateTarball():
 
@@ -146,7 +148,7 @@ class TorrentCreateTarball():
         self.create_torrent = self.cmn.config.image_create_torrent(self.cmn.args.imagename)
         self.tarball_file_path = os.path.join(
             self.cmn.config.get('general', 'torrents_dir'),
-            '%s.tar.gz' % self.cmn.args.imagename
+            '%s.tar.%s' % (self.cmn.args.imagename,self.cmn.config.get('torrent', 'compress'))
         )
 
     def create(self):
@@ -154,16 +156,33 @@ class TorrentCreateTarball():
             raise SaliConfigurationException('torrent=True nog configured for image \'%s\'' % self.cmn.args.imagename)
 
         command = self.tar_options
+        command.insert(0, self.cmn.config.get('commands', 'tar'))
+
+        compress = self.cmn.config.get('torrent', 'compress')
+        if compress == 'gz':
+            command.append('--gzip')
+        elif compress == 'bz2':
+            command.append('--bzip2')
+        elif compress == 'xz':
+            command.append('--use-compress-program=\'xz -T0\'')
+        elif compress == 'zst':
+            command.append('--use-compress-program=\'zstd -9 -T0 --rsyncable\'')
+        else:
+            print('\nUncompressed tar')
+
         if self.cmn.args.verbose:
             command.append('--verbose')
-        command.insert(0, self.cmn.config.get('commands', 'tar'))
+
+
         command.append('--file')
         command.append('%s.tmp' % self.tarball_file_path)
         command.append('.')
-        
+
         print('\nCreating tarball \'%s\'' % self.tarball_file_path)
+
         rcode = run_command_call(
             command,
+            run_shell=True,
             cwd=os.path.join(
                 self.cmn.config.get('general', 'images_dir'),
                 self.cmn.args.imagename
@@ -180,13 +199,13 @@ class TorrentCreateTarball():
 def torrent_exists(cmn, torrent_file_path):
 
     if not os.path.isdir(cmn.config.get('general', 'torrents_dir')):
-        raise SaliDataException('Unable to locate directory \'%s\'' % 
+        raise SaliDataException('Unable to locate directory \'%s\'' %
             cmn.config.get('general', 'torrents_dir')
         )
 
     if os.path.isfile(torrent_file_path):
         return True
-    
+
     return False
 
 def maketorrent(cmn):
@@ -197,7 +216,7 @@ def maketorrent(cmn):
     print('Welcome to the SALI imager')
     print('   %-20s: %s' % ('imagename', cmn.args.imagename))
     print('   %-20s: %s\n' % ('tarball', tarball.tarball_file_path))
-    
+
     # First check of the image exists, then ask about it
     if torrent_exists(cmn, tarball.tarball_file_path):
         question = 'Do you want to update existing torrent'
@@ -254,9 +273,9 @@ def lstorrents(cmn):
         }
     )
 
-    
+
     trans = Transmission(cmn)
-    
+
     for name, torrent in trans.get_torrents().items():
         print(
             line_format % {

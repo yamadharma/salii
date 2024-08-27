@@ -53,7 +53,8 @@ SALI_CONFIGURATION = {
         'transmission_port': 9091,
         'transmission_user': 'transmission',
         'transmission_password': '',
-        'announce_uri': 'local-all:6969'
+        'announce_uri': 'local-all:6969',
+        'compress' : 'zst'
     },
     'commands': {
         'tar'           : 'tar',
