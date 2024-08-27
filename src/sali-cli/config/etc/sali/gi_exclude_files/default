@@ -1,0 +1,22 @@
+#extends:global
+
+## ^^ needs to be the first line, or else it's not processed
+
+/home/*
+/bioasp/*
+/nfs/*
+/projects/*
+/var/lib/cfengine3/state/*
+/var/lib/cfengine3/*.tcdb
+/var/lib/cfengine3/*.db
+/var/lib/cfengine3/*.lmdb
+/var/lib/cfengine3/*.lock
+/var/lib/cfengine3/*runlog*
+/var/lib/cfengine3/*.log
+/var/cfengine/*.tcdb
+/var/cfengine/*.db
+/var/cfengine/*.lock
+/var/cfengine/*runlog*
+/var/cfengine/*.log
+/sara/sw/*
+/usr/sara/*
