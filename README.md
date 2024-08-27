@@ -116,6 +116,21 @@ Also during runtime some SALI specific files are created:
 
 ## Server
 
+### Build server tools
+
+To fetch an image from a client we need the tool `sali-cli`. This is an python tool that can be converted to a standalone
+executable:
+ * `pipenv --python 3`
+ * `pipenv shell`
+ * `pipenv install --dev`
+ * `pipenv run pyinstaller --onefile sali-cli`
+ * install the `sali-cli` utility in your path
+ * `cp -a examples/sali-cli-config` /etc/sali and adjust to your environment for new installations
+
+Now create an golden image from a client via `sali-cli`:
+ 1. `sali-cli getimage <server> <image-name>`
+ 2. `sali-cli rsyncconfig`
+
 ### Requirements
  * Python 3.7+
  * Transmission 2.94+

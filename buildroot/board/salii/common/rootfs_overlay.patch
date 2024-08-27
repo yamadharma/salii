@@ -1,0 +1,42 @@
+diff '--color=auto' -Naurp rootfs_overlay/etc/sali_version /home/dharma/work/projects/soft/salii/src/sali/buildroot/board/sali/common/rootfs_overlay/etc/sali_version
+--- rootfs_overlay/etc/sali_version	2024-01-30 10:26:05.698763253 +0300
++++ /home/dharma/work/projects/soft/salii/src/sali/buildroot/board/sali/common/rootfs_overlay/etc/sali_version	2024-08-27 17:34:13.897419008 +0300
+@@ -1 +1 @@
+-2.1.2
++2.2.0
+diff '--color=auto' -Naurp rootfs_overlay/lib/sali/disks.sh /home/dharma/work/projects/soft/salii/src/sali/buildroot/board/sali/common/rootfs_overlay/lib/sali/disks.sh
+--- rootfs_overlay/lib/sali/disks.sh	2023-10-16 08:37:40.649218674 +0300
++++ /home/dharma/work/projects/soft/salii/src/sali/buildroot/board/sali/common/rootfs_overlay/lib/sali/disks.sh	2024-08-27 17:34:13.898419120 +0300
+@@ -141,7 +141,7 @@ disks_detect(){
+         esac
+ 
+         ## Make sure we order the disks correct based on the length of the string, due to sdaa type of disks
+-        for udisk in $(echo $ALLDISKS | tr " " "\n" | awk '{ print length(), $1 | "sort" }' | awk '{print $2}')
++        for udisk in $(echo $ALLDISKS | tr " " "\n" | awk '{ print length(), $1 }' | awk '{print $2}')
+         do
+             ## Check of we already sorted the given udisk
+             DONE=$(echo $SDISKS|grep -w $udisk)
+diff '--color=auto' -Naurp rootfs_overlay/lib/sali/general.sh /home/dharma/work/projects/soft/salii/src/sali/buildroot/board/sali/common/rootfs_overlay/lib/sali/general.sh
+--- rootfs_overlay/lib/sali/general.sh	2024-01-30 10:29:16.709432490 +0300
++++ /home/dharma/work/projects/soft/salii/src/sali/buildroot/board/sali/common/rootfs_overlay/lib/sali/general.sh	2024-08-27 17:34:13.898419120 +0300
+@@ -222,7 +222,7 @@ download_file(){
+             p_comment 0 "TFTP is not supported yet"
+         ;;
+         rsync)
+-            rsync -az $1 $SALI_CACHE_DIR/$FILENAME &>/dev/null
++            rsync -azz $1 $SALI_CACHE_DIR/$FILENAME &>/dev/null
+         ;;
+         *)
+             p_comment 0 "Unsupported protocol found please use http,https,ftp,tftp or rsync"
+diff '--color=auto' -Naurp rootfs_overlay/lib/sali/imaging.sh /home/dharma/work/projects/soft/salii/src/sali/buildroot/board/sali/common/rootfs_overlay/lib/sali/imaging.sh
+--- rootfs_overlay/lib/sali/imaging.sh	2023-10-17 15:22:53.478508242 +0300
++++ /home/dharma/work/projects/soft/salii/src/sali/buildroot/board/sali/common/rootfs_overlay/lib/sali/imaging.sh	2022-03-01 20:18:29.681952643 +0300
+@@ -89,7 +89,7 @@ getimage_transmission_progress(){
+         p_comment 10 "Download: ${download_speed} / Upload: ${upload_speed}"
+         echo ""
+ 
+-        if [ "$percent_complete" == "100%" ]
++        if [ $percent_complete == "100%" ]
+         then
+             DONE=1
+         else

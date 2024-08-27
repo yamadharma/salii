@@ -1,6 +1,23 @@
+2.2.0
+  * buildroot has been updated to 2024.02 and busybox 1.36.1
+  * use real kernel modutils insstead of the busybox ones, rmmod/insmod/modprobe
+  * fixes issue #10
+  * enable loopback interface
+  * remove the e2fstools from busybox setup. Use the buildroot one
+  * enable zfs
+  * enable btrfs
+  * enabled efivars
+  * moved sali test environment  to `sali-test-client`
+  * added `examples/installation-scripts` directory with pre/post-install scripts
+  * added `examples/sali-cli-config` directory for `sali-cli` utility 
+  * sali-cli getimage option added `-l||--list` to show which files/dirs have been changed
+
 2.1.2
   * sali-cli can now alwo handle ssh keys that are signed by an CA
   * sali-cli added `sali_base_dir` to template for rsyncd.conf
+  * scsi disk detect imporvement do not skip disk when disk when UUID contains `cd`
+  * Updated buildroot version 2022.11.3 (EOL)
+
 
 2.1.0
   * Updated buildroot version 2022.11.1 and busybox 1.35.0

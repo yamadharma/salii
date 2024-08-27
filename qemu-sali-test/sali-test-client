@@ -21,7 +21,7 @@
 ## Some static variables
 ROOT_DIR=$(pwd)
 DEVEL_DIR=${ROOT_DIR}/devel
-EXAMPLES_DIR=${ROOT_DIR}/examples/buildroot
+EXAMPLES_DIR=${ROOT_DIR}/config
 RSYNC_OPTS="-ar --exclude-from=${EXAMPLES_DIR}/rsync_exclude"
 
 ## We need the following commands, just make sure your PATH is correct!

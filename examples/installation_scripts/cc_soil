@@ -1,0 +1,100 @@
+# SALI:2.0
+#  ^ Required, this is used to check if the master_script is compatible
+#    It must be on the firstline of the master script
+
+# This is the base installation script of LISA
+
+## Intialize the SALI environment
+# required
+initialize(){
+    ## variables
+    #SALI_SSHD_KEYS="http://${SALI_IMAGESERVER}:8000/ssh_keys.tar"
+
+    ## Currently only rsync supported, also scripts are always fetched, even wen pre_installation and post_installation
+    ## have not been configured
+    SALI_SCRIPTS="rsync://${SALI_IMAGESERVER}/scripts"
+
+    ## Where can I find the image (for torrent and rsync), based on the variable PROTOCOL
+    ## rsync of bittorrent is used, variables IMAGESERVER and IMAGENAME must be available
+    ## via de linux cmd line
+    image_torrent "rsync://${SALI_IMAGESERVER}/torrents/${SALI_IMAGENAME}.tar.gz.torrent"
+    image_rsync "${SALI_IMAGESERVER}::${SALI_IMAGENAME}" options=-aHS
+
+    ## Optional you can specify the root password, you must specify the actual passwd encrypted string
+    ## BUT we recommend use ssh pub keys!
+    #password root '$6$Laapnootmies''
+    #ssh_authorized_key root "ssh-ed25519 aapnootmies sali@surf"
+}
+
+
+## The partition function
+# required
+partition(){
+    ## Detect all disks in the system and make them available
+    ## via variables $DISK0, $DISK1, etc. Optionally you can
+    ## specify a order in which the disks must be sorted.
+    ## For example: disks_detect hd,sd, this means that hd* disk
+    ## are sorted before sd* disks
+    SALI_SHORT_NAME=`/bin/hostname -s`
+    disks_detect sd nvme      # <order>
+    ## Prepare the disks to be used for partitioning (use all for all disk, else
+    ## use the $DISK0 variables)
+    disks_prep gpt all      # <msdos|gpt> <disks>
+
+    ## Syntax required options:
+    ##  disk       : disk0, disk1 or complete path to device
+    ##  mountpoint : /<path>, swap, none, raid.<id>, pv.<id>
+    ##  size       : specify size in MB (-1 means rest of disk)
+    ##
+    ## Syntax optional options:
+    ##  type=<ext2|ext3|ext4|xfs|swap>       currently supported filesystems
+    ##  flag=<bios_grub|lvm|raid>            which flag must be set on the partition
+    ##                                       when using raid.<id> or lvm.<id> the flag
+    ##                                       lvm or raid is optional!
+    ##  label=boot                           the label of the partition
+    ##  options="-I 128"                     check the man page mkfs.<fstype> for the options
+    ##  dirperms=1777                        with which permissions must the mount directory be
+    ##
+    ##         <disk> <mountpoint> <size> <options>
+    disks_part $DISK0 /boot        1024   type=ext2 label=boot
+    disks_part $DISK0 /boot/efi    1024   type=vfat label=EFI
+    disks_part $DISK0 none         4      flag=bios_grub
+    disks_part $DISK0 swap 		   16384  type=swap label=swap
+    ## Reason for seperate option label= and type= is that not all partitions need this information
+    ## such as the bios_grub partition, it only needs a flag, therfore we call it a flag instead
+    ## of a partition type. And specifying type=none is to much information.
+
+    ## This is a shell script so you can use logic in your masterscript
+    if [ -z "${DISK1}" ]
+    then
+        disks_part "${DISK0}" / 51200 type=xfs label=root
+        disks_part "${DISK0}" /data -1 type=xfs label=data dirperms=0755
+    else
+        disks_part "${DISK0}" / -1 type=xfs label=root
+        disks_part "${DISK1}" /data -1 type=xfs label=data dirperms=0755
+    fi
+}
+
+## Simplify running post/pre scripts. Instead of specify the order number and image
+## name as script name, just specify which scripts you want to use. You can easily
+## change the order per type of install and re-use the same scripts
+
+## Added suffix -ng so we can separate the old and new setup
+
+## A function which is called before the partitioning and installation
+# optional
+pre_installation(){
+    echo "Pre installation starting must define dummy statement"
+    #run_script pre-install/networktuning_jumboframes
+}
+
+## A function which is called after fetching the image
+# optional
+post_installation(){
+    # the chroot=yes optionally to ensure the script is run in the target
+    # please note that the SALI variables are not available
+    run_script post-install/systemd_configure_network chroot=yes $SALI_IMAGESERVER
+
+    # tell pxeconfig we are done
+    run_script post-install/pxeconfigd
+}

@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+#   This example provided by:
+#       Ole Holm Nielsen
+#
+
+# To be used with the pxeconfig tool.
+# Remove the <hex_ipaddr> file from the pxelinux.cfg directory
+# so the client will boot from disk.
+# Get pxeconfig from ftp://ftp.sara.nl/pub/outgoing/pxeconfig.tar.gz
+
+## Source the SALI env
+. /etc/init.d/functions
+
+if [ -z $(which telnet) ]
+then
+    echo "telnet command not found"
+    exit 0
+fi
+
+telnet $SALI_IMAGESERVER 6611
+sleep 1
+
+# For debugging
+# echo "sleep 30"
+# sleep 30
+
+exit 0
