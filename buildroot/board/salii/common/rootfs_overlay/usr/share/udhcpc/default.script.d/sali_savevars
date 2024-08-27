@@ -1,0 +1,19 @@
+#!/bin/sh
+
+cat > /tmp/udhcpc.$interface << EOF
+SALI_DHCP_IMAGESERVER="${opt224}"
+DNS="${dns}"
+DOMAINNAME="${domain}"
+HOSTNAME="${hostname}"
+IPADDR="${ip}"
+MASK="${mask}"
+ROUTER="${router}"
+NETMASK="${subnet}"
+EOF
+
+# Only if hostname is set, else keep the default
+if [ -n "${hostname}" ]
+then
+    echo $hostname > /etc/hostname
+    /bin/hostname $hostname
+fi

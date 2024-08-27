@@ -1,5 +1,0 @@
-#!/bin/sh
-
-
-echo "Hello world from ${0}"
-echo "  args $@"

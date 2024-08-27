@@ -1,0 +1,122 @@
+#!/bin/bash
+#
+# A simple script to install the bootloader legacy or uefi
+# It will install the required packages thanks to Dave LeFevre
+
+## Include the os-release file, so we can determine how to configure the bootloader
+source /etc/os-release
+
+## we can detect EFI within the script or we can
+## pass $SALI_EFI to the script to indicate it is
+## an EFI install. 
+if [ -d "/sys/firmare/efi" ]
+then
+    GRUB_TARGET="$(uname -m)-efi"
+    GRUB_EFI="1"
+else
+    GRUB_TARGET=i386-pc
+    GRUB_EFI="0"
+fi
+
+## unless you know that your image has all the needed packages, I suggest
+## that you use your package mangager within the chroot to make sure 
+## the files you need are there.  You also want to do that when you have
+## on image that might be used both with legacy and with EFI
+grub2_install_packages(){
+
+    ##install needed packages per distro and EFI/legacy
+    case "${ID}" in
+        debian)
+            export DEBIAN_FRONTEND=noninteractive
+            package_mgr="/usr/bin/apt-get -y install"
+            if [ "$GRUB_EFI" = "1" ]
+            then
+                packages="grub2-common grub-efi grub-efi-amd64 efibootmgr"
+            else
+                packages="grub2-common grub-pc grub-pc-bin"
+            fi
+        ;;
+        centos)
+            package_mgr="$(which yum) -y install"
+            if [ "$GRUB_EFI" = "1" ]
+            then
+                packages="grub2-efi-x64 grub2-common grub2-tools"
+            else
+                packages="grub2-pc.x86_64 grub2-common grub2-tools"
+            fi
+        ;;
+        sles)
+            package_mgr="$(which zypper) -y install"
+            if [ "$GRUB_EFI" = "1" ]
+            then
+                packages="grub2 grub2-x86_64-efi"
+            else
+                packages="grub2 grub2-i386-pc"
+            fi
+        ;;
+    esac
+
+   $package_mgr $packages
+}
+
+grub2_check_installed(){
+
+    ## Things are different per distro
+    case "${ID}" in
+        debian)
+            grub_lib_dir=/usr/lib/grub
+            grub_install=/usr/sbin/grub-install
+        ;;
+        centos)`
+            grub_lib_dir=/usr/lib/grub
+            grub_install=/usr/sbin/grub2-install
+        ;;
+        sles)
+            grub_lib_dir=/usr/lib/grub2
+            grub_install=/usr/sbin/grub2-install
+        ;;
+    esac
+
+    ## Check if we have grub
+    if [ ! -x "${grub_install}" ]
+    then
+        echo "Could not locate grub-install command at \"${grub_install}\""
+        exit 1
+    fi
+
+    ## Check if we have the target
+    if [ ! -d "${grub_lib_dir}/${GRUB_TARGET}" ]
+    then
+        echo "The grub-target is not installed \"${grub_lib_dir}/${GRUB_TARGET}\""
+        exit 1
+    fi
+
+    echo "${grub_install}"
+}
+
+grub2_configure(){
+
+    ## Things are different per distro
+    case "${ID}" in
+        debian)
+            grub_cfg_command="/usr/sbin/update-grub"
+        ;;
+        centos|sles)
+            grub_cfg_command="/usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg"
+        ;;
+    esac
+
+    $grub_cfg_command
+}
+
+#make sure needed packages are installed
+grub2_install_packages
+
+## Check if target has been installed and then use the given command to install
+grub_bin=$(grub2_check_installed)
+
+$grub_bin --no-floppy --target $GRUB_TARGET $2
+
+## We also need to update the configuration
+echo "Updating grub.cfg"
+grub2_configure

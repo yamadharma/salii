@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# Description: network parameters to improve BitTorrent transport
+#
+
+# Increase TCP maximum buffer size.
+#echo 16777216 > /proc/sys/net/core/rmem_max
+#echo 16777216 > /proc/sys/net/core/wmem_max
+
+# Increase Linux autotuning TCP buffer limits
+# min, default, and maximum number of bytes to use.
+#echo "4096 87380 16777216" > /proc/sys/net/ipv4/tcp_rmem
+#echo "4096 65536 16777216" > /proc/sys/net/ipv4/tcp_wmem
+
+
+# MTU should be 9000
+for device in `ls /sys/class/net/`
+do
+    if [ `cat /sys/class/net/$device/operstate` = "up" ]
+    then
+        ifconfig $device mtu 9000
+    fi
+done

@@ -1,0 +1,86 @@
+
+## Welcome message for the network stage
+p_stage "Configuring network"
+
+p_comment 0 "Wait $SALI_SPAWINGTREE_WAIT seconds to avoid spanning tree problems"
+sleep $SALI_SPAWINGTREE_WAIT
+
+## We fetch the current hostname (normally it's sali)
+CUR_HOSTNAME=$(cat /etc/hostname)
+
+## Let's begin with the loopback interface
+p_service "Configuring loopback device"
+echo "iface lo inet loopback" > $SALI_INTERFACES_FILE
+echo "auto lo" >> $SALI_INTERFACES_FILE
+echo "" >> $SALI_INTERFACES_FILE
+do_ifup lo
+
+## Now let's configure the physical devices, first check if
+## there is a DEVICE specifed, if so skip all other interfaces.
+## When DEVICE is not set, try to enable networking on all
+## possible interfaces
+if [ -n "${DEVICE}" ]
+then
+    p_service "Configuring interface ${DEVICE}"
+
+    ## When a ip address and netmask are specified then set a static ip
+    ## else use dhcp
+    if [ -n "${IPADDR}" -a -n "${NETMASK}" ]
+    then
+        p_comment 0 "Using static configuration with ip ${IPADDR} and netmask ${NETMASK}"
+
+        add_interface $DEVICE static $IPADDR $NETMASK
+    else
+        p_comment 0 "Using dhcp configuration"
+
+        add_interface $DEVICE dhcp
+        if [ $? -ne 0 ]
+        then
+            p_comment 0 "Unable to add interface to interfaces file"
+        fi
+    fi
+
+    p_comment 0 "Enabling interface"
+    do_ifup $DEVICE
+else
+    ## When trying to enable networking on all interfaces, only
+    ## dhcp is supported
+    p_service "Trying to configure all network interfaces with dhcp"
+    for interface in $(ls -1 /sys/class/net | grep -v lo)
+    do
+        p_comment 0 "Enabling interface ${interface}"
+        add_interface $interface dhcp
+        do_ifup $interface &
+    done
+
+    wait
+fi
+
+## If the hostname is still not set after DHCP, use the $CUR_HOSTNAME
+##   @todo add hostname via variable in the cmdline
+NOW_HOSTNAME=$(cat /etc/hostname)
+if [ -z "${NOW_HOSTNAME}" ]
+then
+    echo $CUR_HOSTNAME > /etc/hostname
+    hostname $CUR_HOSTNAME
+fi
+
+## Check if we have a SALI_DHCP_IMAGESERVER which can be used
+## to set the SALI_IMAGESERVER variable
+for intf_file in $(ls -1 /tmp/udhcpc.* | xargs)
+do
+    . $intf_file
+
+    ## If we have a match, save the value in SALI_IMAGESERVER
+    ## and break the loop, first match wins
+    if [ -n "${SALI_DHCP_IMAGESERVER}" ]
+    then
+        SALI_IMAGESERVER=$(hex2ip $SALI_DHCP_IMAGESERVER)
+        break
+    fi
+done
+
+save_variables
+
+## At the end always return 0, when there is an error return 1 or higher
+return 0

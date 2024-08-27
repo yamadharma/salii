@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+#
+# This file is part of SALI
+#
+# SALI is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# SALI is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with SALI.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright 2010-2021 SURF
+
+import argparse
+import sys
+import os
+
+from sali.common import Common
+from sali import exceptions
+from sali.tools import find_and_add_command
+from sali.tools import is_hostname
+from sali.imaging import getimage
+from sali.imaging import lsimages
+from sali.torrent import maketorrent
+from sali.torrent import lstorrents
+from sali.torrent import rmtorrent
+from sali.configuration import rsyncconfig
+from sali.configuration import transmissionconfig
+from sali import release
+
+# Check if we see sali-test-client, then assume we are developing
+ROOT_DIR=os.path.abspath(
+    os.path.dirname(__name__)
+)
+if os.path.isfile(os.path.join(ROOT_DIR, 'sali-test-client')):
+    CONFIG_DIR = os.path.join(ROOT_DIR,'examples')
+else:
+    CONFIG_DIR = '/etc/sali'
+
+def args_hostname(hostname):
+
+    if is_hostname(hostname):
+        return hostname
+    
+    raise ValueError("Given input is not a valid hostname or not resolvable %s" % hostname)
+
+def args():
+    parser = argparse.ArgumentParser(
+        description='The backend tool for the SALI Linux Imager'
+    )
+    subparsers = parser.add_subparsers(
+        dest='command', description='SALI commands', required=True
+    )
+
+    ## general options to apply to all modules
+    parser.add_argument(
+        '-c', '--config', type=str, metavar='CONFIG',
+        default=os.path.join(CONFIG_DIR, 'sali.ini'),
+        help='specify the main configuration file [default:%(default)s'
+    )
+    parser.add_argument(
+        '-v', '--verbose', action='store_true',
+        help='enable verbose mode for SALI',
+    )
+    parser.add_argument(
+        '-n', '--dry-run', action='store_true',
+        help='enable dry-run mode for SALI',
+    )
+    parser.add_argument(
+        '--version', action='version', version='%s %s - %s' % (
+            release.name,
+            release.version,
+            release.copyright
+        )
+    )
+
+    ## The getimage module
+    parser_getimage = subparsers.add_parser('getimage', 
+        help='Fetch an image from a golden-host'
+    )
+    parser_getimage.add_argument('hostname', type=args_hostname, help='Specify the host/node golden-client name')
+    parser_getimage.add_argument('imagename', help='Specify the name of the image')
+    parser_getimage.add_argument('-f', '--force', action='store_true', help='Use this option when the lockfile has not been removed cleanly')
+    parser_getimage.add_argument('-l', '--list', action='store_true', help='rsync show which files/dirs has been changed')
+    parser_getimage.add_argument('-y', '--yes', action='store_true', help='Dont ask, just do')
+    parser_getimage.add_argument('-e', '--exclude',
+        help='Overule the rsync exclude file based on imagename'
+    )
+    parser_getimage.set_defaults(func=getimage)
+
+    ## The maketorrent module
+    parser_getimage = subparsers.add_parser('maketorrent',
+        help='Based on the given imagename create a tarball and torrent file'
+    )
+    parser_getimage.add_argument('imagename', help='Specify the name of the image')
+    parser_getimage.add_argument('-y', '--yes', action='store_true', help='Dont ask, just do')
+    parser_getimage.add_argument('--force', action='store_true', help='Dont ask, just do')
+    parser_getimage.set_defaults(func=maketorrent)
+
+    ## The list images module
+    parser_getimage = subparsers.add_parser('lsimages',
+        help='List all images with the last modified time (sorted by name)'
+    )
+    parser_getimage.set_defaults(func=lsimages)
+
+    ## The list torrent module
+    parser_getimage = subparsers.add_parser('lstorrents',
+        help='List all torrents'
+    )
+    parser_getimage.set_defaults(func=lstorrents)
+
+    ## The rm torrents module
+    parser_getimage = subparsers.add_parser('rmtorrent',
+        help='Remove a torrent'
+    )
+    parser_getimage.add_argument('torrentname', help='Specify the name of the torrent')
+    parser_getimage.add_argument('-y', '--yes', action='store_true', help='Dont ask, just do')
+    parser_getimage.set_defaults(func=rmtorrent)
+
+    ## The module that generates the rsyncd.conf
+    parser_getimage = subparsers.add_parser('rsyncconfig',
+        help='Generate a new rsyncd.conf'
+    )
+    parser_getimage.set_defaults(func=rsyncconfig)
+
+    ## The module that generates the settings.json for transmission
+    parser_getimage = subparsers.add_parser('transmissionconfig',
+        help='Generate a new settings.json for transmission'
+    )
+    parser_getimage.set_defaults(func=transmissionconfig)
+
+    return parser.parse_args()
+
+if __name__ == '__main__':
+
+    arguments = args()
+    
+    try:
+        cmn = Common(arguments, CONFIG_DIR)
+        cmn.logger("sali", "debug", "Start of logger, calling function based on module %s" % str(cmn.args.func))
+        cmn.args.func(cmn)
+    except exceptions.SaliConfigurationException as error:
+        print('Configuration Error:', error, file=sys.stderr)
+        sys.exit(1)
+    except exceptions.SaliValidationException as error:
+        print('Validation Error:', error, file=sys.stderr)
+        sys.exit(2)
+    except exceptions.SaliDataException as error:
+        print('Data Error:', error, file=sys.stderr)
+        sys.exit(3)
+    except exceptions.SaliImagingException as error:
+        print('Imaging Error:', error, file=sys.stderr)
+        sys.exit(4)
+    except KeyboardInterrupt:
+        print('\n\n\nBye!, until next time')

@@ -1,0 +1,17 @@
+
+if [ -r "${SALI_MASTERSCRIPT_FILE}" ]
+then
+    . "${SALI_MASTERSCRIPT_FILE}"
+else
+    return 1
+fi
+
+check_function_exists partition
+p_stage "Running partition scripts"
+partition
+
+p_stage "Mounting partitions"
+disks_mount
+
+## At the end always return 0, when there is an error return 1 or higher
+return 0

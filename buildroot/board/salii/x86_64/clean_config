@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sed -i -e "/^#.*$/d" \
+    -e "/^\s*$/d" \
+    .config

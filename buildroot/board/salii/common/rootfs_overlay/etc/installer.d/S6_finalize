@@ -1,0 +1,25 @@
+
+
+## Open the console when asked for
+if [ $(is_yes $SALI_CONSOLE_AFTER_INSTALL) -eq 1 ]
+then
+    p_stage "Variable SALI_CONSOLE_AFTER_INSTALL has been set, opening console"
+    return 0
+else
+    p_stage "Installation has been finished, rebooting host"
+fi
+
+
+## Display a nice count-down
+echo ""
+for n in $(awk -v m="${1:-$SALI_FINISH_WAIT_TIME}" 'BEGIN{for(;m;m--){print m}}'); do
+  printf "\rPress any key to cancel reboot in %s " $n
+  if read -s -n1 -t1 ; then
+     printf "\r \r"
+     echo "Reboot cancelled, opening console"
+     return 0
+  fi
+done
+printf "\r \r"  # clean up
+
+reboot
