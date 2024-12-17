@@ -200,7 +200,7 @@ class GetImage():
         ## Fetch the image
         command = [
             self.cmn.config.get('commands', 'rsync'),
-            '--archive', '--hard-links', '--sparse',
+            '--archive', '--hard-links', '--sparse', '--acls', '--xattrs',
             '--numeric-ids', '--delete', '--delete-excluded', 
             '--exclude-from', self.rsync_exclude_file.get_exclude_file(),
             '%s::root/' % self.cmn.args.hostname,
@@ -210,10 +210,13 @@ class GetImage():
             )
         ]
 
-        if self.cmn.args.verbose:
+        if self.cmn.args.list:
+            command.append('--verbose')
+        elif self.cmn.args.verbose:
             command.append('--verbose')
 
         print('\nFetching image with rsync')
+        print("\t %s" % (' '.join(command)))
         rcode = run_command_call(command, run_shell=False)
         if rcode != 0:
             raise SaliDataException('Failed to fetch image with rsync')

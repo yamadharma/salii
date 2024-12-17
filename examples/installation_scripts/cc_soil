@@ -94,6 +94,7 @@ post_installation(){
     # the chroot=yes optionally to ensure the script is run in the target
     # please note that the SALI variables are not available
     run_script post-install/systemd_configure_network chroot=yes $SALI_IMAGESERVER
+    run_script post-install/bootloader chroot=yes $DISK0
 
     # tell pxeconfig we are done
     run_script post-install/pxeconfigd

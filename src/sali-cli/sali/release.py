@@ -32,4 +32,4 @@ author_email    = 'yamadharma@gmail.com'
 url             = 'https://github.com/yamadharma/salii'
 license         = 'GPL'
 download_url    = '%s' % (version)
-keywords        = ['SURF', 'SystemImager', 'SALII', 'installer', 'tornando', 'bittorrent', 'linux']
+keywords        = ['SURF', 'SystemImager', 'SALII', 'installer', 'tornando', 'bittorrent', 'linux', 'rsync']
