@@ -180,8 +180,17 @@ getimage_torrent(){
     case "${SALI_TARBALL}" in
         *.tar.gz)
             zcat "${SALI_TARBALL}" | tar $tar_opts -
+	    ;;
+        *.tar.bz2)
+            bzcat "${SALI_TARBALL}" | tar $tar_opts -
         ;;
-        *.tar)
+        *.tar.xz)
+            xzcat "${SALI_TARBALL}" | tar $tar_opts -
+        ;;	
+        *.tar.zst)
+            zstdcat "${SALI_TARBALL}" | tar $tar_opts -
+        ;;	
+	*.tar)
             tar $tar_opts "${SALI_TARBALL}"
         ;;
         *)
