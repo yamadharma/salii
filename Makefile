@@ -1,4 +1,4 @@
-BR2_VERSION=2023.11.1
+BR2_VERSION=2024.11
 SALII_DIR=$(shell pwd)
 BUILD_DIR=$(SALII_DIR)/../build
 
@@ -12,6 +12,7 @@ prepare:
 	touch prepare
 
 compile: prepare
-	cd $(BUILD_DIR)/buildroot-$(BR2_VERSION)
-	make
-
+	(cd $(BUILD_DIR)/buildroot-$(BR2_VERSION); \
+	make xxhash; \
+	make zstd;\
+	make)
