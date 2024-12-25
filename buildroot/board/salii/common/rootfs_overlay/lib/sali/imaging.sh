@@ -164,9 +164,9 @@ getimage_torrent(){
     ## Based on the verbose mode show the extraction
     if [ "${SALI_VERBOSE_LEVEL}" -ge 256 ]
     then
-        tar_opts="-pxvf --numeric-owner"
+        tar_opts="--numeric-owner -pxvf"
     else
-        tar_opts="-pxvf --numeric-owner"
+        tar_opts="--numeric-owner -pxvf"
     fi
 
     ## We need to remove the .torrent from the filename
